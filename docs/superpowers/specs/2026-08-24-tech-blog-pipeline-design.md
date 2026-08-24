@@ -29,6 +29,7 @@
 | 仓库 | `Bryce505/blog` 单仓库（流水线 + 站点 + 文章 + 图片） | 拆两个仓库要多配跨仓库 token，无收益 |
 | 调度 | GitHub Actions cron，每晚 21:00 北京时间（UTC `0 13 * * *`） | 用户决策 |
 | 站点定位 | 中文专业技术博客，面向生物医药 CMC/分析同行 | 用户决策 |
+| 手动发布 | `drafts/` 目录，扔进去 push 即发；复用取图和双链解析，跳过 AI 和校验 | 用户决策；自己写的稿子不需要防 AI 篡改 |
 
 ## 3. 数据源实测数据
 
@@ -99,12 +100,13 @@ blog/
 │   ├─ images.py              # Drive 取图 + WebP 转换
 │   ├─ compose.py             # DeepSeek 调用
 │   ├─ verify.py              # 机械校验
-│   ├─ main.py                # 串起 ①→⑤
+│   ├─ main.py                # 串起 ①→⑤；--drafts 走手动发布通道
 │   └─ test_pipeline.py       # 自检（含故意注入错误的校验用例）
 ├─ src/                       # Astro
 │   ├─ content/posts/         # 生成的文章（md）
 │   ├─ layouts/  components/  pages/  styles/
 │   └─ plugins/remark-callout.js
+├─ drafts/                    # 手动发布投递口：扔 md 进来，push 即发
 ├─ public/images/<slug>/      # WebP 图片
 ├─ published.json             # 发布状态
 └─ astro.config.mjs
@@ -202,6 +204,40 @@ Note = namedtuple('Note', 'path title tags type description book paper link body
   注意不做章节级锚点：既然采用结构重组（方案 C），源笔记打散后不再对应输出文章里的某个独立章节，锚点无从推导。链到文章即可。
 - **Astro 构建时（remark 插件）**：callout `>[!abstract]` / `>[!summary]` / `>[!note]` / `>[!warning]` 等转成带样式的 `<aside class="callout callout-abstract">`。一个插件处理全站 545 处，不在流水线里逐篇转
 
+### 6.8 手动发布通道
+
+给自己留的口子：写好的 md 扔进仓库根的 `drafts/`，push 上去就发布。
+
+**为什么不是直接扔进 `src/content/posts/`**：直接扔当然也能发，但从 Obsidian 导出的稿子里图片写的是 `![](../image&attachment/xxx.png)`，双链写的是 `[[目标笔记]]`，直接发出去是一堆破图和方括号。手动通道复用流水线已有的 `images.py` 和双链解析，把这两件事替你办了。
+
+**处理流程**（`main.py --drafts`）：
+
+1. 扫 `drafts/*.md`
+2. 取图：复用 `images.py`，从 Drive 拉图转 WebP（和自动通道完全同一套代码）
+3. 双链解析：`[[目标]]` 已发布转站内链接，未发布退化成纯文本
+4. 补全 frontmatter 默认值（见下）
+5. 写入 `src/content/posts/<slug>.md`，删除 `drafts/` 中的原件（避免重复处理）
+
+**不经过 DeepSeek，不经过 `verify.py`** —— 你自己写的内容不需要防篡改校验，跑一遍纯属浪费时间和 token。
+
+**frontmatter 最小要求：只需要 `title` 一个字段**，其余全部有默认值，手写时不用记一堆字段名：
+
+| 字段 | 缺省行为 |
+|---|---|
+| `title` | **必填**，缺失则跳过该文件并在运行报告里报错 |
+| `slug` | 由文件名生成（中文转拼音，去特殊字符） |
+| `date` | 该文件的 git 首次提交时间，取不到则用当天 |
+| `tags` | 空数组 |
+| `category` | 从 `tags` 的一级标签推导；无标签则归入「杂记」 |
+| `description` | 取正文前 120 字 |
+
+**触发方式**：`publish.yml` 增加 `on.push.paths: ['drafts/**']`。同一个 workflow，两种触发：
+
+- push 到 `drafts/` → 只跑 `--drafts`
+- 每晚 21:00 定时 / 手动 dispatch → 先跑 `--drafts`（清理积压），再跑自动通道发一篇
+
+**与自动通道的隔离**：`published.json` 以三级标签组为键，手动文章不写入其中，两条通道各走各的，不会互相覆盖或重复发布。若手动文章的 slug 与已有文章冲突，报错跳过，不静默覆盖。
+
 ### 6.7 站点结构
 
 | 路由 | 内容 |
@@ -288,4 +324,5 @@ checkout blog → 用 PAT checkout Obsidian-base + RoutineRun 到临时目录
 3. Astro 站点本地构建通过，深浅色主题、中文排版、callout、图注均正确
 4. `Bryce505/blog` 仓库建好，两个 workflow 就位
 5. `workflow_dispatch` 手动跑通一次，站点可访问
-6. `README.md` 写明如何配凭据、如何手动补发、校验失败怎么处理
+6. **手动发布通道验证**：往 `drafts/` 扔一篇含 Drive 图片和双链的真实 md，push 后确认图片正常显示、双链正确解析、文章上线
+7. `README.md` 写明如何配凭据、如何手动发布、如何补发、校验失败怎么处理
