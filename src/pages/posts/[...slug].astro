@@ -1,0 +1,23 @@
+---
+import { getCollection, render } from 'astro:content';
+import Post from '../../layouts/Post.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+
+// 相关文章：同二级标签。三级标签太窄常常空集，一级又太宽什么都算相关
+const twoLevel = (t: string) => t.split('/').slice(0, 2).join('/');
+const mine = new Set(entry.data.tags.map(twoLevel));
+const related = (await getCollection('posts'))
+  .filter((p) => p.id !== entry.id && p.data.tags.some((t: string) => mine.has(twoLevel(t))))
+  .sort((a, b) => b.data.date - a.data.date)
+  .slice(0, 5);
+---
+<Post entry={entry} headings={headings} related={related}>
+  <Content />
+</Post>

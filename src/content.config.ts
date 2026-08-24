@@ -11,10 +11,12 @@ const posts = defineCollection({
     date: z.coerce.date(),
     category: z.string().default('杂记'),
     primaryTag: z.string().optional(),
-    tags: z.array(z.string()).default([]),
-    description: z.string().default(''),
-    references: z.array(z.string()).default([]),
-    sourceNotes: z.array(z.string()).default([]),
+    // 空列表在 YAML 里是 null（`references:` 后面直接跟下一个键），
+    // 手写稿同样会这样写，所以一律 nullable 后再兜默认值
+    tags: z.array(z.string()).nullable().default([]).transform((v) => v ?? []),
+    description: z.string().nullable().default('').transform((v) => v ?? ''),
+    references: z.array(z.string()).nullable().default([]).transform((v) => v ?? []),
+    sourceNotes: z.array(z.string()).nullable().default([]).transform((v) => v ?? []),
   }),
 });
 

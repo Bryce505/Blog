@@ -5,6 +5,7 @@
   手动通道  python main.py --drafts
 """
 import argparse
+import collections
 import datetime as dt
 import json
 import os
@@ -22,6 +23,7 @@ import select_ as sel     # noqa: E402
 import vault              # noqa: E402
 import verify             # noqa: E402
 
+H1 = re.compile(r'^#\s+(.+?)\s*$', re.M)
 H2 = re.compile(r'^##\s+(.+)$', re.M)
 
 
@@ -30,7 +32,7 @@ def _q(s):
     return str(s).replace('\\', '\\\\').replace('"', '\\"')
 
 
-def assemble_frontmatter(group, title):
+def assemble_frontmatter(group, title, description=''):
     """frontmatter 由流水线拼装，不让 LLM 生成 —— 否则它会编造日期和标签。"""
     refs, seen_ref = [], set()
     for n in group.notes:
@@ -44,24 +46,59 @@ def assemble_frontmatter(group, title):
              f'date: {dt.date.today().isoformat()}',
              f'category: "{_q(group.tag.split("/")[0])}"',
              f'primaryTag: "{_q(group.tag)}"',
+             f'description: "{_q(description)}"',
              'tags:']
-    seen = set()
-    for n in group.notes:
-        for t in n.tags:
-            if t not in seen:
-                seen.add(t)
-                lines.append(f'  - "{_q(t)}"')
-    lines.append('references:')
-    lines += [f'  - "{_q(r)}"' for r in refs]
+    lines += [f'  - "{_q(t)}"' for t in _group_tags(group)]
+    # 空列表键不输出：`references:` 后面直接跟下一个键，YAML 解析成 null
+    if refs:
+        lines.append('references:')
+        lines += [f'  - "{_q(r)}"' for r in refs]
     lines.append('sourceNotes:')
     lines += [f'  - "{_q(n.path)}"' for n in group.notes]
     lines.append('---')
     return '\n'.join(lines) + '\n\n'
 
 
-def _title_of(article_md, group):
+def _group_tags(group):
+    """只保留组内至少两篇笔记共有的标签，加上主标签兜底。
+
+    收全部标签的话一篇文章能挂 62 个（实测中位数 14），文章会出现在
+    几十个标签页上、大多不相关，标签导航直接作废。只出现一次的标签是
+    某篇笔记的个人属性，不是这组内容的共性。
+    """
+    cnt = collections.Counter(t for n in group.notes for t in n.tags)
+    shared = [t for t, c in cnt.items() if c >= 2]
+    if group.tag not in shared:
+        shared.append(group.tag)
+    return sorted(shared)
+
+
+def split_title(article_md, group):
+    """抽出 H1 当文章标题，并把它从正文里摘掉（标题由版式单独渲染）。
+
+    退而取第一个 H2、再退到标签末段。取 H2 只是兜底 —— 那是第一个章节
+    标题不是文章标题，会得到「HCP」「PTM」这种没有信息量的标题。
+    """
+    m = H1.search(article_md)
+    if m:
+        body = (article_md[:m.start()] + article_md[m.end():]).lstrip('\n')
+        return m.group(1).strip(), body
     m = H2.search(article_md)
-    return m.group(1).strip() if m else group.tag.split('/')[-1]
+    return (m.group(1).strip() if m else group.tag.split('/')[-1]), article_md
+
+
+def first_paragraph(md, limit=140):
+    """取导读段落当摘要：跳过标题、图片、callout、代码块。"""
+    for block in re.split(r'\n\s*\n', md):
+        t = block.strip()
+        if not t or t.startswith(('#', '>', '|', '```', '![', '*[')):
+            continue
+        t = re.sub(r'!\[[^\]]*\]\([^)]*\)|\[([^\]]*)\]\([^)]*\)|[*`_#>]', r'\1', t)
+        t = re.sub(r'\s+', ' ', t).strip()
+        if len(t) >= 20:
+            return t[:limit]
+    return ''
+
 
 
 def load_published(blog_root):
@@ -106,6 +143,7 @@ def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
             blog_root / 'public' / 'images' / g.slug, f'/images/{g.slug}')
 
         article = compose.compose(g, api_key)
+        title, article = split_title(article, g)
         # 找不到的图不参与校验：它们本来就发不出去，不该算作 AI 丢图
         res = verify.verify(src_text, article,
                             [i for i in src_images if i not in missing])
@@ -113,7 +151,7 @@ def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
         caption_of = {i: render.caption_for(n) for n in g.notes for i in n.images}
         body = render.rewrite_images(article, img_map, missing, caption_of)
         body = render.resolve_wikilinks(body, title_slug_map(published))
-        doc = assemble_frontmatter(g, _title_of(article, g)) + body
+        doc = assemble_frontmatter(g, title, first_paragraph(article)) + body
 
         if res.ok:
             out = blog_root / 'src' / 'content' / 'posts' / f'{g.slug}.md'

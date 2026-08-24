@@ -1,0 +1,168 @@
+/* 设计令牌来自 design/ 下的视觉稿。
+   中文正文刻意不加载 webfont：CJK 字体动辄数 MB，国内访问是灾难。
+   系统中文栈 + 拉丁字母走 IBM Plex（等宽数字对数据表格是刚需）。 */
+
+:root {
+  --han: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+  --han-serif: "Songti SC", "SimSun", "Source Han Serif SC", serif;
+  --sans: "IBM Plex Sans", var(--han);
+  --serif: "IBM Plex Serif", var(--han-serif);
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  --measure: 40rem;
+  --page: 1080px;
+
+  /* 浅色定义在裸 :root —— 系统「跟随」状态不带 data-theme 属性，
+     只靠 prefers-color-scheme 区分，颜色不能只定义在媒体查询里 */
+  --bg: oklch(0.992 0.003 240);
+  --surface: oklch(0.972 0.005 245);
+  --fg: oklch(0.26 0.015 250);
+  --muted: oklch(0.53 0.012 250);
+  --border: oklch(0.90 0.008 250);
+  --accent: oklch(0.47 0.085 232);
+  --warn: oklch(0.52 0.085 68);
+  --ok: oklch(0.48 0.070 160);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: oklch(0.185 0.012 252);
+    --surface: oklch(0.232 0.013 252);
+    --fg: oklch(0.925 0.008 250);
+    --muted: oklch(0.665 0.011 250);
+    --border: oklch(0.325 0.013 252);
+    --accent: oklch(0.755 0.085 232);
+    --warn: oklch(0.79 0.085 74);
+    --ok: oklch(0.76 0.070 162);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: oklch(0.185 0.012 252);
+  --surface: oklch(0.232 0.013 252);
+  --fg: oklch(0.925 0.008 250);
+  --muted: oklch(0.665 0.011 250);
+  --border: oklch(0.325 0.013 252);
+  --accent: oklch(0.755 0.085 232);
+  --warn: oklch(0.79 0.085 74);
+  --ok: oklch(0.76 0.070 162);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px;
+}
+
+.wrap { max-width: var(--page); margin: 0 auto; padding: 0 40px; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.eyebrow {
+  font-family: var(--serif); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px;
+}
+.skip {
+  position: absolute; left: -9999px; top: 0; background: var(--bg);
+  padding: 10px 16px; border: 1px solid var(--accent); z-index: 100;
+}
+.skip:focus { left: 8px; top: 8px; }
+
+/* ---- 正文排版：中文行高比英文松，标点挤压交给浏览器 ---- */
+.prose { max-width: var(--measure); font-size: 16.5px; line-height: 1.9; }
+.prose > * { margin: 0 0 1.15em; }
+.prose h2 {
+  font-family: var(--serif); font-size: 20px; font-weight: 600;
+  margin: 2.4em 0 0.7em; letter-spacing: -0.005em;
+  padding-bottom: 0.35em; border-bottom: 1px solid var(--border);
+  scroll-margin-top: 88px;
+}
+.prose h3 {
+  font-family: var(--serif); font-size: 17px; font-weight: 600;
+  margin: 1.9em 0 0.55em; scroll-margin-top: 88px;
+}
+.prose p { text-wrap: pretty; }
+/* 长 URL 会撑破窄屏：笔记里有大量裸链接（FDA 说明书、DOI），
+   窄屏实测溢出 213px。break-word 只在词无法放下时才断，不影响中文和普通英文。 */
+.prose, .prose li, .prose td, .prose th { overflow-wrap: break-word; }
+.prose a { word-break: break-word; }
+.prose ul, .prose ol { padding-left: 1.4em; }
+.prose li { margin-bottom: 0.35em; }
+.prose blockquote {
+  border-left: 3px solid var(--border); padding-left: 16px;
+  margin-left: 0; color: var(--muted);
+}
+
+/* 宽内容各自横向滚动，页面本身永不横向滚动 */
+.prose table, .prose pre { display: block; max-width: 100%; overflow-x: auto; }
+/* 块级公式同样可能超宽 */
+.prose .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+.prose .katex { font-size: 1.02em; }
+
+.prose img {
+  max-width: 100%; height: auto; display: block;
+  border: 1px solid var(--border); border-radius: 2px;
+}
+/* 图注：render.py 产出的是「图片后紧跟一行斜体」 */
+.prose img + em, .prose p > img + em {
+  display: block; text-align: center; font-style: normal;
+  font-size: 13px; color: var(--muted); margin-top: 0.6em;
+}
+
+.prose code {
+  font-family: var(--mono); font-size: 0.88em; background: var(--surface);
+  padding: 0.12em 0.34em; border-radius: 2px; border: 1px solid var(--border);
+}
+.prose pre {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 3px; padding: 14px 16px; font-size: 13.5px; line-height: 1.7;
+}
+.prose pre code { background: none; border: 0; padding: 0; font-size: 1em; }
+
+.prose table { border-collapse: collapse; font-size: 14.5px; }
+.prose th, .prose td {
+  border: 1px solid var(--border); padding: 7px 11px;
+  text-align: left; vertical-align: top;
+}
+.prose th { background: var(--surface); font-weight: 600; white-space: nowrap; }
+
+/* ---- Obsidian callout：remark-callout.mjs 产出 ---- */
+.callout {
+  border-left: 3px solid var(--accent); background: var(--surface);
+  padding: 13px 16px; border-radius: 0 3px 3px 0; margin: 1.5em 0;
+}
+.callout > *:last-child { margin-bottom: 0; }
+.callout-title {
+  font-family: var(--sans); font-weight: 600; font-size: 13px;
+  letter-spacing: 0.03em; color: var(--accent); margin-bottom: 0.4em;
+}
+.callout-summary, .callout-tip, .callout-success { border-left-color: var(--ok); }
+.callout-summary .callout-title,
+.callout-tip .callout-title,
+.callout-success .callout-title { color: var(--ok); }
+.callout-warning, .callout-caution, .callout-danger,
+.callout-attention, .callout-important { border-left-color: var(--warn); }
+.callout-warning .callout-title, .callout-caution .callout-title,
+.callout-danger .callout-title, .callout-attention .callout-title,
+.callout-important .callout-title { color: var(--warn); }
+/* 引用类弱化：它们是旁注不是重点 */
+.callout-quote, .callout-reference, .callout-cite { border-left-color: var(--border); }
+.callout-quote .callout-title, .callout-reference .callout-title,
+.callout-cite .callout-title { color: var(--muted); }
+
+/* ---- 窄屏：侧栏折到正文下方 ---- */
+@media (max-width: 880px) {
+  .wrap { padding: 0 20px; }
+  .two-col { grid-template-columns: minmax(0, 1fr) !important; gap: 40px !important; }
+  .two-col aside { position: static !important; }
+  .prose { font-size: 16px; }
+}

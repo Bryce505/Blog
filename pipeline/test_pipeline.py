@@ -559,13 +559,41 @@ def test_assemble_frontmatter_has_required_fields():
           vault.Note('b.md', 'B', ['02分子表征/PTM/糖基化'], 'note', link='http://x')]
     g = sel.Group(tag='02分子表征/PTM/糖基化', notes=ns, source_hash='h',
                   slug='02分子表征-ptm-糖基化')
-    fm = mn.assemble_frontmatter(g, '蛋白糖基化表征')
+    fm = mn.assemble_frontmatter(g, '蛋白糖基化表征', '一段导读')
     assert fm.startswith('---\n') and '\n---\n' in fm
     assert 'title: "蛋白糖基化表征"' in fm
     assert 'category: "02分子表征"' in fm
     assert '02分子表征/PTM/糖基化' in fm
     assert '书A' in fm and 'http://x' in fm
     assert 'sourceNotes:' in fm
+
+
+def test_group_tags_keeps_only_shared_tags():
+    """收全部标签一篇文章能挂 62 个，标签导航直接作废。"""
+    ns = [vault.Note('a.md', 'A', ['共有/标签', '甲的私有'], 'note'),
+          vault.Note('b.md', 'B', ['共有/标签', '乙的私有'], 'note'),
+          vault.Note('c.md', 'C', ['共有/标签', '丙的私有'], 'note')]
+    g = sel.Group(tag='共有/标签', notes=ns, source_hash='h', slug='s')
+    assert mn._group_tags(g) == ['共有/标签']
+
+
+def test_group_tags_always_includes_primary_tag():
+    """主标签只在一篇里出现也要留 —— 它是这篇文章的身份。"""
+    ns = [vault.Note('a.md', 'A', ['主/标/签'], 'note'),
+          vault.Note('b.md', 'B', ['别的/标签'], 'note'),
+          vault.Note('c.md', 'C', ['别的/标签'], 'note')]
+    g = sel.Group(tag='主/标/签', notes=ns, source_hash='h', slug='s')
+    tags = mn._group_tags(g)
+    assert '主/标/签' in tags and '别的/标签' in tags
+
+
+def test_frontmatter_actually_uses_trimmed_tags():
+    """函数写了却没接进 frontmatter 是真出过的事：只测函数抓不到。"""
+    import yaml as _yaml
+    ns = [vault.Note(f'{i}.md', 'N', ['共有/标签', f'私有{i}'], 'note') for i in range(4)]
+    g = sel.Group(tag='共有/标签', notes=ns, source_hash='h', slug='s')
+    fm = _yaml.safe_load(mn.assemble_frontmatter(g, 'T').strip().strip('-'))
+    assert fm['tags'] == ['共有/标签'], fm['tags']
 
 
 def test_assemble_frontmatter_escapes_quotes_in_title():
@@ -581,14 +609,43 @@ def test_assemble_frontmatter_dedupes_references():
     assert mn.assemble_frontmatter(g, 'T').count('同一本书') == 1
 
 
-def test_title_extracted_from_first_h2():
+def test_title_taken_from_h1_and_stripped_from_body():
+    """H1 是文章标题，版式单独渲染，不能留在正文里重复出现一次。"""
     g = sel.Group(tag='a/b/糖基化', notes=[], source_hash='h', slug='s')
-    assert mn._title_of('## 蛋白糖基化表征方法\n正文', g) == '蛋白糖基化表征方法'
+    title, body = mn.split_title('# 蛋白糖基化表征方法\n\n导读段落。\n\n## 原理\n正文', g)
+    assert title == '蛋白糖基化表征方法'
+    assert not body.lstrip().startswith('#'), body[:40]
+    assert '## 原理' in body
 
 
-def test_title_falls_back_to_tag_leaf():
+def test_title_falls_back_to_h2_then_tag_leaf():
+    """取 H2 只是兜底：那是第一个章节标题，会得到「HCP」这种没信息量的标题。"""
     g = sel.Group(tag='a/b/糖基化', notes=[], source_hash='h', slug='s')
-    assert mn._title_of('没有标题的正文', g) == '糖基化'
+    assert mn.split_title('## 只有二级标题\n正文', g)[0] == '只有二级标题'
+    assert mn.split_title('没有任何标题的正文', g)[0] == '糖基化'
+
+
+def test_first_paragraph_skips_headings_and_callouts():
+    md = ('# 标题\n\n> [!abstract] 摘要\n> 这是 callout\n\n'
+          '![](a.png)\n\n这是真正的导读段落，交代这篇文章讲什么。\n')
+    d = mn.first_paragraph(md)
+    assert d.startswith('这是真正的导读段落'), repr(d)
+    assert 'callout' not in d
+
+
+def test_first_paragraph_strips_markdown_marks():
+    d = mn.first_paragraph('**加粗**的导读段落，含 [链接](http://x) 与 `代码` 标记。')
+    assert '**' not in d and '](' not in d and '`' not in d, repr(d)
+    assert '加粗的导读段落' in d, repr(d)
+
+
+def test_empty_references_key_omitted_not_null():
+    """`references:` 空着会被 YAML 解析成 null，Astro schema 直接报错。"""
+    import yaml as _yaml
+    g = sel.Group(tag='a/b/c', notes=[vault.Note('a.md', 'A', ['a/b/c'], 'note')],
+                  source_hash='h', slug='s')
+    fm = _yaml.safe_load(mn.assemble_frontmatter(g, 'T').strip().strip('-'))
+    assert 'references' not in fm or fm['references'], fm.get('references')
 
 
 def test_frontmatter_is_valid_yaml():

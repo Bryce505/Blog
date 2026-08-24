@@ -1,0 +1,26 @@
+---
+interface Props { post: any; }
+const { post } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const d = post.data.date;
+const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const count = post.data.sourceNotes?.length ?? 0;
+---
+<article style="padding: 26px 0; border-bottom: 1px solid var(--border);">
+  <div style="display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-bottom: 7px;">
+    <time class="num" datetime={date}>{date}</time>
+    <span aria-hidden="true" style="color: var(--border);">·</span>
+    <a href={`${base}/category/${encodeURIComponent(post.data.category)}`} style="color: var(--muted);">{post.data.category}</a>
+    {count > 0 && (
+      <span style="margin-left: auto;">由 <span class="num">{count}</span> 篇笔记整理</span>
+    )}
+  </div>
+  <h3 style="margin: 0 0 8px; font-family: var(--serif); font-size: 21px; font-weight: 600; line-height: 1.45; letter-spacing: -0.005em;">
+    <a href={`${base}/posts/${post.id}`} style="color: var(--fg);">{post.data.title}</a>
+  </h3>
+  {post.data.description && (
+    <p style="margin: 0; max-width: var(--measure); font-size: 15px; color: var(--muted); line-height: 1.8; text-wrap: pretty;">
+      {post.data.description}
+    </p>
+  )}
+</article>

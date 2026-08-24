@@ -1,39 +1,22 @@
 ---
-title: "PTM"
+title: "翻译后修饰的表征：脱酰胺、氧化与糖基化的分析路径"
 date: 2026-08-24
 category: "02分子表征"
 primaryTag: "02分子表征/PTM"
+description: "本文汇总该主题下 11 篇工作笔记，按原理、方法与常见问题三条线索重新组织，数据与法规条款均取自原始笔记。"
 tags:
-  - "02分子表征/PTM"
-  - "02分子表征/Charge-variant"
-  - "05仪器与分析技术/质谱"
-  - "06工艺"
-  - "02分子表征/PTM/Carbamylation"
-  - "02分子表征/PTM/deamidation"
-  - "14编程与软件/HTML"
-  - "02分子表征/PTM/氧化"
-  - "00基础/生物制品/疫苗/titer"
-  - "02分子表征/肽图"
-  - "00基础/生物制品/单抗"
   - "00基础/文献/综述"
-  - "02分子表征/PTM/糖基化/O-glycan"
-  - "04抗体设计与筛选/Fc"
+  - "02分子表征/Charge-variant"
   - "02分子表征/De-glycosylation"
-  - "02分子表征/PTM/糖基化/脱糖"
-  - "03质量控制/SDS-PAGE"
+  - "02分子表征/PTM"
+  - "02分子表征/PTM/Carbamylation"
   - "02分子表征/PTM/Isomerization"
-  - "02分子表征/PTM/糖化Glycation"
-  - "02分子表征/PTM/C-Terminal_Lysine"
+  - "02分子表征/PTM/deamidation"
+  - "02分子表征/PTM/氧化"
+  - "02分子表征/PTM/糖基化/O-glycan"
+  - "02分子表征/PTM/糖基化/脱糖"
+  - "04抗体设计与筛选/Fc"
   - "04抗体设计与筛选/structure"
-  - "04抗体设计与筛选/stability"
-  - "03工艺与制剂/制剂开发"
-  - "05质量与法规/CQA"
-  - "02分子表征/肽图/样品前处理"
-  - "02分子表征/PTM/糖基化"
-  - "02分子表征/PTM/糖基化/糖基化位点分析"
-  - "05仪器与分析技术/质谱/CID"
-  - "05仪器与分析技术/质谱/离子碎裂技术/ETD"
-references:
 sourceNotes:
   - "Antibody-Characterization/IEX酸性峰调查/大肠杆菌蛋白修饰与酸性峰.md"
   - "Antibody-Characterization/IEX酸性峰调查/大肠杆菌表达蛋白PTM与IEX电荷变体-详细报告.md"
@@ -48,9 +31,7 @@ sourceNotes:
   - "Antibody-Characterization/翻译后修饰-PTM.md"
 ---
 
-## PTM
-
-本文汇总该主题下 11 篇笔记，分为若干部分。
+本文汇总该主题下 11 篇工作笔记，按原理、方法与常见问题三条线索重新组织，数据与法规条款均取自原始笔记。
 
 
 > [!abstract]

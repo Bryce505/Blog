@@ -1,0 +1,35 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import 'katex/dist/katex.min.css';
+import '../styles/global.css';
+
+interface Props { title: string; description?: string; }
+const { title, description = '生物医药 CMC 与分析方法的工作笔记。' } = Astro.props;
+const site = '表征笔记';
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title === site ? site : `${title} · ${site}`}</title>
+    <meta name="description" content={description} />
+    <link rel="sitemap" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/sitemap-index.xml`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- 只给拉丁字母和数字加载 webfont；中文走系统栈 -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+  </head>
+  <body style="display: flex; flex-direction: column; min-height: 100vh;">
+    <a class="skip" href="#main">跳到正文</a>
+    <Header />
+    <main id="main" style="flex: 1;">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

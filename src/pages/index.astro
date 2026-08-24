@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const posts = (await getCollection('posts')).sort((a, b) => b.data.date - a.data.date);
+
+// 分类不硬编码：从文章里推导，知识库加了新的一级标签就自动出现
+const counts = new Map<string, number>();
+for (const p of posts) counts.set(p.data.category, (counts.get(p.data.category) ?? 0) + 1);
+const cats = [...counts.entries()]
+  .map(([name, count]) => ({
+    no: /^\d+/.exec(name)?.[0] ?? '',
+    label: name.replace(/^\d+/, ''),
+    name, count,
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name, 'zh'));
+---
+<Base title="表征笔记">
+  <section class="wrap" style="padding: 56px 40px 40px;">
+    <p style="max-width: var(--measure); margin: 0; font-size: 17px; color: var(--muted); line-height: 1.85;">
+      生物医药 CMC 与分析方法的工作笔记。内容由 Obsidian 知识库按主题整理成文，保留原始数据、法规条款与文献出处。
+    </p>
+  </section>
+
+  <hr style="height: 1px; background: var(--border); border: 0; margin: 0;" />
+
+  <div class="wrap two-col" style="display: grid; grid-template-columns: minmax(0, 1fr) 232px; gap: 64px; padding-top: 40px; padding-bottom: 72px; align-items: start;">
+    <div>
+      <h2 class="eyebrow" style="margin-bottom: 4px;">最新</h2>
+      {posts.length === 0 && (
+        <p style="color: var(--muted); padding: 26px 0;">还没有文章。流水线每晚 21:00 发布一篇。</p>
+      )}
+      {posts.slice(0, 12).map((post) => <PostCard post={post} />)}
+      {posts.length > 12 && (
+        <p style="padding-top: 22px;"><a href={`${base}/archive`}>查看全部 {posts.length} 篇 →</a></p>
+      )}
+    </div>
+
+    <aside style="position: sticky; top: 96px;">
+      <h2 class="eyebrow">分类</h2>
+      <nav style="display: flex; flex-direction: column; gap: 1px;" aria-label="分类导航">
+        {cats.map((c) => (
+          <a
+            href={`${base}/category/${encodeURIComponent(c.name)}`}
+            style="display: flex; align-items: baseline; gap: 10px; padding: 7px 10px; margin: 0 -10px; border-radius: 3px; font-size: 14px; color: var(--fg);"
+          >
+            <span class="num" style="color: var(--muted); font-size: 12px; min-width: 20px;">{c.no}</span>
+            <span>{c.label}</span>
+            <span class="num" style="margin-left: auto; color: var(--muted); font-size: 12px;">{c.count}</span>
+          </a>
+        ))}
+      </nav>
+    </aside>
+  </div>
+</Base>

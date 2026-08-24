@@ -101,5 +101,86 @@
       "碱催化β消除法表征O糖",
       "翻译后修饰-PTM"
     ]
+  },
+  "05仪器与分析技术/色谱分析/HPLC": {
+    "slug": "05仪器与分析技术-色谱分析-hplc",
+    "published_at": "2026-08-24",
+    "source_hash": "sha256:9df63c9c319bf3d985ef42741b37d8e63d87b1d726f1a8e50af9bdddc275abd4",
+    "notes": [
+      "Analytical technology/HILIC-HPLC/HILIC色谱柱汇总.md",
+      "Analytical technology/HPLC色谱柱相关知识.md",
+      "Analytical technology/IEX-HPLC/IEX色谱柱信息汇总.md",
+      "Analytical technology/RP反相/New trends in reversed-phase liquid chromatographic separations of therapeutic peptides and proteins Theory and applications.md",
+      "Analytical technology/RP反相/反相色谱柱.md",
+      "Analytical technology/RP反相/梯度洗脱.md",
+      "Analytical technology/RP反相/肽图.md",
+      "Analytical technology/SEC-HPLC/SEC SOP.md",
+      "Analytical technology/SEC-HPLC/SEC-HPLC.md",
+      "Analytical technology/SEC-HPLC/SEC色谱柱信息汇总.md",
+      "Analytical technology/USP Classification of HPLC Columns.md"
+    ],
+    "noteTitles": [
+      "HILIC色谱柱汇总",
+      "HPLC色谱柱相关知识",
+      "IEX色谱柱信息汇总",
+      "New trends in reversed-phase liquid chromatographic separations of therapeutic peptides and proteins Theory and applications",
+      "反相色谱柱",
+      "梯度洗脱",
+      "肽图考虑点",
+      "SEC SOP",
+      "SEC-HPLC",
+      "SEC色谱柱信息汇总",
+      "USP Classification of HPLC Columns"
+    ]
+  },
+  "00基础/生物制品/单抗": {
+    "slug": "00基础-生物制品-单抗",
+    "published_at": "2026-08-24",
+    "source_hash": "sha256:f4b68a2e6f7671c330e1923101afbcfadca3e8e43f9b674b477f3e2a898fa04e",
+    "notes": [
+      "Analytical technology/ELISA Assay/1103 Immunological test methods-Enzyme-linked immunosorbent assay.md",
+      "Analytical technology/理化分析/Chapter1 Overview of monoclonal antibodies.md",
+      "Analytical technology/理化分析/Chapter2 Physicochemical characterization of monoclonal antibodies.md",
+      "Analytical technology/理化分析/FcγR受体.md",
+      "Antibody-Characterization/ASKB589原液质量标准.md",
+      "Antibody-Characterization/Analytical Characterization of Biotherapeutics/Chapter1 Introduction to Biotherapeutics.md",
+      "Antibody-Characterization/Antibody-Characterization总目录.md",
+      "Antibody-Characterization/IEX酸性峰调查/大肠杆菌表达蛋白PTM与IEX电荷变体.md"
+    ],
+    "noteTitles": [
+      "1103 Immunological test methods-Enzyme-linked immunosorbent assay",
+      "Chapter1 Overview of monoclonal antibodies",
+      "Chapter2 Physicochemical characterization of monoclonal antibodies",
+      "FcγR受体",
+      "ASKB589原液质量标准",
+      "Chapter1 Introduction to Biotherapeutics",
+      "Antibody-Characterization总目录",
+      "大肠杆菌表达蛋白PTM与IEX电荷变体分析"
+    ]
+  },
+  "02分子表征/PTM/二硫键": {
+    "slug": "02分子表征-ptm-二硫键",
+    "published_at": "2026-08-24",
+    "source_hash": "sha256:350c41613582390010eaa391426e1c3a50d1a97a8b12789bd8ac99c7224eb61e",
+    "notes": [
+      "Analytical technology/还原剂TCEP.md",
+      "Antibody-Characterization/Biophysical characterization of proteins in developing biopharmaceuticals/Chapter1 The complexity of protein structure and the challenges it poses in developing biopharmaceuticals.md",
+      "Antibody-Characterization/IEX酸性峰调查/Disulfide-Scrambling-与酸性峰的关系-文献综述.md",
+      "Antibody-Characterization/IEX酸性峰调查/二硫键与酸性峰-关键机制图解.md",
+      "Antibody-Characterization/IEX酸性峰调查/二硫键错配分析-快速参考表.md",
+      "Antibody-Characterization/SDS-PAGE与artifact bands.md",
+      "Antibody-Characterization/二硫键如何形成.md",
+      "Antibody-Characterization/前处理/二硫键分析流程(NR&R).md"
+    ],
+    "noteTitles": [
+      "还原剂TCEP",
+      "Chapter1 The complexity of protein structure and the challenges it poses in developing biopharmaceuticals",
+      "Disulfide Scrambling与酸性峰的关系-文献综述与机制分析",
+      "二硫键错配与酸性峰增加的关键机制图解",
+      "二硫键错配分析快速参考表",
+      "SDS-PAGE与artifact bands",
+      "二硫键如何形成",
+      "二硫键分析流程(NR&R)"
+    ]
   }
 }
