@@ -110,9 +110,15 @@ def build_groups(notes):
     return sorted((g for g in made if g), key=lambda g: (-len(g.notes), g.tag))
 
 
-def pick_next(groups, published):
-    """取第一个未发布、或源笔记已变更的组。"""
+def pick_next(groups, published, skip=()):
+    """取第一个未发布、或源笔记已变更的组。
+
+    skip 里的 tag 一律跳过。校验失败的组不写 published.json，若不跳过，
+    每次都会重新挑中它，队列被永久堵死、后面的文章一篇也发不出去。
+    """
     for g in groups:
+        if g.tag in skip:
+            continue
         rec = published.get(g.tag)
         if rec is None or rec.get('source_hash') != g.source_hash:
             return g

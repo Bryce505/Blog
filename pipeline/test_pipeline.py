@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import compose as cp
+import main as mn
 import config
 import images as im
 import render as rd
@@ -183,6 +184,23 @@ def test_pick_next_skips_published_unchanged():
     g = sel.build_groups(ns)[0]
     assert sel.pick_next([g], {g.tag: {'source_hash': g.source_hash, 'slug': g.slug}}) is None
     assert sel.pick_next([g], {}) is g
+
+
+def test_pick_next_honours_skip_set():
+    """校验失败的组不跳过就会永久霸占队首，后面的文章一篇也发不出去。"""
+    ns = [_fake(f'n{i}.md', ['02分子表征/PTM/糖基化']) for i in range(5)]
+    ns += [_fake(f'm{i}.md', ['03质量控制/SEC/柱效']) for i in range(4)]
+    gs = sel.build_groups(ns)
+    first = sel.pick_next(gs, {})
+    second = sel.pick_next(gs, {}, skip={first.tag})
+    assert second is not None and second.tag != first.tag
+
+
+def test_verify_image_check_survives_url_encoding():
+    """Obsidian 粘贴的图片名带空格，正文里是 %20 编码，basename 是解码的。"""
+    src = '![](../x/Pasted image 20240528.png)'
+    out = '![](../x/Pasted%20image%2020240528.png)'
+    assert vf.verify(src, out * 3, ['Pasted image 20240528.png']).ok
 
 
 def test_pick_next_returns_changed_group():
@@ -531,6 +549,161 @@ def test_compose_raises_on_malformed_response():
         assert 'insufficient balance' in str(e), str(e)
     else:
         raise AssertionError('响应缺少 choices 时应抛 ComposeError，不能静默返回空文章')
+
+
+# ---------- main（自动通道）----------
+
+def test_assemble_frontmatter_has_required_fields():
+    ns = [vault.Note('a.md', 'A', ['02分子表征/PTM/糖基化'], 'note', book='书A'),
+          vault.Note('b.md', 'B', ['02分子表征/PTM/糖基化'], 'note', link='http://x')]
+    g = sel.Group(tag='02分子表征/PTM/糖基化', notes=ns, source_hash='h',
+                  slug='02分子表征-ptm-糖基化')
+    fm = mn.assemble_frontmatter(g, '蛋白糖基化表征')
+    assert fm.startswith('---\n') and '\n---\n' in fm
+    assert 'title: "蛋白糖基化表征"' in fm
+    assert 'category: "02分子表征"' in fm
+    assert '02分子表征/PTM/糖基化' in fm
+    assert '书A' in fm and 'http://x' in fm
+    assert 'sourceNotes:' in fm
+
+
+def test_assemble_frontmatter_escapes_quotes_in_title():
+    g = sel.Group(tag='a/b/c', notes=[vault.Note('a.md', 'A', ['a/b/c'], 'note')],
+                  source_hash='h', slug='s')
+    assert '\\"' in mn.assemble_frontmatter(g, '含"引号"的标题')
+
+
+def test_assemble_frontmatter_dedupes_references():
+    ns = [vault.Note(f'{i}.md', 'A', ['a/b/c'], 'note', book='同一本书')
+          for i in range(3)]
+    g = sel.Group(tag='a/b/c', notes=ns, source_hash='h', slug='s')
+    assert mn.assemble_frontmatter(g, 'T').count('同一本书') == 1
+
+
+def test_title_extracted_from_first_h2():
+    g = sel.Group(tag='a/b/糖基化', notes=[], source_hash='h', slug='s')
+    assert mn._title_of('## 蛋白糖基化表征方法\n正文', g) == '蛋白糖基化表征方法'
+
+
+def test_title_falls_back_to_tag_leaf():
+    g = sel.Group(tag='a/b/糖基化', notes=[], source_hash='h', slug='s')
+    assert mn._title_of('没有标题的正文', g) == '糖基化'
+
+
+def test_frontmatter_is_valid_yaml():
+    """拼错一个引号，Astro 构建就整站失败。"""
+    import yaml as _yaml
+    ns = [vault.Note('a: b.md', '标题里有: 冒号', ['a/b/c'], 'note',
+                     book='书名含"引号"', link='http://x?a=1&b=2')]
+    g = sel.Group(tag='a/b/c', notes=ns, source_hash='h', slug='s')
+    fm = mn.assemble_frontmatter(g, '标题: 带冒号和"引号"')
+    parsed = _yaml.safe_load(fm.strip().strip('-'))
+    assert parsed['title'] == '标题: 带冒号和"引号"', parsed['title']
+    assert parsed['category'] == 'a'
+
+
+def test_run_auto_end_to_end_offline():
+    """端到端：真实 vault + 假 Drive + 假 LLM，跑完整条链。
+
+    单元测试测零件，串起来才是真正会出问题的地方。
+    """
+    import shutil
+    root = Path('/home/user/obsidian-base')
+    if not root.exists():
+        return  # CI 无 vault 时跳过
+
+    blog = TMP / 'blog-e2e'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+
+    # LLM 换成「原样返回源文 + 一句导读」——这是合法重组的下限，必须过校验
+    def fake_compose(group, api_key, model=None, _post=None):
+        body = '\n\n'.join(n.body for n in group.notes)
+        return f'## {group.tag.split("/")[-1]}\n\n本文分为 3 个部分。\n\n{body}'
+
+    def fake_fetch(names, index, service, out_dir, url_prefix, _download=None):
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        m = {}
+        for n in names:
+            dest = out_dir / (Path(n).stem + '.webp')
+            dest.write_bytes(b'fake')
+            m[n] = f'{url_prefix}/{dest.name}'
+        return m, []
+
+    orig = (mn.compose.compose, mn.images.drive_service,
+            mn.images.load_index, mn.images.fetch_images)
+    mn.compose.compose = fake_compose
+    mn.images.drive_service = lambda _: None
+    mn.images.load_index = lambda *a, **k: {}
+    mn.images.fetch_images = fake_fetch
+    try:
+        rs = mn.run_auto(root, blog, 'fake-key', '{}', count=2)
+    finally:
+        (mn.compose.compose, mn.images.drive_service,
+         mn.images.load_index, mn.images.fetch_images) = orig
+
+    assert len(rs) == 2, rs
+    assert all(r['status'] == 'published' for r in rs), \
+        [(r['slug'], r['failures']) for r in rs]
+
+    # 产出物必须真的落盘，且 frontmatter 是合法 YAML
+    import yaml as _yaml
+    for r in rs:
+        f = blog / 'src' / 'content' / 'posts' / f"{r['slug']}.md"
+        assert f.exists(), f
+        text = f.read_text(encoding='utf-8')
+        fm = _yaml.safe_load(text.split('---')[1])
+        assert fm['title'] and fm['category'] and fm['sourceNotes']
+        assert 'image&attachment' not in text, '图片路径未重写'
+
+    # published.json 记录正确，重跑不重复发布
+    pub = json.loads((blog / 'published.json').read_text(encoding='utf-8'))
+    assert len(pub) == 2, pub
+    mn.compose.compose = fake_compose
+    mn.images.drive_service = lambda _: None
+    mn.images.load_index = lambda *a, **k: {}
+    mn.images.fetch_images = fake_fetch
+    try:
+        again = mn.run_auto(root, blog, 'fake-key', '{}', count=2)
+    finally:
+        (mn.compose.compose, mn.images.drive_service,
+         mn.images.load_index, mn.images.fetch_images) = orig
+    assert {r['slug'] for r in again}.isdisjoint({r['slug'] for r in rs}), \
+        '重跑发布了同一组'
+
+
+def test_run_auto_routes_failed_verification_to_review():
+    """校验不过的文章必须进 _review/，不能进 posts/。"""
+    import shutil
+    root = Path('/home/user/obsidian-base')
+    if not root.exists():
+        return
+
+    blog = TMP / 'blog-review'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+
+    def tampering_compose(group, api_key, model=None, _post=None):
+        body = '\n\n'.join(n.body for n in group.notes)
+        return f'## X\n\n流速改为 987.654 mL/min。\n\n{body}'
+
+    orig = (mn.compose.compose, mn.images.drive_service,
+            mn.images.load_index, mn.images.fetch_images)
+    mn.compose.compose = tampering_compose
+    mn.images.drive_service = lambda _: None
+    mn.images.load_index = lambda *a, **k: {}
+    mn.images.fetch_images = lambda *a, **k: ({}, list(a[0]))
+    try:
+        rs = mn.run_auto(root, blog, 'k', '{}', count=1)
+    finally:
+        (mn.compose.compose, mn.images.drive_service,
+         mn.images.load_index, mn.images.fetch_images) = orig
+
+    assert rs[0]['status'] == 'review', rs
+    assert (blog / '_review' / f"{rs[0]['slug']}.md").exists()
+    assert not (blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md").exists()
+    assert not (blog / 'published.json').exists(), '校验失败不该写 published.json'
 
 
 if __name__ == '__main__':

@@ -7,6 +7,7 @@
 四项检查任一不过，文章进 _review/ 等人工复核，不发布。
 """
 import re
+import urllib.parse
 from dataclasses import dataclass, field
 
 import config
@@ -90,8 +91,17 @@ class VerifyResult:
 
 
 def verify(src, out, images, min_ratio=None):
+    """四项确定性检查。任一不过则不发布。
+
+    先整体 URL 解码再比对：Obsidian 粘贴的图片名带空格，正文里是
+    「Pasted%20image%2020240528.png」。不解码有两处会出错 ——
+    图片 basename 对不上（误判丢图），且 %2020240528 会被数字校验
+    读成 2020240528，凭空多出一个源文没有的「数据」。
+    """
     if min_ratio is None:
         min_ratio = config.MIN_LENGTH_RATIO
+    src = urllib.parse.unquote(src)
+    out = urllib.parse.unquote(out)
     failures = []
 
     missing = [i for i in images if i not in out]
