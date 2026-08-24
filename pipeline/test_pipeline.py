@@ -2,12 +2,16 @@
 
 用法: python pipeline/test_pipeline.py
 """
+import io
+import json
 import re
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import images as im
 import render as rd
 import select_ as sel
 import vault
@@ -327,6 +331,100 @@ def test_caption_for_prefers_book_then_paper_then_link():
     assert rd.caption_for(N('p', 't', [], 'note', paper='P论文')) == '图源：P论文'
     assert rd.caption_for(N('p', 't', [], 'note', link='http://x')) == '图源：http://x'
     assert rd.caption_for(N('p', 't', [], 'note')) == ''
+
+
+# ---------- images ----------
+
+TMP = Path('/tmp/pipe-test')
+
+
+def _png(w, h):
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new('RGB', (w, h), 'white').save(buf, format='PNG')
+    return buf.getvalue()
+
+
+def test_to_webp_downscales_and_converts():
+    from PIL import Image
+    TMP.mkdir(parents=True, exist_ok=True)
+    dest = TMP / 'out.webp'
+    im.to_webp(_png(2400, 1200), dest)
+    assert dest.exists()
+    img = Image.open(dest)
+    assert img.size == (1200, 600), img.size
+    assert img.format == 'WEBP'
+
+
+def test_to_webp_does_not_upscale_small_image():
+    from PIL import Image
+    TMP.mkdir(parents=True, exist_ok=True)
+    dest = TMP / 'small.webp'
+    im.to_webp(_png(300, 200), dest)
+    assert Image.open(dest).size == (300, 200)
+
+
+def test_to_webp_handles_palette_and_alpha():
+    """Obsidian 截图常是带透明通道的 PNG，直接存 WebP 会炸。"""
+    from PIL import Image
+    TMP.mkdir(parents=True, exist_ok=True)
+    buf = io.BytesIO()
+    Image.new('RGBA', (100, 50), (255, 0, 0, 128)).save(buf, format='PNG')
+    dest = TMP / 'alpha.webp'
+    im.to_webp(buf.getvalue(), dest)
+    assert Image.open(dest).size == (100, 50)
+
+
+def test_index_cache_expires():
+    TMP.mkdir(parents=True, exist_ok=True)
+    cache = TMP / 'idx.json'
+    cache.write_text(json.dumps({'built_at': 0, 'index': {'a.png': 'id1'}}))
+    calls = []
+
+    def factory():
+        calls.append(1)
+        return {'b.png': 'id2'}
+
+    assert im.load_index(cache, factory, max_age_days=7) == {'b.png': 'id2'}
+    assert calls == [1]
+
+
+def test_index_cache_reused_when_fresh():
+    TMP.mkdir(parents=True, exist_ok=True)
+    cache = TMP / 'idx2.json'
+    cache.write_text(json.dumps({'built_at': time.time(), 'index': {'a.png': 'id1'}}))
+
+    def factory():
+        raise AssertionError('缓存未过期时不应重建索引')
+
+    assert im.load_index(cache, factory, max_age_days=7) == {'a.png': 'id1'}
+
+
+def test_index_cache_rebuilds_on_corrupt_file():
+    TMP.mkdir(parents=True, exist_ok=True)
+    cache = TMP / 'idx3.json'
+    cache.write_text('{ 这不是合法 json')
+    assert im.load_index(cache, lambda: {'ok': '1'}, max_age_days=7) == {'ok': '1'}
+
+
+def test_fetch_images_reports_missing_and_is_idempotent():
+    """找不到的图要报出来，不能静默；已存在的图不重复下载。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    out = TMP / 'fetch'
+    out.mkdir(exist_ok=True)
+    (out / 'have.webp').write_bytes(_png(10, 10))
+    downloads = []
+
+    def fake_download(service, fid):
+        downloads.append(fid)
+        return _png(50, 25)
+
+    mapping, missing = im.fetch_images(
+        ['have.png', 'gone.png'], {'have.png': 'id1'}, None, out, '/images/x',
+        _download=fake_download)
+    assert mapping == {'have.png': '/images/x/have.webp'}, mapping
+    assert missing == ['gone.png'], missing
+    assert downloads == [], '已存在的图不该重新下载'
 
 
 if __name__ == '__main__':

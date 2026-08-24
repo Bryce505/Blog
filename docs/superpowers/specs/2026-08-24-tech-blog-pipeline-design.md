@@ -64,7 +64,9 @@
 
 **RoutineRun**（私有仓库）：真笔记 5 篇 —— `git&github/笔记.md`、`git&github/README.md`、`PPT制作/README.md`、`翻译/README.md`、`docs/claude-code-cloud-notes.md`
 
-**图片体量**：1235 张原图约 494 MB；限宽 1200px 转 WebP（quality 82）后约 74 MB，且随发布进度逐步增长，git 仓库可承受。
+**图片体量**：1235 张原图约 494 MB；限宽 1200px 转 WebP（quality 82）后 **实测压到原大小的 10%，约 49 MB**（用 Drive 上的真实图片验证：1372×661 的 652 KB 截图 → 43 KB，压到 7%），且随发布进度逐步增长，git 仓库可承受。
+
+待发布文章引用的图片格式实测：PNG 800、JPG 468、JPEG 2，**零 SVG**；另有 1 个 `.excalidraw` 源文件和 2 个无扩展名文件（共 3 张，占 0.2%）会走「图缺失」路径优雅降级。
 
 ## 4. 架构与数据流
 
