@@ -7,7 +7,7 @@ import remarkCallout from './src/plugins/remark-callout.mjs';
 
 export default defineConfig({
   site: 'https://bryce505.github.io',
-  base: '/blog',
+  base: '/Blog',
   integrations: [sitemap()],
   markdown: {
     // Astro 7 起默认处理器换成了 Sätteri；remark 插件要走 unified() 显式挂载

@@ -3,7 +3,7 @@
 把 Obsidian 知识库里的原创笔记，按主题自动整理成技术文章，定时发布到
 GitHub Pages。
 
-- **站点**：https://bryce505.github.io/blog
+- **站点**：https://bryce505.github.io/Blog
 - **数据源**：`Bryce505/Obsidian-base`（生物医药 CMC 与分析方法）、
   `Bryce505/RoutineRun`（工具与效率栏目）
 - **图片**：Google Drive `image&attachment` 文件夹
