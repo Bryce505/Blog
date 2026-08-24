@@ -269,7 +269,9 @@ Expected: `3/3 passed`
 - [ ] **Step 8: 对真实 vault 冒烟**
 
 Run: `python -c "import sys; sys.path.insert(0,'pipeline'); import vault; from pathlib import Path; ns=vault.load_vault(Path('/home/user/obsidian-base')); print(len(ns),'篇解析成功')"`
-Expected: 输出 1000 以上，无异常抛出
+Expected: **516 篇**，无异常抛出。
+
+实测基准（黑名单外共 971 篇 md）：454 篇无 frontmatter、1 篇 YAML 损坏（`Python/AI/llm-wiki-ClaudeCodeCLI...md`，双引号未闭合）、516 篇正常解析。无 frontmatter 的笔记没有标签和 type，本来就不会被选中发布，跳过不造成损失。数字大幅低于 516 说明解析逻辑退化。
 
 - [ ] **Step 9: 提交**
 
