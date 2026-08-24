@@ -4,6 +4,12 @@ on:
   push:
     branches: [master]
     paths-ignore: ['drafts/**', 'pipeline/**', 'docs/**', 'design/**', 'README.md']
+  # publish 提交文章后必须接着部署。workflow 用内置 GITHUB_TOKEN 推的提交
+  # 不会触发其他 workflow（GitHub 防递归的安全规则），所以光靠上面的 push
+  # 触发，每晚发的文章会一直躺在仓库里不上线。
+  workflow_run:
+    workflows: [publish]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -17,6 +23,10 @@ concurrency:
 
 jobs:
   build:
+    # publish 失败时不必白跑一次构建
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

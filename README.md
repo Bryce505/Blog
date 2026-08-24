@@ -206,6 +206,11 @@ Google Drive 的 `image&attachment` 文件夹。流水线要用服务账号去�
 
 Actions → publish → Run workflow，可填本次发布篇数。
 
+发布成功后 `deploy` 会自动跟着跑（靠 `workflow_run` 触发）。这里有个
+GitHub 的坑：**workflow 用内置 `GITHUB_TOKEN` 推的提交不会触发其他
+workflow**（防递归的安全规则），所以不能指望 publish 的 push 去触发
+deploy 的 push 事件 —— 文章会一直躺在仓库里不上线。
+
 ### 校验没过的文章怎么办
 
 流水线会把它写进 `_review/<slug>.md`，文件开头的注释里写着没过哪一项。
