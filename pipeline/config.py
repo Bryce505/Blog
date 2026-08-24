@@ -11,8 +11,30 @@ MIN_GROUP, MAX_GROUP = 3, 30
 
 # 体量上限。按篇数限制是错的指标：实测有单篇 158 万字符的笔记（整本书
 # 导入），一篇就撑爆 1M 上下文；也有 9 篇加起来 170 万字符的组。
-# 单篇超过 20 万字符的，实测全是整书/整课程导入，不是笔记。
-MAX_NOTE_CHARS = 200_000
+#
+# 阈值定在 3 万字符：超过这个量的笔记实测绝大多数是整书/整章转录
+# （《Capillary Electrophoresis Methods》《ELISA Guidebook》《Mass
+# Spectrometry A Textbook》等），公开重组发布有版权问题。真正的读书
+# 笔记都在几千字符量级，不受影响。
+MAX_NOTE_CHARS = 30_000
+
+# 体量豁免名单：作者自己写的长文，绕过上面的阈值。
+#
+# 为什么用名单而不是自动判别：实测数据里没有可靠信号 —— book 字段只填了
+# 4/22，文件名模式要凑 Chapter/作者_年份/Guidebook/course/Practitioners
+# 一串关键词才盖得全，新增一本书就漏。只有二十来篇要分类，写分类器不如
+# 列名单：默认排除（对版权问题这是安全方向），原创的显式放行。
+#
+# 新写了超过 3 万字符的原创长文，往这里加一行路径即可。
+SIZE_EXEMPT_NOTES = {
+    'Bio-analysis/酶活性/重组尿酸氧化酶活性分析方法开发.md',
+    'Antibody-Characterization/QC检测流程梳理.md',
+    'Antibody-Characterization/HCP/吐温降解酶(高风险HCP)及其检测方法系统综述.md',
+    'Antibody-Characterization/protein sequencing与离子类型.md',
+    'Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-结构表征研究策略-20260702.md',
+    'Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-功能学研究策略-20260703.md',
+    'Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CE_Electrokinetic_Injection_EOF_Report.md',
+}
 # 组的总预算，留足空间给系统提示和模型输出
 MAX_GROUP_CHARS = 400_000
 

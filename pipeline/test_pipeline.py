@@ -65,21 +65,41 @@ def test_oversized_note_excluded():
     assert big not in sel.publishable([big])
 
 
+def test_exempt_note_bypasses_size_limit():
+    """作者自己写的长文不该被当成书籍转录剔除。"""
+    path = next(iter(config.SIZE_EXEMPT_NOTES))
+    n = vault.Note(path, 'N', ['a/b/c'], 'note',
+                   body='x' * (config.MAX_NOTE_CHARS + 1))
+    assert n in sel.publishable([n])
+
+
+def test_exempt_list_paths_all_exist_in_vault():
+    """名单里的路径写错了会静默失效 —— 那篇长文就被悄悄剔除了。"""
+    root = Path('/home/user/obsidian-base')
+    if not root.exists():
+        return  # CI 无 vault 时跳过
+    for rel in config.SIZE_EXEMPT_NOTES:
+        assert (root / rel).exists(), '豁免名单路径不存在: ' + rel
+
+
 def test_group_truncated_by_char_budget_not_just_count():
     """按篇数限制是错的指标：9 篇也可能加起来 170 万字符。"""
-    # 5 篇 x 9 万 = 45 万，超预算 40 万；应截到 4 篇（36 万）而非整组丢弃
-    ns = [vault.Note(f'n{i}.md', f'N{i}', ['a/b/c'], 'note',
-                     body='x' * 90_000) for i in range(5)]
+    # 20 篇 x 2.9 万 = 58 万，超预算 40 万；应截断而非整组丢弃
+    ns = [vault.Note(f'n{i:02d}.md', f'N{i}', ['a/b/c'], 'note',
+                     body='x' * 29_000) for i in range(20)]
     g = sel.build_groups(ns)[0]
     total = sum(len(n.body) for n in g.notes)
     assert total <= config.MAX_GROUP_CHARS, total
-    assert len(g.notes) == 4, len(g.notes)
+    assert config.MIN_GROUP <= len(g.notes) < 20, len(g.notes)
 
 
 def test_group_dropped_when_budget_cannot_fit_min_notes():
-    """预算装不下 3 篇就整组放弃，不发半截文章。"""
-    ns = [vault.Note(f'n{i}.md', f'N{i}', ['a/b/c'], 'note',
-                     body='x' * 199_000) for i in range(5)]
+    """预算装不下 3 篇就整组放弃，不发半截文章。
+
+    用豁免名单里的路径构造：它们绕过单篇上限，因此能撑到组预算装不下。
+    """
+    paths = sorted(config.SIZE_EXEMPT_NOTES)[:3]
+    ns = [vault.Note(p, 'N', ['a/b/c'], 'note', body='x' * 200_000) for p in paths]
     assert sel.build_groups(ns) == []
 
 

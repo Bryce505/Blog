@@ -21,15 +21,16 @@ class Group:
 def publishable(notes):
     """type 在白名单内、有标签、且体量正常的才可发布。
 
-    体量上限不是性能优化，是内容判定：实测超过 20 万字符的「笔记」全是
-    整本书或整套课程导入（如整本《Capillary Electrophoresis Methods for
-    Pharmaceutical Analysis》，142 万字符），一篇就撑爆 1M 上下文，而且
-    整书重组发布还有版权问题。
+    体量上限不是性能优化，是内容判定：实测超过 3 万字符的笔记绝大多数是
+    整书/整章转录（如整本《Capillary Electrophoresis Methods for
+    Pharmaceutical Analysis》，142 万字符），既撑上下文又有版权问题。
+    作者自己写的长文走 SIZE_EXEMPT_NOTES 名单放行。
     """
     return [n for n in notes
             if n.type in config.PUBLISHABLE_TYPES
             and n.tags
-            and len(n.body) <= config.MAX_NOTE_CHARS]
+            and (len(n.body) <= config.MAX_NOTE_CHARS
+                 or n.path in config.SIZE_EXEMPT_NOTES)]
 
 
 def _primary_tag(note):
