@@ -54,7 +54,7 @@ MIN_LENGTH_RATIO = 0.4
 # 技术内容改写对保真度要求高，默认用 pro；想省钱换 flash 即可，
 # 反正机械校验器会兜底。
 DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions'
-DEEPSEEK_MODEL = 'deepseek-v4-pro'
+DEEPSEEK_MODEL = 'deepseek-v4-flash'
 # 给足输出余量：截断会触发「正文过短」校验，白烧一次 token 还得重跑
 DEEPSEEK_MAX_TOKENS = 65536
 DEEPSEEK_TEMPERATURE = 0.3
