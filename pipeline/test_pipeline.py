@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import compose as cp
+import drafts as df
 import main as mn
 import config
 import images as im
@@ -704,6 +705,121 @@ def test_run_auto_routes_failed_verification_to_review():
     assert (blog / '_review' / f"{rs[0]['slug']}.md").exists()
     assert not (blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md").exists()
     assert not (blog / 'published.json').exists(), '校验失败不该写 published.json'
+
+
+# ---------- drafts（手动通道）----------
+
+def test_fill_defaults_requires_title_only():
+    fm = df.fill_defaults({'title': '我的文章'}, Path('drafts/my-post.md'), '正文内容很长' * 30)
+    assert fm['title'] == '我的文章'
+    assert fm['slug'] == 'my-post'
+    assert fm['category'] == '杂记'
+    assert fm['tags'] == []
+    assert 0 < len(fm['description']) <= 120
+    assert re.match(r'\d{4}-\d{2}-\d{2}', str(fm['date']))
+
+
+def test_fill_defaults_derives_category_from_tags():
+    fm = df.fill_defaults({'title': 'T', 'tags': ['03质量控制/SEC']}, Path('a.md'), '正文')
+    assert fm['category'] == '03质量控制'
+
+
+def test_fill_defaults_missing_title_returns_none():
+    assert df.fill_defaults({}, Path('a.md'), '正文') is None
+    assert df.fill_defaults({'title': ''}, Path('a.md'), '正文') is None
+
+
+def test_fill_defaults_respects_explicit_values():
+    fm = df.fill_defaults({'title': 'T', 'slug': 'custom', 'date': '2020-01-02',
+                           'description': '自定义摘要'}, Path('a.md'), '正文')
+    assert fm['slug'] == 'custom' and str(fm['date']) == '2020-01-02'
+    assert fm['description'] == '自定义摘要'
+
+
+def test_slugify_cn_keeps_ascii_and_strips_symbols():
+    assert df.slugify_cn('My Post! (v2)') == 'my-post-v2'
+    assert df.slugify_cn('SEC 方法开发') == 'sec-方法开发'
+
+
+def test_description_strips_markdown_noise():
+    """摘要取正文前 120 字，不该混进图片语法和标题井号。"""
+    body = '# 标题\n\n![](../x/a.png)\n\n这是**正文**的第一句话。'
+    d = df.fill_defaults({'title': 'T'}, Path('a.md'), body)['description']
+    assert '![' not in d and '#' not in d and '**' not in d, repr(d)
+    assert '这是正文的第一句话' in d, repr(d)
+
+
+def test_run_drafts_end_to_end():
+    """扔一篇含 Drive 图片和双链的稿子，确认取图、双链、落盘、删原件都对。"""
+    import shutil
+    blog = TMP / 'blog-drafts'
+    shutil.rmtree(blog, ignore_errors=True)
+    (blog / 'drafts').mkdir(parents=True)
+    (blog / 'src' / 'content' / 'posts').mkdir(parents=True)
+
+    (blog / 'drafts' / 'sec-note.md').write_text(
+        '---\ntitle: SEC 方法开发\ntags:\n  - 03质量控制/SEC\n---\n'
+        '柱温 25 °C。详见[[某未发布笔记]]。\n'
+        '![](../image&attachment/image-laptop/SEC-peak.png)\n', encoding='utf-8')
+    (blog / 'drafts' / 'README.md').write_text('说明文件，不该被当成稿子', encoding='utf-8')
+    (blog / 'drafts' / 'no-title.md').write_text('---\ntags: []\n---\n正文', encoding='utf-8')
+
+    def fake_fetch(names, index, service, out_dir, url_prefix, _download=None):
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        m = {}
+        for n in names:
+            dest = out_dir / (Path(n).stem + '.webp')
+            dest.write_bytes(b'fake')
+            m[n] = f'{url_prefix}/{dest.name}'
+        return m, []
+
+    orig = (df.images.drive_service, df.images.load_index, df.images.fetch_images)
+    df.images.drive_service = lambda _: None
+    df.images.load_index = lambda *a, **k: {}
+    df.images.fetch_images = fake_fetch
+    try:
+        rs = df.run_drafts(blog, '{}')
+    finally:
+        (df.images.drive_service, df.images.load_index, df.images.fetch_images) = orig
+
+    by = {r['file']: r for r in rs}
+    assert 'README.md' not in by, 'README.md 不该被当成稿子处理'
+    assert by['no-title.md']['status'] == 'error', by['no-title.md']
+    ok = by['sec-note.md']
+    assert ok['status'] == 'published', ok
+
+    out = (blog / 'src' / 'content' / 'posts' / f"{ok['slug']}.md").read_text(encoding='utf-8')
+    assert '/images/' in out and 'image&attachment' not in out, '图片未重写'
+    assert '[[' not in out and '详见某未发布笔记' in out, '双链未解析'
+    assert not (blog / 'drafts' / 'sec-note.md').exists(), '发布后原件应删除'
+    assert (blog / 'drafts' / 'README.md').exists(), 'README 不该被删'
+
+
+def test_run_drafts_refuses_slug_collision():
+    """slug 撞车必须报错跳过，不能静默覆盖已有文章。"""
+    import shutil
+    blog = TMP / 'blog-collide'
+    shutil.rmtree(blog, ignore_errors=True)
+    (blog / 'drafts').mkdir(parents=True)
+    posts = blog / 'src' / 'content' / 'posts'
+    posts.mkdir(parents=True)
+    (posts / 'dup.md').write_text('已有文章', encoding='utf-8')
+    (blog / 'drafts' / 'dup.md').write_text(
+        '---\ntitle: 新稿\n---\n正文', encoding='utf-8')
+
+    orig = (df.images.drive_service, df.images.load_index, df.images.fetch_images)
+    df.images.drive_service = lambda _: None
+    df.images.load_index = lambda *a, **k: {}
+    df.images.fetch_images = lambda *a, **k: ({}, [])
+    try:
+        rs = df.run_drafts(blog, '{}')
+    finally:
+        (df.images.drive_service, df.images.load_index, df.images.fetch_images) = orig
+
+    assert rs[0]['status'] == 'error' and 'slug' in rs[0]['reason'], rs
+    assert (posts / 'dup.md').read_text(encoding='utf-8') == '已有文章', '已有文章被覆盖了'
+    assert (blog / 'drafts' / 'dup.md').exists(), '出错时不该删原件'
 
 
 if __name__ == '__main__':
