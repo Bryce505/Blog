@@ -31,29 +31,169 @@ Google Drive  ─┤ ② 取图：Drive 拉图 → WebP(≤1200px) → public/im
 
 ## 配置（首次部署必做）
 
-### 1. 三个 Secrets
+三个 Secret + 一次 Drive 共享 + 开启 Pages。全程免费，Drive API 只读和
+GitHub Actions 在这个用量下都在免费额度内。
 
-仓库 Settings → Secrets and variables → Actions：
+> 下面每一步都标了**为什么需要**和**漏了会怎样**。这套配置踩坑的地方在于
+> 报错信息普遍不指向真正的原因，所以按顺序做完再手动跑一次验证。
 
-| 名称 | 内容 | 怎么拿 |
-|---|---|---|
-| `DEEPSEEK_API_KEY` | DeepSeek API key | platform.deepseek.com 控制台创建 |
-| `VAULT_TOKEN` | GitHub 细粒度 PAT | Settings → Developer settings → Fine-grained tokens，仅勾选 `Obsidian-base` 和 `RoutineRun` 的 **Contents: Read** |
-| `GDRIVE_SA_JSON` | Google 服务账号 JSON 全文 | GCP 控制台建服务账号 → 建密钥（JSON）→ 把整个文件内容粘进来 |
+### 1. `DEEPSEEK_API_KEY`
 
-> 两个源仓库都是**私有**的，没有 `VAULT_TOKEN` 拉不到笔记。
+**做什么用**：调 DeepSeek 把笔记整理成文章。
 
-### 2. 把 Drive 文件夹共享给服务账号
+1. 打开 https://platform.deepseek.com/ 登录
+2. 左侧 **API keys** → **创建 API key**，名字随便起
+3. 复制生成的字符串（**只显示这一次**）
 
-**这一步最容易漏，漏了就是取图全失败，而且报错不直观。**
+模型在 `pipeline/config.py` 里配置，默认 `deepseek-v4-pro`。想省钱可以
+改成 `deepseek-v4-flash`，机械校验器会兜底。模型 ID 以
+`GET https://api.deepseek.com/models` 返回的清单为准 —— 早期的
+`deepseek-chat` / `deepseek-reasoner` 已经不在清单里了。
 
-打开 Drive 里的 `image&attachment` 文件夹 → 共享 → 把服务账号邮箱
-（形如 `xxx@yyy.iam.gserviceaccount.com`，在 JSON 的 `client_email` 字段里）
-加为**查看者**。
+### 2. `VAULT_TOKEN`
 
-### 3. 开启 Pages
+**做什么用**：GitHub Actions 自带的令牌只能访问它自己所在的仓库（本仓库），
+碰不到 `Obsidian-base` 和 `RoutineRun`。而这两个源仓库都是**私有**的，
+所以要单独给一个只能读它们的令牌。
 
-Settings → Pages → Source 选 **GitHub Actions**（不是 Deploy from a branch）。
+**漏了会怎样**：workflow 在 checkout 源仓库那步就失败，报 404 或
+authentication failed。
+
+1. 打开 https://github.com/settings/personal-access-tokens/new
+   （手点路径：头像 → Settings → 最底部 **Developer settings** →
+   **Personal access tokens** → **Fine-grained tokens** → **Generate new token**）
+2. 按下表填：
+
+   | 项 | 填什么 |
+   |---|---|
+   | Token name | 随便起，如 `blog-vault-read` |
+   | Expiration | 建议 1 year。**到期后流水线会停**，记一下时间 |
+   | Resource owner | 选你自己（Bryce505） |
+   | Repository access | 选 **Only select repositories** |
+   | └ Select repositories | 勾上 **Obsidian-base** 和 **RoutineRun** |
+   | Permissions → Repository permissions → **Contents** | 改成 **Read-only** |
+
+   `Metadata: Read-only` 会自动跟着勾上，那是必需项。其他权限一个都别给。
+
+3. **Generate token** → 立刻复制那串 `github_pat_` 开头的字符串
+   （**只显示这一次**，刷新就没了，只能重新生成）
+
+> 如果 Fine-grained 那页填不出来，退路是同一个 Developer settings 里的
+> **Tokens (classic)** → Generate new token → 只勾 `repo`。缺点是它能读写
+> 你**所有**仓库，不如细粒度安全。
+
+### 3. `GDRIVE_SA_JSON`
+
+**做什么用**：笔记正文里的图片（实测 1235 张）不在 git 仓库里，只在
+Google Drive 的 `image&attachment` 文件夹。流水线要用服务账号去读。
+
+**这一项步骤最多，也最容易在中途卡住。**
+
+#### 3.1 建项目并开启 Drive API
+
+1. 打开 https://console.cloud.google.com/ ，**用拥有那个 Drive 文件夹的
+   账号登录**（登错账号后面共享那步会没权限）
+2. 顶部项目选择器 → **新建项目**，名字如 `obsidian-blog` → 创建
+3. **确保顶部项目选择器里选中的就是这个新项目** ← 常见卡点：不选中项目的话，
+   服务账号页面只会显示「要查看此页面，请选择一个项目」，根本看不到
+   「创建服务账号」按钮
+4. 打开 https://console.cloud.google.com/apis/library/drive.googleapis.com
+   → 点 **启用**（ENABLE）
+
+   已经启用的话这里显示「API 已启用」或 **管理**（MANAGE）。
+   **没启用的话服务账号建得再对也读不了 Drive，而且报 403 不会说是 API 没开。**
+
+#### 3.2 建服务账号
+
+打开 https://console.cloud.google.com/iam-admin/serviceaccounts →
+**+ 创建服务账号**
+
+| 步骤 | 怎么做 |
+|---|---|
+| 服务账号名称 | 如 `blog-image-reader`，ID 自动生成不用改 |
+| 第 2 步「授予角色」 | **直接跳过**（点继续）—— 它不需要任何 GCP 角色，权限来自 Drive 的文件夹共享 |
+| 第 3 步「用户访问权限」 | 也跳过，点完成 |
+
+#### 3.3 生成 JSON 密钥
+
+在服务账号列表点刚建的那个 → 顶部 **密钥**（KEYS）标签 →
+**添加密钥** → **创建新密钥** → 选 **JSON** → 创建。
+
+浏览器自动下载一个 .json 文件，内容形如：
+
+```json
+{
+  "type": "service_account",
+  "project_id": "obsidian-blog-506523",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+  "client_email": "blog-image-reader@obsidian-blog-506523.iam.gserviceaccount.com",
+  ...
+}
+```
+
+**把整个文件内容全选复制**（从第一个 `{` 到最后一个 `}`），一个字符都别漏。
+
+> ⚠️ 这个文件里有私钥。**别提交进任何仓库、别发到聊天工具里。**
+> 粘进 GitHub Secret 之后本地那份可以删掉，要用再重新生成一个密钥。
+
+### 4. 把 Drive 文件夹共享给服务账号 ← 最容易漏的一步
+
+**漏了会怎样**：流水线能正常跑完，但**一张图都取不到**，全部文章的图片
+变成「图缺失」占位文字，而且报的是 404 而不是「你没共享文件夹」。
+
+1. 从上面 JSON 里找到 **`client_email`** 的值（形如
+   `blog-image-reader@xxx.iam.gserviceaccount.com`），复制引号里那一整串
+2. 打开文件夹
+   https://drive.google.com/drive/folders/1jwf_lkCo-Rq42VwWToyTeu2ciJTRg4zT
+   ，确认登录的是文件夹所有者账号
+3. 点页面**顶部中间的文件夹名** → 下拉菜单 → **共享** → **共享**
+   （或在「我的云端硬盘」列表里右键该文件夹 → 共享）
+4. 在「添加成员和群组」里粘贴那个邮箱
+   - 可能提示「此收件人不是 Google 账号」之类的警告 —— **正常，无视**，
+     服务账号本来就不是真人账号
+   - 角色选 **查看者**（Viewer）
+   - **把「通知用户」的勾去掉** ← 服务账号收不了邮件，勾着可能直接报错
+5. 点 **共享** / **发送**
+
+### 5. 把三个 Secret 填进仓库
+
+本仓库 → **Settings** → **Secrets and variables** → **Actions** →
+**New repository secret**，依次建三条：
+
+| Name | Secret |
+|---|---|
+| `DEEPSEEK_API_KEY` | 第 1 步复制的 key |
+| `VAULT_TOKEN` | 第 2 步复制的 `github_pat_...` |
+| `GDRIVE_SA_JSON` | 第 3 步 JSON 文件的**全文** |
+
+名字必须一字不差，workflow 里是按这三个名字取的。
+
+### 6. 开启 Pages
+
+**Settings** → **Pages** → Source 选 **GitHub Actions**
+（不是 Deploy from a branch）。
+
+站点地址是 `https://<用户名>.github.io/<仓库名>/`。
+**GitHub Pages 的路径区分大小写** —— 仓库叫 `Blog` 站点就在 `/Blog/`，
+所以 `astro.config.mjs` 里的 `base` 必须和仓库名大小写完全一致。
+改仓库名的话记得同步改这一行。
+
+### 7. 验证：先手动跑一次
+
+**别配完就直接等定时。** Actions → **publish** → **Run workflow**，
+篇数填 1。
+
+跑完检查三处：
+
+- **workflow 是否全绿** —— 红了看是哪一步：checkout 源仓库失败是
+  `VAULT_TOKEN` 问题，取图失败是 Drive 共享或 API 没启用，
+  整理那步失败看 DeepSeek 的报错（余额、模型名）
+- **文章有没有图** —— 打开生成的文章，如果满屏「图缺失」，回去检查第 4 步
+- **文章内容读一遍** —— 这是唯一没法自动验证的部分，见下
+
+> **首次运行务必人工通读生成的文章。** 机械校验器只能保证数据没被篡改、
+> 图片没丢，保证不了文章好不好读。觉得改写力度不对（太放飞或太保守），
+> 调 `pipeline/prompt.md` 里的提示词即可。
 
 ## 日常使用
 
@@ -101,6 +241,7 @@ CI 里可以直接跑。
 ```
 pipeline/     Python 流水线（config / vault / select_ / verify / render
               / images / compose / drafts / routinerun / main）
+  prompt.md   DeepSeek 的系统提示词，改写力度不对就调这里
 src/          Astro 站点
 drafts/       手动发布投递口
 public/images/ 文章图片（WebP）
