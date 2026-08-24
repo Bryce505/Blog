@@ -1,0 +1,81 @@
+name: publish
+
+on:
+  schedule:
+    - cron: '0 13 * * *'      # UTC 13:00 = 北京时间 21:00
+  push:
+    paths: ['drafts/**']      # 往 drafts/ 扔稿子即刻发布
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 本次自动通道发布的篇数
+        default: '1'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false   # 两次运行同时写 published.json 会打架
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 两个源仓库都是私有的，必须用 PAT
+      - uses: actions/checkout@v4
+        with:
+          repository: Bryce505/Obsidian-base
+          token: ${{ secrets.VAULT_TOKEN }}
+          path: .vault
+      - uses: actions/checkout@v4
+        with:
+          repository: Bryce505/RoutineRun
+          token: ${{ secrets.VAULT_TOKEN }}
+          path: .routinerun
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r pipeline/requirements.txt
+
+      - name: 处理 drafts（两种触发都先跑）
+        env:
+          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+        run: python pipeline/main.py --drafts --blog . | tee -a report.json
+
+      - name: 工具与效率栏目
+        run: python pipeline/main.py --routinerun .routinerun --blog . | tee -a report.json
+
+      - name: 自动通道发文（仅定时与手动触发）
+        if: github.event_name != 'push'
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+        run: |
+          python pipeline/main.py --vault .vault --blog . \
+            --count "${{ github.event.inputs.count || 1 }}" | tee -a report.json
+
+      - name: 提交产出
+        run: |
+          rm -rf .vault .routinerun
+          git config user.name  'blog-bot'
+          git config user.email 'makejun505@gmail.com'
+          git add src/content/posts public/images published.json \
+                  pipeline/drive_index.json _review drafts 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo '本次没有新产出'
+          else
+            git commit -m "自动发布：$(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: run-report
+          path: report.json
+          if-no-files-found: ignore
