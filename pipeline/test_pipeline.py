@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import render as rd
 import select_ as sel
 import vault
 import verify as vf
@@ -240,6 +241,92 @@ def test_doi_regex_stops_at_markdown_syntax():
     a = vf.dois('[10.1021/pr4010019](https://doi.org/10.1021/pr4010019)')
     b = vf.dois('参考 10.1021/pr4010019。')
     assert a == b == {'10.1021/pr4010019'}, (a, b)
+
+
+# ---------- render ----------
+
+def test_wikilink_published_becomes_link():
+    assert rd.resolve_wikilinks('详见[[热容和热容差]]。', {'热容和热容差': 'dsc-basics'}) \
+        == '详见[热容和热容差](/posts/dsc-basics)。'
+
+
+def test_wikilink_with_alias():
+    assert rd.resolve_wikilinks('见[[热容和热容差|热容]]。', {'热容和热容差': 'dsc-basics'}) \
+        == '见[热容](/posts/dsc-basics)。'
+
+
+def test_wikilink_unpublished_degrades_to_plain_text():
+    """不留死链：未发布的目标退化成纯文字，保留可读性。"""
+    assert rd.resolve_wikilinks('详见[[某笔记]]。', {}) == '详见某笔记。'
+
+
+def test_wikilink_does_not_touch_image_embeds():
+    """![[...]] 是图片嵌入，不是双链，不能被当成链接处理。"""
+    t = '![[../x/a.png]] 和 [[某笔记]]'
+    assert rd.resolve_wikilinks(t, {}) == '![[../x/a.png]] 和 某笔记'
+
+
+def test_wikilink_skips_fenced_code_block():
+    """Python 嵌套列表 [['a','b']] 会被双链正则匹配，改写后代码就坏了。"""
+    t = "文字[[某笔记]]\\n```python\\nx = [['及格', '不及格']]\\n```"
+    out = rd.resolve_wikilinks(t, {})
+    assert "[['及格', '不及格']]" in out, out
+    assert '文字某笔记' in out
+
+
+def test_wikilink_skips_inline_code():
+    t = '见 `[[literal]]` 与 [[某笔记]]'
+    out = rd.resolve_wikilinks(t, {})
+    assert '`[[literal]]`' in out and '与 某笔记' in out, out
+
+
+def test_image_rewrite_skips_code_block():
+    t = '```\\n![](../x/a.png)\\n```'
+    assert rd.rewrite_images(t, {'a.png': '/images/a.webp'}, [], {}) == t
+
+
+def test_image_rewritten_to_webp_path():
+    out = rd.rewrite_images('![](../image&attachment/image-laptop/SEC-peak.png)',
+                            {'SEC-peak.png': '/images/sec/SEC-peak.webp'}, [], {})
+    assert '/images/sec/SEC-peak.webp' in out and 'image&attachment' not in out
+
+
+def test_image_wiki_embed_rewritten():
+    out = rd.rewrite_images('![[../x/SEC-peak.png|600]]',
+                            {'SEC-peak.png': '/images/sec/SEC-peak.webp'}, [], {})
+    assert out == '![](/images/sec/SEC-peak.webp)', out
+
+
+def test_url_encoded_image_name_resolved():
+    """Obsidian 粘贴的图片名常含 URL 编码空格。"""
+    out = rd.rewrite_images('![](../x/Pasted%20image%2020240528.png)',
+                            {'Pasted image 20240528.png': '/images/a/x.webp'}, [], {})
+    assert '/images/a/x.webp' in out
+
+
+def test_external_image_left_untouched():
+    t = '![](https://raw.githubusercontent.com/a/b/c.png)'
+    assert rd.rewrite_images(t, {}, [], {}) == t
+
+
+def test_missing_image_becomes_note_not_broken_img():
+    out = rd.rewrite_images('![](../x/GONE.png)', {}, ['GONE.png'], {})
+    assert out.strip() == '*[图缺失：GONE.png]*' and '![' not in out
+
+
+def test_image_caption_appended():
+    out = rd.rewrite_images('![](../x/DSC-curve.png)',
+                            {'DSC-curve.png': '/images/a/DSC-curve.webp'}, [],
+                            {'DSC-curve.png': '图源：《Biophysical characterization》'})
+    assert '图源：《Biophysical characterization》' in out
+
+
+def test_caption_for_prefers_book_then_paper_then_link():
+    N = vault.Note
+    assert rd.caption_for(N('p', 't', [], 'note', book='B书')) == '图源：《B书》'
+    assert rd.caption_for(N('p', 't', [], 'note', paper='P论文')) == '图源：P论文'
+    assert rd.caption_for(N('p', 't', [], 'note', link='http://x')) == '图源：http://x'
+    assert rd.caption_for(N('p', 't', [], 'note')) == ''
 
 
 if __name__ == '__main__':
