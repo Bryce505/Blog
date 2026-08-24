@@ -19,8 +19,17 @@ class Group:
 
 
 def publishable(notes):
-    """type 在白名单内、且有标签的才可发布。无标签的没法归类，也就没法成组。"""
-    return [n for n in notes if n.type in config.PUBLISHABLE_TYPES and n.tags]
+    """type 在白名单内、有标签、且体量正常的才可发布。
+
+    体量上限不是性能优化，是内容判定：实测超过 20 万字符的「笔记」全是
+    整本书或整套课程导入（如整本《Capillary Electrophoresis Methods for
+    Pharmaceutical Analysis》，142 万字符），一篇就撑爆 1M 上下文，而且
+    整书重组发布还有版权问题。
+    """
+    return [n for n in notes
+            if n.type in config.PUBLISHABLE_TYPES
+            and n.tags
+            and len(n.body) <= config.MAX_NOTE_CHARS]
 
 
 def _primary_tag(note):
@@ -53,8 +62,24 @@ def _hash(notes):
     return 'sha256:' + h.hexdigest()
 
 
+def _fit_budget(ns):
+    """按体量预算截取。小的优先入选，同预算下能多容纳几篇，文章视角更全。"""
+    picked, used = [], 0
+    for n in sorted(ns, key=lambda x: (len(x.body), x.path)):
+        if len(picked) >= config.MAX_GROUP:
+            break
+        if used + len(n.body) > config.MAX_GROUP_CHARS:
+            continue
+        picked.append(n)
+        used += len(n.body)
+    return sorted(picked, key=lambda x: x.path)
+
+
 def _make(tag, ns):
-    ns = sorted(ns, key=lambda x: x.path)[:config.MAX_GROUP]
+    """预算装不下 MIN_GROUP 篇就返回 None —— 不发半截文章。"""
+    ns = _fit_budget(ns)
+    if len(ns) < config.MIN_GROUP:
+        return None
     return Group(tag=tag, notes=ns, source_hash=_hash(ns), slug=_slugify(tag))
 
 
@@ -80,9 +105,8 @@ def build_groups(notes):
             tag = '/'.join(parts[:2])
         merged.setdefault(tag, []).extend(ns)
 
-    return sorted((_make(t, ns) for t, ns in merged.items()
-                   if len(ns) >= config.MIN_GROUP),
-                  key=lambda g: (-len(g.notes), g.tag))
+    made = (_make(t, ns) for t, ns in merged.items() if len(ns) >= config.MIN_GROUP)
+    return sorted((g for g in made if g), key=lambda g: (-len(g.notes), g.tag))
 
 
 def pick_next(groups, published):

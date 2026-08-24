@@ -11,6 +11,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import compose as cp
+import config
 import images as im
 import render as rd
 import select_ as sel
@@ -54,6 +56,31 @@ def test_publishable_excludes_clipping_type():
     pub = sel.publishable(vault.load_vault(FIX))
     assert len(pub) == 2, [n.path for n in pub]
     assert all(n.type != 'clipping' for n in pub)
+
+
+def test_oversized_note_excluded():
+    """单篇 158 万字符的「笔记」其实是整本书导入，一篇就撑爆上下文。"""
+    big = vault.Note('book.md', 'B', ['a/b/c'], 'note',
+                     body='x' * (config.MAX_NOTE_CHARS + 1))
+    assert big not in sel.publishable([big])
+
+
+def test_group_truncated_by_char_budget_not_just_count():
+    """按篇数限制是错的指标：9 篇也可能加起来 170 万字符。"""
+    # 5 篇 x 9 万 = 45 万，超预算 40 万；应截到 4 篇（36 万）而非整组丢弃
+    ns = [vault.Note(f'n{i}.md', f'N{i}', ['a/b/c'], 'note',
+                     body='x' * 90_000) for i in range(5)]
+    g = sel.build_groups(ns)[0]
+    total = sum(len(n.body) for n in g.notes)
+    assert total <= config.MAX_GROUP_CHARS, total
+    assert len(g.notes) == 4, len(g.notes)
+
+
+def test_group_dropped_when_budget_cannot_fit_min_notes():
+    """预算装不下 3 篇就整组放弃，不发半截文章。"""
+    ns = [vault.Note(f'n{i}.md', f'N{i}', ['a/b/c'], 'note',
+                     body='x' * 199_000) for i in range(5)]
+    assert sel.build_groups(ns) == []
 
 
 def test_group_by_third_level_tag():
@@ -425,6 +452,65 @@ def test_fetch_images_reports_missing_and_is_idempotent():
     assert mapping == {'have.png': '/images/x/have.webp'}, mapping
     assert missing == ['gone.png'], missing
     assert downloads == [], '已存在的图不该重新下载'
+
+
+# ---------- compose ----------
+
+def _grp(notes, tag='t/x/y'):
+    return sel.Group(tag=tag, notes=notes, source_hash='h', slug='s')
+
+
+def test_build_user_message_includes_all_notes_and_meta():
+    ns = [vault.Note('a.md', 'A笔记', ['t/x/y'], 'note', body='正文A', book='书A'),
+          vault.Note('b.md', 'B笔记', ['t/x/y'], 'note', body='正文B', paper='论文B')]
+    msg = cp.build_user_message(_grp(ns))
+    for token in ('正文A', '正文B', 'A笔记', 'B笔记', '书A', '论文B', 't/x/y'):
+        assert token in msg, token
+
+
+def test_system_prompt_carries_hard_constraints():
+    for token in ('逐字原样保留', '不得引入源文中不存在', '不要输出 frontmatter',
+                  '打散重组', '一个都不能少'):
+        assert token in cp.SYSTEM_PROMPT, token
+
+
+def test_compose_sends_system_prompt_first_and_returns_content():
+    captured = {}
+
+    def fake_post(url, headers, payload):
+        captured.update(url=url, headers=headers, payload=payload)
+        return {'choices': [{'message': {'content': '  ## 重组后的文章\n正文  '}}]}
+
+    out = cp.compose(_grp([vault.Note('a.md', 'A', ['t/x/y'], 'note', body='正文A')]),
+                     api_key='k', _post=fake_post)
+    assert out == '## 重组后的文章\n正文'
+    msgs = captured['payload']['messages']
+    assert msgs[0]['role'] == 'system' and '逐字原样保留' in msgs[0]['content']
+    assert msgs[1]['role'] == 'user'
+    assert captured['payload']['model'] == config.DEEPSEEK_MODEL
+    assert captured['headers']['Authorization'] == 'Bearer k'
+
+
+def test_compose_uses_current_v4_model_not_retired_alias():
+    """deepseek-chat / deepseek-reasoner 已不在 GET /models 清单里。"""
+    assert config.DEEPSEEK_MODEL.startswith('deepseek-v4-'), config.DEEPSEEK_MODEL
+
+
+def test_compose_max_tokens_generous_enough_for_long_article():
+    """输出被截断会触发「正文过短」校验，白烧一次 token 还得重跑。"""
+    assert config.DEEPSEEK_MAX_TOKENS >= 32000, config.DEEPSEEK_MAX_TOKENS
+
+
+def test_compose_raises_on_malformed_response():
+    def bad_post(url, headers, payload):
+        return {'error': {'message': 'insufficient balance'}}
+    try:
+        cp.compose(_grp([vault.Note('a.md', 'A', ['t/x/y'], 'note', body='x')]),
+                   api_key='k', _post=bad_post)
+    except cp.ComposeError as e:
+        assert 'insufficient balance' in str(e), str(e)
+    else:
+        raise AssertionError('响应缺少 choices 时应抛 ComposeError，不能静默返回空文章')
 
 
 if __name__ == '__main__':
