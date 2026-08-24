@@ -2,6 +2,8 @@
 
 把 GitHub 仓库和 Google Drive 中同步的 Obsidian 笔记，由 AI 整理成单篇技术文章，定时发布到博客。测试通过后会用 `git subtree split` 拆分成独立仓库（见根目录 `docs/claude-code-cloud-notes.md`）。
 
+本文档的可视化版本见 [`obsidian-publish-pipeline.html`](./obsidian-publish-pipeline.html)（浏览器直接打开）。
+
 ## 整体思路
 
 拆成四个可以独立选型、独立替换的环节，而不是设计成一整个大系统：**数据源接入 → AI 整理生成 → 调度触发 → 发布上线**。下图实线是推荐路线，虚线是可选分支。

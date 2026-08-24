@@ -1,0 +1,439 @@
+<title>Obsidian 发布流水线</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --bg: #EEF2F4;
+    --surface: #FFFFFF;
+    --surface-2: #E3E9EC;
+    --ink: #141B22;
+    --ink-muted: #4B5A66;
+    --ink-faint: #8A98A2;
+    --line: #CDD7DB;
+    --line-strong: #9FB0B8;
+    --accent: #B8631E;
+    --accent-ink: #7A4113;
+    --accent-soft: rgba(184, 99, 30, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10151B;
+      --surface: #161D24;
+      --surface-2: #1C252D;
+      --ink: #E7ECEF;
+      --ink-muted: #9AA9B3;
+      --ink-faint: #62717B;
+      --line: #283239;
+      --line-strong: #3B4750;
+      --accent: #E0954A;
+      --accent-ink: #F0AE6E;
+      --accent-soft: rgba(224, 149, 74, 0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10151B;
+    --surface: #161D24;
+    --surface-2: #1C252D;
+    --ink: #E7ECEF;
+    --ink-muted: #9AA9B3;
+    --ink-faint: #62717B;
+    --line: #283239;
+    --line-strong: #3B4750;
+    --accent: #E0954A;
+    --accent-ink: #F0AE6E;
+    --accent-soft: rgba(224, 149, 74, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', 'Noto Sans SC', system-ui, sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .page { max-width: 800px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin: 0 0 0.75rem;
+  }
+  h1 {
+    font-family: 'ZCOOL QingKe HuangYou', 'IBM Plex Sans', sans-serif;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1.25;
+    text-wrap: balance;
+    margin: 0 0 0.9rem;
+    color: var(--ink);
+  }
+  .lede {
+    font-size: 1.0625rem;
+    color: var(--ink-muted);
+    max-width: 44rem;
+    margin: 0;
+  }
+
+  header.page-head { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--line); }
+
+  .section { margin: 3.5rem 0; }
+  .section > p { margin: 0.9rem 0; max-width: 44rem; }
+  .stage-title-row { display: flex; align-items: flex-end; gap: 1rem; margin-bottom: 0.4rem; }
+  .stage-num {
+    font-family: 'ZCOOL QingKe HuangYou', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3rem);
+    line-height: 1;
+    color: var(--line-strong);
+  }
+  .stage-title-row h2 { margin: 0; font-size: 1.4rem; font-weight: 600; }
+  .stage-job { margin: 0.35rem 0 1.25rem; color: var(--ink-muted); font-size: 0.98rem; max-width: 44rem; }
+
+  h2.plain { font-size: 1.4rem; font-weight: 600; margin: 0 0 0.5rem; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.92rem; }
+  thead th {
+    text-align: left; font-weight: 600; font-size: 0.78rem; letter-spacing: 0.03em;
+    color: var(--ink-muted); background: var(--surface-2);
+    padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--line);
+  }
+  tbody td { padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; background: var(--surface); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr.is-rec td { background: var(--accent-soft); }
+  tbody tr.is-rec td:first-child { box-shadow: inset 2px 0 0 var(--accent); }
+  td.opt-name { font-weight: 600; }
+  td.verdict { white-space: nowrap; text-align: right; }
+  .tag-rec { font-family: 'IBM Plex Mono', 'Noto Sans SC', monospace; font-size: 0.8rem; color: var(--accent-ink); font-weight: 600; }
+  .verdict-plain { color: var(--ink-faint); font-size: 0.88rem; }
+
+  figure.diagram { margin: 1.5rem 0 0.75rem; }
+  .diagram-scroll { overflow-x: auto; }
+  .diagram-scroll svg { min-width: 640px; width: 100%; height: auto; display: block; }
+  figcaption { margin-top: 0.85rem; font-size: 0.9rem; color: var(--ink-muted); max-width: 44rem; }
+  .diagram text { font-family: 'IBM Plex Sans', 'Noto Sans SC', sans-serif; }
+  .node-title { font-size: 13px; font-weight: 600; fill: var(--ink); }
+  .node-title.muted { fill: var(--ink-muted); font-weight: 500; }
+  .node-sub { font-size: 10.5px; fill: var(--ink-muted); }
+  .arrow-label { font-size: 10.5px; fill: var(--ink-muted); }
+  .node-box { fill: var(--surface); stroke: var(--ink); stroke-width: 1.4; }
+  .node-box.optional { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
+  .line-main { stroke: var(--accent); stroke-width: 1.6; fill: none; }
+  .line-opt { stroke: var(--ink-faint); stroke-width: 1.4; fill: none; stroke-dasharray: 3 3; }
+  .arrow-main-fill { fill: var(--accent); }
+  .arrow-opt-fill { fill: var(--ink-faint); }
+
+  .stack-panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    padding: 2rem 2rem 2.2rem;
+  }
+  .stack-panel::before, .stack-panel::after {
+    content: ""; position: absolute; width: 14px; height: 14px; border: 2px solid var(--accent);
+  }
+  .stack-panel::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .stack-panel::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .stack-panel h2 { margin-top: 0; }
+  .chain { list-style: none; margin: 1.4rem 0 0; padding: 0; position: relative; display: flex; flex-direction: column; gap: 1rem; }
+  .chain::before { content: ""; position: absolute; left: 0.75rem; top: 0.75rem; bottom: 0.75rem; width: 1px; background: var(--line); }
+  .chain li { display: flex; gap: 0.9rem; align-items: baseline; }
+  .chain-n {
+    position: relative; z-index: 1; flex: none;
+    width: 1.5rem; height: 1.5rem; display: inline-flex; align-items: center; justify-content: center;
+    background: var(--surface); border: 1px solid var(--line-strong);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--accent-ink);
+  }
+  .stack-note { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px dashed var(--line); color: var(--ink-muted); font-size: 0.94rem; }
+
+  ul.plain-list { margin: 1rem 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.9rem; max-width: 44rem; }
+  ul.plain-list li { padding-left: 1.1rem; position: relative; }
+  ul.plain-list li::before { content: "·"; position: absolute; left: 0; color: var(--accent-ink); font-weight: 700; }
+  ul.plain-list b { font-weight: 600; }
+
+  code, .mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.88em; background: var(--surface-2); padding: 0.08em 0.35em; border: 1px solid var(--line); }
+
+  footer.page-foot { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: 0.85rem; color: var(--ink-faint); }
+
+  @media (max-width: 560px) {
+    .page { padding: 2rem 1.1rem 4rem; }
+    .stage-title-row { gap: 0.6rem; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="page-head">
+    <p class="eyebrow">架构备忘 · 2026-08-24</p>
+    <h1>Obsidian 发布流水线</h1>
+    <p class="lede">把 GitHub 和 Google Drive 里同步的 Obsidian 笔记，交给 AI 整理成单篇技术文章，定时发布到博客。按四段拆开对比实现方式，并给出一条推荐的最简路线。</p>
+  </header>
+
+  <section class="section">
+    <h2 class="plain">整体思路</h2>
+    <p>把这件事拆成四个独立环节——<b>数据源接入</b>、<b>AI 整理生成</b>、<b>调度触发</b>、<b>发布上线</b>——而不是设计成一整个大系统。每一段都能单独选型、单独替换。下图中实线是推荐路线，虚线是可选分支。</p>
+
+    <figure class="diagram">
+      <div class="diagram-scroll">
+        <svg viewBox="0 0 1020 250" role="img" aria-label="流水线示意图：Obsidian 知识库经 Git 插件同步到 GitHub 仓库，这是推荐的主路径；Google Drive 只是个人多端备份，按需才桥接，是虚线表示的可选分支。GitHub 仓库经定时任务触发 AI 整理为 Markdown，再由静态站点构建并自动发布上线。">
+          <defs>
+            <marker id="arrow-main" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path class="arrow-main-fill" d="M0,0 L10,5 L0,10 z"/>
+            </marker>
+            <marker id="arrow-opt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path class="arrow-opt-fill" d="M0,0 L10,5 L0,10 z"/>
+            </marker>
+          </defs>
+
+          <!-- connectors -->
+          <line class="line-main" x1="160" y1="110" x2="236" y2="65" marker-end="url(#arrow-main)"/>
+          <text class="arrow-label" x="198" y="79" text-anchor="middle">Git 插件同步</text>
+
+          <line class="line-opt" x1="160" y1="130" x2="236" y2="188" marker-end="url(#arrow-opt)"/>
+          <text class="arrow-label" x="198" y="151" text-anchor="middle">桌面同步·备份</text>
+
+          <line class="line-opt" x1="313" y1="160" x2="313" y2="100" marker-end="url(#arrow-opt)"/>
+          <text class="arrow-label" x="313" y="132" text-anchor="middle">可选桥接</text>
+
+          <line class="line-main" x1="390" y1="65" x2="466" y2="65" marker-end="url(#arrow-main)"/>
+          <text class="arrow-label" x="428" y="57" text-anchor="middle">定时拉取</text>
+
+          <line class="line-main" x1="640" y1="65" x2="716" y2="65" marker-end="url(#arrow-main)"/>
+          <text class="arrow-label" x="678" y="57" text-anchor="middle">生成 Markdown</text>
+
+          <line class="line-main" x1="860" y1="65" x2="906" y2="65" marker-end="url(#arrow-main)"/>
+          <text class="arrow-label" x="883" y="57" text-anchor="middle">push 部署</text>
+
+          <!-- nodes -->
+          <g>
+            <rect class="node-box" x="20" y="85" width="140" height="70"/>
+            <text class="node-title" x="90" y="114" text-anchor="middle">Obsidian</text>
+            <text class="node-sub" x="90" y="130" text-anchor="middle">笔记 · 双链 · frontmatter</text>
+          </g>
+
+          <g>
+            <rect class="node-box" x="236" y="30" width="154" height="70"/>
+            <text class="node-title" x="313" y="59" text-anchor="middle">GitHub 仓库</text>
+            <text class="node-sub" x="313" y="75" text-anchor="middle">git 提交历史</text>
+          </g>
+
+          <g>
+            <rect class="node-box optional" x="236" y="160" width="154" height="56"/>
+            <text class="node-title muted" x="313" y="184" text-anchor="middle">Google Drive</text>
+            <text class="node-sub" x="313" y="200" text-anchor="middle">文件级同步（可选）</text>
+          </g>
+
+          <g>
+            <rect class="node-box" x="466" y="30" width="174" height="70"/>
+            <text class="node-title" x="553" y="59" text-anchor="middle">AI 整理</text>
+            <text class="node-sub" x="553" y="75" text-anchor="middle">Claude API → Markdown</text>
+          </g>
+
+          <g>
+            <rect class="node-box" x="716" y="30" width="144" height="70"/>
+            <text class="node-title" x="788" y="59" text-anchor="middle">静态构建</text>
+            <text class="node-sub" x="788" y="75" text-anchor="middle">Hugo / Astro</text>
+          </g>
+
+          <g>
+            <rect class="node-box" x="906" y="30" width="94" height="70"/>
+            <text class="node-title" x="953" y="59" text-anchor="middle">已发布</text>
+            <text class="node-sub" x="953" y="75" text-anchor="middle">Pages / CDN</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>推荐路线（实线）：Obsidian → GitHub 仓库 → 定时任务 → AI 整理 → 静态构建 → 发布上线。Google Drive（虚线）默认只是个人多端备份，不接入自动化，只有笔记确实只经 Drive 编辑时才值得桥接。</figcaption>
+    </figure>
+  </section>
+
+  <section class="section">
+    <div class="stage-title-row">
+      <span class="stage-num">01</span>
+      <h2>数据源接入</h2>
+    </div>
+    <p class="stage-job">让流水线能读到 Obsidian 笔记，并且分辨出"什么变了"。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>方案</th><th>技术栈</th><th>取舍</th><th>结论</th></tr>
+        </thead>
+        <tbody>
+          <tr class="is-rec">
+            <td class="opt-name">GitHub 仓库单一来源</td>
+            <td>Obsidian Git 插件 + git</td>
+            <td>有 diff、有提交历史，原生适配 CI；前提是笔记先经过 git 同步</td>
+            <td class="verdict"><span class="tag-rec">[ 推荐 ]</span></td>
+          </tr>
+          <tr>
+            <td class="opt-name">Google Drive → GitHub 桥接</td>
+            <td>Drive API + 定时脚本写回 git</td>
+            <td>能接住只在 Drive 编辑、没走 git 的笔记；多一套 OAuth/服务账号和轮询逻辑</td>
+            <td class="verdict"><span class="verdict-plain">可选</span></td>
+          </tr>
+          <tr>
+            <td class="opt-name">双源各自轮询</td>
+            <td>两条独立监听 / 轮询逻辑</td>
+            <td>两套状态、两套失败模式，笔记内容其实是同一份，重复建设</td>
+            <td class="verdict"><span class="verdict-plain">不建议</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>笔记要能被自动化处理，前提是"变化"能被看见。Git 天然带 diff、提交历史和触发钩子；Google Drive 的同步大多只是文件级镜像，拿不到这些。默认只让 GitHub 仓库进流水线，Google Drive 继续做它最擅长的事——多设备间的个人备份。</p>
+  </section>
+
+  <section class="section">
+    <div class="stage-title-row">
+      <span class="stage-num">02</span>
+      <h2>AI 整理生成</h2>
+    </div>
+    <p class="stage-job">把选中的笔记（可能零散、带双链和 frontmatter）整理成一篇结构完整的技术文章。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>方案</th><th>技术栈</th><th>取舍</th><th>结论</th></tr>
+        </thead>
+        <tbody>
+          <tr class="is-rec">
+            <td class="opt-name">LLM 出 Markdown，渲染器出 HTML</td>
+            <td>Claude API + 现成 SSG 渲染管线</td>
+            <td>多一次转换；HTML 结构稳定、主题统一，不怕模型吐出破损标签</td>
+            <td class="verdict"><span class="tag-rec">[ 推荐 ]</span></td>
+          </tr>
+          <tr>
+            <td class="opt-name">LLM 直接出 HTML</td>
+            <td>Claude API + HTML 格式 prompt</td>
+            <td>少一步转换；但标签结构、转义、样式钩子全靠模型自觉，主题很难统一维护</td>
+            <td class="verdict"><span class="verdict-plain">不建议</span></td>
+          </tr>
+          <tr>
+            <td class="opt-name">RAG 式跨笔记整理</td>
+            <td>embeddings + 向量检索 + LLM</td>
+            <td>能自动关联相关笔记一起整理；多养一套索引和更新逻辑</td>
+            <td class="verdict"><span class="verdict-plain">可选</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>让模型直接吐 HTML 能省一步，但代价是每篇文章的标签结构、转义、样式钩子都靠模型当场发挥，主题很难统一维护。让模型专心整理成干净的 Markdown，HTML 交给渲染器统一生成，分工更稳。模型档位上，整理类任务 <code>claude-sonnet-5</code> 这个档位通常够用，量大且要求不高的摘要可以再降到 Haiku 档。如果一次定时任务要整理多篇笔记，把不变的风格指南、输出格式放进系统提示最前面并加上 prompt caching，同一次运行能省下不少重复计费的 token。</p>
+  </section>
+
+  <section class="section">
+    <div class="stage-title-row">
+      <span class="stage-num">03</span>
+      <h2>调度触发</h2>
+    </div>
+    <p class="stage-job">决定"整理 + 发布"这条链什么时候跑一次。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>方案</th><th>技术栈</th><th>取舍</th><th>结论</th></tr>
+        </thead>
+        <tbody>
+          <tr class="is-rec">
+            <td class="opt-name">GitHub Actions 定时任务</td>
+            <td><code>schedule</code> cron，跑在 blog 仓库</td>
+            <td>零额外基础设施，和代码同仓库，个人博客量级免费额度够用</td>
+            <td class="verdict"><span class="tag-rec">[ 推荐 ]</span></td>
+          </tr>
+          <tr>
+            <td class="opt-name">外部调度器</td>
+            <td>Cloud Scheduler / Vercel Cron 等</td>
+            <td>不受单次运行时长限制；多一个要维护的账号和部署目标</td>
+            <td class="verdict"><span class="verdict-plain">可选</span></td>
+          </tr>
+          <tr>
+            <td class="opt-name">自建常驻服务</td>
+            <td>自己维护的常驻进程 / 服务器</td>
+            <td>为一个每天跑一次的任务，养一台要保活、打补丁的机器</td>
+            <td class="verdict"><span class="verdict-plain">不建议</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>调度只是"什么时候跑一次"，不需要长期占资源的常驻服务。定时任务的免费额度对个人博客这种量级足够，而且和内容、构建脚本同仓库，不用再额外管一台机器的存活。</p>
+  </section>
+
+  <section class="section">
+    <div class="stage-title-row">
+      <span class="stage-num">04</span>
+      <h2>发布上线</h2>
+    </div>
+    <p class="stage-job">把生成的文章变成访问者能看到的网页。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>方案</th><th>技术栈</th><th>取舍</th><th>结论</th></tr>
+        </thead>
+        <tbody>
+          <tr class="is-rec">
+            <td class="opt-name">静态站点生成器 + Git 托管自动部署</td>
+            <td>Hugo / Astro / Eleventy + GitHub Pages 或 Cloudflare Pages 等</td>
+            <td>push 即构建部署，没有服务器和数据库，文章历史天然在 git 里</td>
+            <td class="verdict"><span class="tag-rec">[ 推荐 ]</span></td>
+          </tr>
+          <tr>
+            <td class="opt-name">Headless CMS + 独立前端</td>
+            <td>CMS API + Next.js 等前端</td>
+            <td>换来协作编辑、评论等能力；多一套 CMS 托管、鉴权、前后端双部署</td>
+            <td class="verdict"><span class="verdict-plain">可选</span></td>
+          </tr>
+          <tr>
+            <td class="opt-name">自建后端直接渲染</td>
+            <td>自写服务端 + 自建数据库</td>
+            <td>把 SSG 已经做好的事重新做一遍</td>
+            <td class="verdict"><span class="verdict-plain">不建议</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>静态站点生成器把"内容"和"样式"彻底分开：AI 只管产出 Markdown，换主题不影响任何一篇已发布的文章。push 即构建部署，没有服务器和数据库要维护。</p>
+  </section>
+
+  <section class="section stack-panel">
+    <h2 class="plain">推荐的最简整体方案</h2>
+    <p style="margin:0; color:var(--ink-muted);">全部用已经存在的东西拼起来，不新增服务器、数据库、CMS 或向量库：</p>
+    <ol class="chain">
+      <li><span class="chain-n">1</span><span>Obsidian Git 插件把 vault 同步到 GitHub 仓库（只读输入，Google Drive 不接入自动化）</span></li>
+      <li><span class="chain-n">2</span><span>blog 仓库里的 GitHub Actions <code>schedule</code> 定时任务（例如每天一次）</span></li>
+      <li><span class="chain-n">3</span><span>拉取 vault 仓库，筛选 frontmatter 标了 <code>publish: true</code> 且未处理过的笔记（用一个 <code>published.json</code> 记录已处理项）</span></li>
+      <li><span class="chain-n">4</span><span>调用 Claude API（Sonnet 档位打底，简单摘要可降到 Haiku 档）把笔记整理成 Markdown</span></li>
+      <li><span class="chain-n">5</span><span>写入 blog 仓库的内容目录、更新 <code>published.json</code>，commit + push</span></li>
+      <li><span class="chain-n">6</span><span>Hugo 或 Astro（任选其一，看熟悉度）构建站点</span></li>
+      <li><span class="chain-n">7</span><span>push 触发 GitHub Pages / Cloudflare Pages 自动部署</span></li>
+    </ol>
+    <p class="stack-note">Google Drive 全程不出现——如果笔记最终都会经 Obsidian Git 插件同步到 GitHub，它就只是个人多端备份，留在流水线外最省事。</p>
+  </section>
+
+  <section class="section">
+    <h2 class="plain">还需要你决定</h2>
+    <ul class="plain-list">
+      <li><b>内容颗粒度</b>：一篇笔记对一篇博客，还是把几篇相关笔记合并整理成一篇？决定了怎么选笔记、怎么写 prompt。</li>
+      <li><b>Google Drive 要不要接入自动化</b>：如果所有笔记最终都会经过 Obsidian Git 插件同步，Drive 可以完全留在流水线之外。</li>
+      <li><b>发布节奏</b>：定时轮询（简单）够用，还是需要 push 即触发（要多一层跨仓库的 webhook / <code>repository_dispatch</code>）？</li>
+      <li><b>SSG 和主题</b>：Hugo、Astro、Eleventy 差异主要在生态和熟悉度，不影响上面的架构。</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2 class="plain">实施时留意的几个坑</h2>
+    <ul class="plain-list">
+      <li><b>两个仓库分开</b>：流水线只读 vault 仓库、只写 blog 仓库。让自动化和 Obsidian Git 插件的自动提交共用同一个仓库，迟早会撞上冲突。</li>
+      <li><b>去重和幂等</b>：cron 每次都会重新扫描，没有状态记录就会重复整理、重复发布同一篇笔记。</li>
+      <li><b>密钥只放 Actions Secrets</b>，不要出现在仓库或生成的文章里。</li>
+      <li><b>真要接 Google Drive 的话</b>：Drive API 只能告诉你"文件改了"，给不了"改了什么"，桥接脚本要自己算 diff，比读 git log 麻烦不少。</li>
+    </ul>
+  </section>
+
+  <footer class="page-foot">
+    这是一份架构参考，不是实现代码——真正落地时，再针对某一段展开具体脚本和配置。
+  </footer>
+
+</div>
