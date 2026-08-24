@@ -1,0 +1,35 @@
+{
+  "05仪器与分析技术/质谱": {
+    "slug": "05仪器与分析技术-质谱",
+    "published_at": "2026-08-24",
+    "source_hash": "sha256:78d7434f9429b84d5593bc9fab07890ba9ace9f8b38197ab24e4f4972fefe7b4",
+    "notes": [
+      "Analytical technology/Isobaric labeling.md",
+      "Antibody-Characterization/Analytical Characterization of Biotherapeutics/Chapter2 Mass Spectrometric Characterization of Recombinant Proteins.md",
+      "Antibody-Characterization/Analytical Characterization of Biotherapeutics/Chapter6 Antibody de novo Sequencing.md",
+      "Antibody-Characterization/CID碎裂-proline effect.md",
+      "Antibody-Characterization/HCP/2011-Global quantification of mammalian gene expression control.md",
+      "Antibody-Characterization/HCP/HCP样品前处理流程.md",
+      "Antibody-Characterization/IEX酸性峰调查/CID_离子表说明文档.md",
+      "Antibody-Characterization/Mascot training.md",
+      "Antibody-Characterization/Mass Spectrometry for the Novice/Chapter3 Methodologies  and Strategies.md",
+      "Antibody-Characterization/为什么不会有b1离子.md",
+      "Antibody-Characterization/质谱分析工具.md",
+      "Mass Spectrometry/Mass Spectrometry for the Novice/Chapter1 An Overview.md"
+    ],
+    "noteTitles": [
+      "Isobaric labeling",
+      "Chapter2 Mass Spectrometric Characterization of Recombinant Proteins",
+      "Chapter6 Antibody de novo Sequencing",
+      "CID碎裂-proline effect",
+      "2011-Global quantification of mammalian gene expression control",
+      "HCP样品前处理流程",
+      "Romiplostim CID碎裂离子表 - 数据说明与质量检查",
+      "Mascot training",
+      "Chapter3 Methodologies  and Strategies",
+      "为什么不会有b1离子",
+      "质谱分析工具",
+      "Chapter1 An Overview"
+    ]
+  }
+}
