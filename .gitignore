@@ -4,3 +4,4 @@ dist/
 .astro/
 __pycache__/
 *.pyc
+technical-blog-design.html

@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    /* 中文不加载 webfont：CJK 字体动辄数 MB，国内访问是灾难。
+       系统中文栈 + 拉丁字母走 IBM Plex（等宽数字对数据表格很重要）。 */
+    :root {
+      --han: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+      --han-serif: "Songti SC", "SimSun", "Source Han Serif SC", serif;
+      --sans: "IBM Plex Sans", var(--han);
+      --serif: "IBM Plex Serif", var(--han-serif);
+      --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      --measure: 40rem;
+    }
+    [data-theme="light"] {
+      --bg: oklch(0.992 0.003 240); --surface: oklch(0.972 0.005 245);
+      --fg: oklch(0.26 0.015 250);  --muted: oklch(0.53 0.012 250);
+      --border: oklch(0.90 0.008 250); --accent: oklch(0.47 0.085 232);
+      --warn: oklch(0.52 0.085 68);   --ok: oklch(0.48 0.070 160);
+    }
+    [data-theme="dark"] {
+      --bg: oklch(0.185 0.012 252); --surface: oklch(0.232 0.013 252);
+      --fg: oklch(0.925 0.008 250); --muted: oklch(0.665 0.011 250);
+      --border: oklch(0.325 0.013 252); --accent: oklch(0.755 0.085 232);
+      --warn: oklch(0.79 0.085 74);   --ok: oklch(0.76 0.070 162);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .root { background: var(--bg); color: var(--fg); font-family: var(--sans);
+            min-height: 100%; font-size: 16px; line-height: 1.75; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 40px; }
+    .rule { height: 1px; background: var(--border); border: 0; margin: 0; }
+    .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  </style>
+</helmet>
+
+<div class="root" data-theme="{{theme}}">
+
+  <!-- 页眉：站名 + 主导航 -->
+  <header style="border-bottom: 1px solid var(--border); background: var(--bg);
+                 position: sticky; top: 0; z-index: 10;">
+    <div class="wrap" style="display: flex; align-items: baseline; gap: 32px;
+                             height: 68px;">
+      <a href="/" style="font-family: var(--serif); font-size: 19px; font-weight: 600;
+                         color: var(--fg); letter-spacing: -0.01em;">表征笔记</a>
+      <nav style="display: flex; gap: 22px; font-size: 14px; margin-left: auto;">
+        <a href="/archive" style="color: var(--muted);">归档</a>
+        <a href="/tags" style="color: var(--muted);">标签</a>
+        <a href="/tools" style="color: var(--muted);">工具与效率</a>
+        <a href="/about" style="color: var(--muted);">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 站点定位：一句话，不做 hero，不做营销 -->
+  <section class="wrap" style="padding: 56px 40px 40px;">
+    <p style="max-width: var(--measure); margin: 0; font-size: 17px;
+              color: var(--muted); line-height: 1.85;">
+      生物医药 CMC 与分析方法的工作笔记。内容由 Obsidian 知识库按主题整理成文，
+      保留原始数据、法规条款与文献出处。
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 主体：文章列表 + 分类侧栏 -->
+  <div class="wrap" style="display: grid; grid-template-columns: minmax(0, 1fr) 232px;
+                           gap: 64px; padding-top: 40px; padding-bottom: 72px;
+                           align-items: start;">
+
+    <main>
+      <h2 style="font-family: var(--serif); font-size: 13px; font-weight: 600;
+                 letter-spacing: 0.08em; color: var(--muted); margin: 0 0 4px;
+                 text-transform: uppercase;">最新</h2>
+
+      <sc-for list="{{posts}}" as="p" hint-placeholder-count="4">
+        <article style="padding: 26px 0; border-bottom: 1px solid var(--border);">
+          <div style="display: flex; gap: 12px; align-items: baseline;
+                      font-size: 12.5px; color: var(--muted); margin-bottom: 7px;">
+            <span class="num">{{p.date}}</span>
+            <span style="color: var(--border);">·</span>
+            <a href="{{p.catHref}}" style="color: var(--muted);">{{p.category}}</a>
+            <span style="margin-left: auto;" class="num">{{p.notes}} 篇笔记</span>
+          </div>
+          <h3 style="margin: 0 0 8px; font-family: var(--serif); font-size: 21px;
+                     font-weight: 600; line-height: 1.45; letter-spacing: -0.005em;">
+            <a href="{{p.href}}" style="color: var(--fg);">{{p.title}}</a>
+          </h3>
+          <p style="margin: 0; max-width: var(--measure); font-size: 15px;
+                    color: var(--muted); line-height: 1.8; text-wrap: pretty;">
+            {{p.excerpt}}
+          </p>
+        </article>
+      </sc-for>
+    </main>
+
+    <!-- 分类：直接沿用知识库的数字编号标签树，不另建体系 -->
+    <aside style="position: sticky; top: 96px;">
+      <h2 style="font-family: var(--serif); font-size: 13px; font-weight: 600;
+                 letter-spacing: 0.08em; color: var(--muted); margin: 0 0 14px;
+                 text-transform: uppercase;">分类</h2>
+      <nav style="display: flex; flex-direction: column; gap: 1px;">
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="9">
+          <a href="{{c.href}}" style="display: flex; align-items: baseline; gap: 10px;
+                    padding: 7px 10px; margin: 0 -10px; border-radius: 3px;
+                    font-size: 14px; color: var(--fg);">
+            <span class="num" style="color: var(--muted); font-size: 12px;
+                                     min-width: 20px;">{{c.no}}</span>
+            <span>{{c.name}}</span>
+            <span class="num" style="margin-left: auto; color: var(--muted);
+                                     font-size: 12px;">{{c.count}}</span>
+          </a>
+        </sc-for>
+      </nav>
+    </aside>
+  </div>
+
+  <footer style="border-top: 1px solid var(--border);">
+    <div class="wrap" style="padding: 26px 40px; display: flex; gap: 20px;
+                             font-size: 13px; color: var(--muted);">
+      <span>内容来自个人 Obsidian 知识库，由流水线定时整理发布</span>
+      <a href="/rss.xml" style="margin-left: auto;">RSS</a>
+    </div>
+  </footer>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light","section":"主题"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      theme: this.props.theme ?? 'light',
+      posts: [
+        { date: '2026-08-24', category: '03质量控制', catHref: '/category/03质量控制',
+          notes: 14, href: '/posts/03质量控制-残留-hcp',
+          title: '宿主细胞蛋白残留：检测方法、覆盖率评估与限度设定',
+          excerpt: 'HCP 是工艺相关杂质中风险最高的一类。本文汇总 ELISA 与质谱两条路线的适用边界、抗体覆盖率的评估方法，以及限度设定在 ICH Q6B 框架下的依据。' },
+        { date: '2026-08-23', category: '05仪器与分析技术', catHref: '/category/05仪器与分析技术',
+          notes: 13, href: '/posts/05仪器与分析技术-质谱',
+          title: '质谱基础：离子化、质量分析器与碎裂方式的选型',
+          excerpt: '从 ESI 与 MALDI 的适用样品谈起，比较 Orbitrap、TOF、四极杆在分辨率与扫描速度上的取舍，以及 CID / HCD / ETD 对不同修饰位点的适配性。' },
+        { date: '2026-08-22', category: '02分子表征', catHref: '/category/02分子表征',
+          notes: 11, href: '/posts/02分子表征-ptm',
+          title: '翻译后修饰的表征：脱酰胺、氧化与糖基化的分析路径',
+          excerpt: '按修饰类型梳理肽图前处理条件对人为修饰的引入风险，以及各修饰在电荷变异体与分子量层面的表现差异。' },
+        { date: '2026-08-21', category: '02分子表征', catHref: '/category/02分子表征',
+          notes: 13, href: '/posts/02分子表征-相互作用-亲和力affinity',
+          title: '亲和力测定：SPR 与 BLI 的动力学参数解读',
+          excerpt: '结合速率与解离速率的独立意义常被 KD 一个数字掩盖。本文讨论传感图拟合的常见误区，以及配体固定密度对表观动力学的影响。' },
+      ],
+      cats: [
+        { no: '00', name: '基础',           count: 28, href: '/category/00基础' },
+        { no: '02', name: '分子表征',       count: 47, href: '/category/02分子表征' },
+        { no: '03', name: '质量控制',       count: 31, href: '/category/03质量控制' },
+        { no: '04', name: '抗体设计与筛选', count: 12, href: '/category/04抗体设计与筛选' },
+        { no: '05', name: '仪器与分析技术', count: 44, href: '/category/05仪器与分析技术' },
+        { no: '06', name: '工艺',           count:  9, href: '/category/06工艺' },
+        { no: '07', name: '注册与法规',     count: 18, href: '/category/07注册与法规' },
+        { no: '08', name: '安全性评价',     count:  4, href: '/category/08安全性评价' },
+        { no: '14', name: '编程与软件',     count: 16, href: '/category/14编程与软件' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

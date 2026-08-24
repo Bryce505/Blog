@@ -1,0 +1,105 @@
+{
+  "03质量控制/残留/HCP": {
+    "slug": "03质量控制-残留-hcp",
+    "published_at": "2026-08-24",
+    "source_hash": "sha256:9900cbae163168ea4ad1bf2866d5c05fe17729fbbb0a30822461fe120885c029",
+    "notes": [
+      "Antibody-Characterization/HCP/2012-Comparison and applications of label-free absolute proteome quantification methods on Escherichia coli.md",
+      "Antibody-Characterization/HCP/Absolute Quantification of Proteins by LC-MSE.md",
+      "Antibody-Characterization/HCP/CD44毒性文献综述与患者风险评估.md",
+      "Antibody-Characterization/HCP/HCP-ELISA稀释线性不通过的判定报告与早期方法开发策略.md",
+      "Antibody-Characterization/HCP/HCP-QTOF定量文献综述.md",
+      "Antibody-Characterization/HCP/HCP鉴定与定量.md",
+      "Antibody-Characterization/HCP/HCP靶向定量方法综述与CD44-QTOF-PRM试验方案设计.md",
+      "Antibody-Characterization/HCP/吐温降解酶(高风险HCP)及其检测方法系统综述.md",
+      "Antibody-Characterization/HCP/高风险宿主细胞蛋白分类表（按影响分类）.md",
+      "Antibody-Characterization/Residual host cell protein(HCP)鉴定与定量.md",
+      "Antibody-Characterization/SC-mAb-HCP-Dosing-Comparison.md",
+      "Antibody-Characterization/Volume 2 Biopharmaceutical Characterization The NISTmAb Case Study/Chapter9 Analytical Methods for the Measurement of Host Cell Proteins and Other Process-Related Impurities.md",
+      "Quality_and_Regulation/验证相关/ELISA方法开发-稀释线性和平行性.md",
+      "SCI-Paper/2026-Graham-Assessment and Control of Host Cell Proteins in Biologics Survey of Industry Practices and a Vision for Harmonization.md"
+    ],
+    "noteTitles": [
+      "2012-Comparison and applications of label-free absolute proteome quantification methods on Escherichia coli",
+      "Absolute Quantification of Proteins by LCMSE",
+      "CD44毒性文献综述与患者风险评估",
+      "HCP ELISA 稀释线性不通过的判定、报告与早期方法开发策略",
+      "HCP 靶向定量文献综述（QTOF / LC-MS）",
+      "HCP鉴定与定量",
+      "HCP靶向定量方法综述与CD44-QTOF/PRM靶向定量试验方案设计",
+      "吐温降解酶（高风险 HCP）及其检测方法系统综述",
+      "高风险宿主细胞蛋白分类表（按影响分类）",
+      "Residual host cell protein(HCP)鉴定与定量",
+      "已上市皮下注射单抗 Dosing Regimen 与 HCP 量比较分析",
+      "Chapter9 Analytical Methods for the Measurement of Host Cell Proteins and Other Process-Related Impurities",
+      "ELISA方法开发-稀释线性和平行性",
+      "2026-Graham-Assessment and Control of Host Cell Proteins in Biologics Survey of Industry Practices and a Vision for Harmonization"
+    ]
+  },
+  "05仪器与分析技术/质谱": {
+    "slug": "05仪器与分析技术-质谱",
+    "published_at": "2026-08-24",
+    "source_hash": "sha256:6cf473470f755bfb383790b555fa06b08a2dd8c26d8752e4dd7b0ec7efee8499",
+    "notes": [
+      "Analytical technology/Isobaric labeling.md",
+      "Antibody-Characterization/Analytical Characterization of Biotherapeutics/Chapter2 Mass Spectrometric Characterization of Recombinant Proteins.md",
+      "Antibody-Characterization/Analytical Characterization of Biotherapeutics/Chapter6 Antibody de novo Sequencing.md",
+      "Antibody-Characterization/CID碎裂-proline effect.md",
+      "Antibody-Characterization/HCP/2011-Global quantification of mammalian gene expression control.md",
+      "Antibody-Characterization/HCP/HCP样品前处理流程.md",
+      "Antibody-Characterization/IEX酸性峰调查/CID_离子表说明文档.md",
+      "Antibody-Characterization/Mascot training.md",
+      "Antibody-Characterization/Mass Spectrometry for the Novice/Chapter3 Methodologies  and Strategies.md",
+      "Antibody-Characterization/protein sequencing与离子类型.md",
+      "Antibody-Characterization/为什么不会有b1离子.md",
+      "Antibody-Characterization/质谱分析工具.md",
+      "Mass Spectrometry/Mass Spectrometry for the Novice/Chapter1 An Overview.md"
+    ],
+    "noteTitles": [
+      "Isobaric labeling",
+      "Chapter2 Mass Spectrometric Characterization of Recombinant Proteins",
+      "Chapter6 Antibody de novo Sequencing",
+      "CID碎裂-proline effect",
+      "2011-Global quantification of mammalian gene expression control",
+      "HCP样品前处理流程",
+      "Romiplostim CID碎裂离子表 - 数据说明与质量检查",
+      "Mascot training",
+      "Chapter3 Methodologies  and Strategies",
+      "protein sequencing与离子类型",
+      "为什么不会有b1离子",
+      "质谱分析工具",
+      "Chapter1 An Overview"
+    ]
+  },
+  "02分子表征/PTM": {
+    "slug": "02分子表征-ptm",
+    "published_at": "2026-08-24",
+    "source_hash": "sha256:4d681842a2c044406f7f70a3a7a2f9a6d1762035cb02919a41b8545acd5fb60e",
+    "notes": [
+      "Antibody-Characterization/IEX酸性峰调查/大肠杆菌蛋白修饰与酸性峰.md",
+      "Antibody-Characterization/IEX酸性峰调查/大肠杆菌表达蛋白PTM与IEX电荷变体-详细报告.md",
+      "Antibody-Characterization/O-Xylosylation修饰.md",
+      "Antibody-Characterization/PNGaseF.md",
+      "Antibody-Characterization/PTM.md",
+      "Antibody-Characterization/iso-aspartic acid定量.md",
+      "Antibody-Characterization/mAb天冬氨酸异构化与天冬酰胺脱酰胺-文献研究报告.md",
+      "Antibody-Characterization/前处理/脱糖方法.md",
+      "Antibody-Characterization/抗体常见修饰.md",
+      "Antibody-Characterization/碱催化β消除法表征O糖.md",
+      "Antibody-Characterization/翻译后修饰-PTM.md"
+    ],
+    "noteTitles": [
+      "大肠杆菌重组表达蛋白翻译后修饰全景及酸性电荷异质性形成机制深度研究报告",
+      "大肠杆菌表达蛋白PTM与IEX电荷变体分析（详细报告）",
+      "O-Xylosylation修饰",
+      "PNGaseF",
+      "PTM",
+      "iso-aspartic acid定量",
+      "mAb天冬氨酸异构化与天冬酰胺脱酰胺-文献研究报告",
+      "脱糖方法",
+      "抗体常见修饰",
+      "碱催化β消除法表征O糖",
+      "翻译后修饰-PTM"
+    ]
+  }
+}

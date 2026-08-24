@@ -1,0 +1,19 @@
+{
+  "pages": [
+    { "id": "page-1", "name": "主方向" },
+    { "id": "page-2", "name": "备选方向" }
+  ],
+  "artboards": [
+    { "file": "Main.dc.html",    "x": 0,    "y": 0, "w": 1080, "h": 1180, "page": "page-1", "title": "首页" },
+    { "file": "Article.dc.html", "x": 1200, "y": 0, "w": 1080, "h": 2100, "page": "page-1", "title": "文章页" },
+    { "file": "AltDense.dc.html",   "x": 0,   "y": 0, "w": 760, "h": 640, "page": "page-2", "title": "方向 A · 数据台账型" },
+    { "file": "AltJournal.dc.html", "x": 880, "y": 0, "w": 640, "h": 860, "page": "page-2", "title": "方向 B · 学刊型" }
+  ],
+  "annotations": [
+    { "id": "brief", "x": 0, "y": -150, "w": 460, "page": "page-1",
+      "text": "主方向：冷静克制、阅读优先。\n中文正文不加载 webfont（CJK 字体数 MB，国内访问是灾难），走系统中文栈；拉丁字母与数字用 IBM Plex，等宽数字对数据表格是刚需。\n导航直接沿用知识库已有的数字编号标签树，不另建体系。" },
+    { "id": "alts", "x": 0, "y": -130, "w": 440, "page": "page-2",
+      "text": "两个低保真备选方向，各走一条不同的轴，供比较。\n每块画板底部写了它的取舍。" }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" }
+}

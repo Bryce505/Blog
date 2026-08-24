@@ -1,0 +1,264 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    :root {
+      --han: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+      --han-serif: "Songti SC", "SimSun", "Source Han Serif SC", serif;
+      --sans: "IBM Plex Sans", var(--han);
+      --serif: "IBM Plex Serif", var(--han-serif);
+      --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      --measure: 40rem;
+    }
+    [data-theme="light"] {
+      --bg: oklch(0.992 0.003 240); --surface: oklch(0.972 0.005 245);
+      --fg: oklch(0.26 0.015 250);  --muted: oklch(0.53 0.012 250);
+      --border: oklch(0.90 0.008 250); --accent: oklch(0.47 0.085 232);
+      --warn: oklch(0.52 0.085 68);   --ok: oklch(0.48 0.070 160);
+    }
+    [data-theme="dark"] {
+      --bg: oklch(0.185 0.012 252); --surface: oklch(0.232 0.013 252);
+      --fg: oklch(0.925 0.008 250); --muted: oklch(0.665 0.011 250);
+      --border: oklch(0.325 0.013 252); --accent: oklch(0.755 0.085 232);
+      --warn: oklch(0.79 0.085 74);   --ok: oklch(0.76 0.070 162);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .root { background: var(--bg); color: var(--fg); font-family: var(--sans);
+            font-size: 16px; line-height: 1.75; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 40px; }
+    .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+    /* 正文排版：中文长文的行高要比英文松，标点挤压交给浏览器 */
+    .prose { max-width: var(--measure); font-size: 16.5px; line-height: 1.9; }
+    .prose > * { margin: 0 0 1.15em; }
+    .prose h2 { font-family: var(--serif); font-size: 20px; font-weight: 600;
+                margin: 2.4em 0 0.7em; letter-spacing: -0.005em;
+                padding-bottom: 0.35em; border-bottom: 1px solid var(--border); }
+    .prose h3 { font-family: var(--serif); font-size: 17px; font-weight: 600;
+                margin: 1.9em 0 0.55em; }
+    .prose p { text-wrap: pretty; }
+    .prose strong { font-weight: 600; }
+    /* 宽内容各自横向滚动，页面本身永不横向滚动 */
+    .prose table, .prose pre { display: block; max-width: 100%; overflow-x: auto; }
+    .prose img { max-width: 100%; height: auto; display: block;
+                 border: 1px solid var(--border); border-radius: 2px; }
+    /* 图注：render.py 产出的是「图片后紧跟一行斜体」 */
+    .prose img + em { display: block; text-align: center; font-style: normal;
+                      font-size: 13px; color: var(--muted); margin-top: 0.6em; }
+    .prose code { font-family: var(--mono); font-size: 0.88em;
+                  background: var(--surface); padding: 0.12em 0.34em;
+                  border-radius: 2px; border: 1px solid var(--border); }
+    .prose pre { background: var(--surface); border: 1px solid var(--border);
+                 border-radius: 3px; padding: 14px 16px; font-size: 13.5px;
+                 line-height: 1.7; }
+    .prose pre code { background: none; border: 0; padding: 0; }
+
+    /* 数据表格：等宽数字对齐，实测源笔记里表格很多 */
+    .prose table { border-collapse: collapse; font-size: 14.5px; width: 100%; }
+    .prose th, .prose td { border: 1px solid var(--border); padding: 7px 11px;
+                           text-align: left; vertical-align: top; }
+    .prose th { background: var(--surface); font-weight: 600; white-space: nowrap; }
+    .prose td.n, .prose th.n { font-family: var(--mono);
+                               font-variant-numeric: tabular-nums; text-align: right; }
+
+    /* Obsidian callout：remark 插件产出 .callout / .callout-<kind> */
+    .callout { border-left: 3px solid var(--accent); background: var(--surface);
+               padding: 13px 16px; border-radius: 0 3px 3px 0; margin: 1.5em 0; }
+    .callout > *:last-child { margin-bottom: 0; }
+    .callout-title { font-family: var(--sans); font-weight: 600; font-size: 13px;
+                     letter-spacing: 0.03em; color: var(--accent);
+                     margin-bottom: 0.4em; }
+    .callout-summary { border-left-color: var(--ok); }
+    .callout-summary .callout-title { color: var(--ok); }
+    .callout-warning { border-left-color: var(--warn); }
+    .callout-warning .callout-title { color: var(--warn); }
+
+    .toc a { display: block; color: var(--muted); font-size: 13.5px;
+             padding: 4px 0 4px 11px; border-left: 2px solid var(--border);
+             line-height: 1.5; }
+    .toc a.on { color: var(--accent); border-left-color: var(--accent); }
+    .toc a.sub { padding-left: 22px; font-size: 13px; }
+    .endblock h2 { font-family: var(--serif); font-size: 13px; font-weight: 600;
+                   letter-spacing: 0.08em; text-transform: uppercase;
+                   color: var(--muted); margin: 0 0 12px; }
+  </style>
+</helmet>
+
+<div class="root" data-theme="{{theme}}">
+
+  <header style="border-bottom: 1px solid var(--border); background: var(--bg);
+                 position: sticky; top: 0; z-index: 10;">
+    <div class="wrap" style="display: flex; align-items: baseline; gap: 32px; height: 68px;">
+      <a href="/" style="font-family: var(--serif); font-size: 19px; font-weight: 600;
+                         color: var(--fg); letter-spacing: -0.01em;">表征笔记</a>
+      <nav style="display: flex; gap: 22px; font-size: 14px; margin-left: auto;">
+        <a href="/archive" style="color: var(--muted);">归档</a>
+        <a href="/tags" style="color: var(--muted);">标签</a>
+        <a href="/tools" style="color: var(--muted);">工具与效率</a>
+        <a href="/about" style="color: var(--muted);">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap" style="display: grid; grid-template-columns: minmax(0, 1fr) 200px;
+                           gap: 64px; padding-top: 44px; padding-bottom: 80px;
+                           align-items: start;">
+
+    <article style="min-width: 0;">
+      <!-- 面包屑 -->
+      <div style="font-size: 13px; color: var(--muted); margin-bottom: 14px;
+                  display: flex; gap: 7px; align-items: baseline;">
+        <a href="/category/03质量控制" style="color: var(--muted);">03质量控制</a>
+        <span style="color: var(--border);">/</span>
+        <span>残留 / HCP</span>
+      </div>
+
+      <h1 style="font-family: var(--serif); font-size: 30px; font-weight: 600;
+                 line-height: 1.4; margin: 0 0 14px; letter-spacing: -0.01em;
+                 max-width: var(--measure);">
+        宿主细胞蛋白残留：检测方法、覆盖率评估与限度设定
+      </h1>
+
+      <!-- 元信息：篇数是这套流水线的特点，明说文章由几篇笔记整理而来 -->
+      <div style="display: flex; gap: 14px; align-items: baseline; font-size: 13px;
+                  color: var(--muted); padding-bottom: 22px;
+                  border-bottom: 1px solid var(--border);">
+        <span class="num">2026-08-24</span>
+        <span style="color: var(--border);">·</span>
+        <span>由 <span class="num">14</span> 篇笔记整理</span>
+      </div>
+
+      <div class="prose" style="padding-top: 26px;">
+        <aside class="callout callout-abstract">
+          <div class="callout-title">摘要</div>
+          <p style="margin: 0;">HCP 是工艺相关杂质中风险最高的一类。本文按「方法选型 → 覆盖率评估 → 限度设定」梳理，
+          数据与法规条款均取自原始笔记，未作改写。</p>
+        </aside>
+
+        <p>宿主细胞蛋白（Host Cell Protein, HCP）来自表达体系，随下游纯化被部分去除。
+        残留 HCP 的风险不只在于免疫原性，某些酶活性组分还会降解制剂中的辅料
+        —— 聚山梨酯降解就是典型例子。</p>
+
+        <h2>方法选型</h2>
+
+        <p>ELISA 与质谱是两条主线。ELISA 通量高、灵敏度可达 <span class="num">1 ng/mg</span> 量级，
+        但依赖多抗试剂对 HCP 谱的覆盖；质谱能给出组分身份，代价是前处理复杂、定量下限较高。</p>
+
+        <table>
+          <thead>
+            <tr><th>方法</th><th>定量下限</th><th>能否定性</th><th>主要限制</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>ELISA（多抗）</td><td class="n">1–5 ng/mg</td><td>否</td><td>覆盖率未知则结果不可解释</td></tr>
+            <tr><td>LC-MS/MS（DDA）</td><td class="n">10–50 ng/mg</td><td>是</td><td>高丰度产物压制低丰度 HCP</td></tr>
+            <tr><td>LC-MS/MS（DIA）</td><td class="n">5–20 ng/mg</td><td>是</td><td>需谱图库，方法开发周期长</td></tr>
+          </tbody>
+        </table>
+
+        <img src="hcp-workflow.png" alt="HCP 检测流程示意">
+        <em>图源：《Analytical Characterization of Biotherapeutics》Ch.9</em>
+
+        <h2>覆盖率评估</h2>
+
+        <aside class="callout callout-summary">
+          <div class="callout-title">要点</div>
+          <p style="margin: 0;">覆盖率是 ELISA 结果能否被解释的前提。抗体识别不到的 HCP，
+          在检测结果里等同于不存在。</p>
+        </aside>
+
+        <p>二维电泳配 Western blot 是经典做法，近年更多用抗体亲和纯化结合质谱鉴定
+        （AAE-MS）。两者都在回答同一个问题：多抗试剂能识别到细胞裂解液中多大比例的蛋白。</p>
+
+        <pre><code>覆盖率 = 被抗体识别的斑点数 / 总斑点数 × 100%
+       （2D-DIGE 计数口径，需注明所用染色方法）</code></pre>
+
+        <h2>限度设定</h2>
+
+        <p>常见做法是把限度定在 <span class="num">100 ng/mg</span> 以内，
+        但这个数字不是法规规定的通用阈值。<code>ICH Q6B</code> 只要求基于工艺能力与安全性
+        论证，具体限度须结合给药途径、剂量与临床阶段。</p>
+
+        <aside class="callout callout-warning">
+          <div class="callout-title">注意</div>
+          <p style="margin: 0;">把「<span class="num">100 ng/mg</span>」当成通用合格标准是常见误读。
+          该数值来自个别品种的历史数据，不构成法规依据。</p>
+        </aside>
+      </div>
+
+      <!-- 末尾三个区块，来源各不相同 -->
+      <div style="display: grid; gap: 34px; margin-top: 56px; padding-top: 32px;
+                  border-top: 1px solid var(--border);">
+        <section class="endblock">
+          <h2>参考文献</h2>
+          <ul style="margin: 0; padding-left: 18px; font-size: 14.5px;
+                     color: var(--muted); line-height: 1.85;">
+            <li>Analytical Characterization of Biotherapeutics</li>
+            <li>Wang X. et al. <span class="num">10.1002/bit.26466</span></li>
+            <li>ICH Q6B — Specifications: Test Procedures and Acceptance Criteria</li>
+          </ul>
+        </section>
+
+        <section class="endblock">
+          <h2>延伸阅读</h2>
+          <p style="margin: 0 0 10px; font-size: 13px; color: var(--muted);">
+            以下为他人文章，仅列标题与原文链接。</p>
+          <ul style="margin: 0; padding-left: 18px; font-size: 14.5px; line-height: 1.85;">
+            <li><a href="#">HCP 检测中抗体覆盖率的评估策略</a></li>
+            <li><a href="#">聚山梨酯降解与高风险 HCP 的关联</a></li>
+          </ul>
+        </section>
+
+        <section class="endblock">
+          <h2>相关文章</h2>
+          <ul style="margin: 0; padding-left: 18px; font-size: 14.5px; line-height: 1.85;">
+            <li><a href="#">分析方法验证：专属性、准确度与线性的判定口径</a></li>
+            <li><a href="#">ELISA 方法开发：包被、封闭与基质效应</a></li>
+          </ul>
+        </section>
+      </div>
+    </article>
+
+    <!-- 目录 -->
+    <aside style="position: sticky; top: 96px;">
+      <h2 style="font-family: var(--serif); font-size: 12px; font-weight: 600;
+                 letter-spacing: 0.08em; text-transform: uppercase;
+                 color: var(--muted); margin: 0 0 10px;">目录</h2>
+      <nav class="toc">
+        <a href="#a" class="on">方法选型</a>
+        <a href="#b">覆盖率评估</a>
+        <a href="#c" class="sub">2D-Western</a>
+        <a href="#d" class="sub">AAE-MS</a>
+        <a href="#e">限度设定</a>
+      </nav>
+    </aside>
+  </div>
+
+  <footer style="border-top: 1px solid var(--border);">
+    <div class="wrap" style="padding: 26px 40px; display: flex; gap: 20px;
+                             font-size: 13px; color: var(--muted);">
+      <span>内容来自个人 Obsidian 知识库，由流水线定时整理发布</span>
+      <a href="/rss.xml" style="margin-left: auto;">RSS</a>
+    </div>
+  </footer>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light","section":"主题"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { theme: this.props.theme ?? 'light' };
+  }
+}
+</script>
+</body>
+</html>

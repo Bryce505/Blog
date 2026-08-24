@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><script src="./support.js"></script></head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { color: #2b4c66; } a:hover { color: #1a3346; }
+    .r { background: #fdfdfc; color: #2a2a28; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+         font-size: 13px; line-height: 1.6; padding: 28px 32px; min-height: 100%; }
+    .hd { display: flex; gap: 16px; align-items: baseline; border-bottom: 2px solid #2a2a28;
+          padding-bottom: 8px; margin-bottom: 18px; }
+    .lbl { font-size: 10px; letter-spacing: .12em; color: #8a8a84; text-transform: uppercase; }
+    .row { display: grid; grid-template-columns: 78px 92px 1fr 54px; gap: 12px;
+           padding: 7px 0; border-bottom: 1px dotted #d5d5cf; align-items: baseline; }
+    .cats { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+    .chip { border: 1px solid #c8c8c2; padding: 3px 8px; font-size: 11px; color: #55554f; }
+    .note { position: absolute; }
+  </style>
+</helmet>
+<div class="r">
+  <div class="hd">
+    <strong style="font-size: 15px;">表征笔记</strong>
+    <span class="lbl">index</span>
+    <span class="lbl" style="margin-left: auto;">198 notes / 32 articles</span>
+  </div>
+
+  <div class="lbl" style="margin-bottom: 6px;">latest</div>
+  <div class="row"><span>2026-08-24</span><span>03质量控制</span><span>宿主细胞蛋白残留：检测方法、覆盖率评估与限度设定</span><span style="text-align:right;">14n</span></div>
+  <div class="row"><span>2026-08-23</span><span>05仪器技术</span><span>质谱基础：离子化、质量分析器与碎裂方式的选型</span><span style="text-align:right;">13n</span></div>
+  <div class="row"><span>2026-08-22</span><span>02分子表征</span><span>翻译后修饰的表征：脱酰胺、氧化与糖基化的分析路径</span><span style="text-align:right;">11n</span></div>
+  <div class="row"><span>2026-08-21</span><span>02分子表征</span><span>亲和力测定：SPR 与 BLI 的动力学参数解读</span><span style="text-align:right;">13n</span></div>
+  <div class="row"><span>2026-08-20</span><span>05仪器技术</span><span>HPLC 梯度洗脱：柱平衡、溶剂强度与峰形</span><span style="text-align:right;">11n</span></div>
+
+  <div class="lbl" style="margin-top: 22px;">categories</div>
+  <div class="cats">
+    <span class="chip">00 基础 · 28</span><span class="chip">02 分子表征 · 47</span>
+    <span class="chip">03 质量控制 · 31</span><span class="chip">04 抗体设计 · 12</span>
+    <span class="chip">05 仪器与分析 · 44</span><span class="chip">06 工艺 · 9</span>
+    <span class="chip">07 注册与法规 · 18</span><span class="chip">08 安全性 · 4</span>
+    <span class="chip">14 编程与软件 · 16</span>
+  </div>
+
+  <p style="margin-top: 26px; font-size: 11px; color: #8a8a84; line-height: 1.7;">
+    方向 A · 数据台账型。全等宽、无侧栏、一屏塞下更多条目，像翻实验记录本。<br>
+    取舍：扫读效率最高，但中文长正文用等宽字体读起来累，标题也失去层次感。
+  </p>
+</div>
+</x-dc>
+<script data-dc-script>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>
