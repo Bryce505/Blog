@@ -35,8 +35,12 @@ SIZE_EXEMPT_NOTES = {
     'Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-功能学研究策略-20260703.md',
     'Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CE_Electrokinetic_Injection_EOF_Report.md',
 }
-# 组的总预算，留足空间给系统提示和模型输出
-MAX_GROUP_CHARS = 400_000
+# 组的总预算。实测教训：上限 40 万时有个组攒到 17 万字符（14 篇），
+# DeepSeek 直接退化成摘要，输出只有源文的 10%，86 条文献引用全丢。
+# 要求模型把 15 万字符忠实重组成一篇文章，这个要求本身不现实。
+# 调到 5 万后组数只从 32 掉到 30，中位组体量几乎不变（27.9K → 25.4K），
+# 砍掉的只是几个撑爆的离群组。
+MAX_GROUP_CHARS = 50_000
 
 DRIVE_FOLDER_ID = '1jwf_lkCo-Rq42VwWToyTeu2ciJTRg4zT'
 IMAGE_MAX_WIDTH = 1200

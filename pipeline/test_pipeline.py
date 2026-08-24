@@ -86,9 +86,9 @@ def test_exempt_list_paths_all_exist_in_vault():
 
 def test_group_truncated_by_char_budget_not_just_count():
     """按篇数限制是错的指标：9 篇也可能加起来 170 万字符。"""
-    # 20 篇 x 2.9 万 = 58 万，超预算 40 万；应截断而非整组丢弃
+    # 20 篇 x 8 千 = 16 万，超预算 5 万；应截断而非整组丢弃
     ns = [vault.Note(f'n{i:02d}.md', f'N{i}', ['a/b/c'], 'note',
-                     body='x' * 29_000) for i in range(20)]
+                     body='x' * 8_000) for i in range(20)]
     g = sel.build_groups(ns)[0]
     total = sum(len(n.body) for n in g.notes)
     assert total <= config.MAX_GROUP_CHARS, total

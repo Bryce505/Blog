@@ -64,8 +64,13 @@ jobs:
           rm -rf .vault .routinerun
           git config user.name  'blog-bot'
           git config user.email 'makejun505@gmail.com'
-          git add src/content/posts public/images published.json \
-                  pipeline/drive_index.json _review drafts 2>/dev/null || true
+          # 逐个添加：git add 遇到任一不存在的路径会整条中止、一个文件都不暂存。
+          # 校验失败时 published.json 不会生成，之前因此把 _review/ 里的文章和
+          # 刚从 Drive 取回的图片一起丢了。
+          for p in src/content/posts public/images published.json \
+                   pipeline/drive_index.json _review drafts; do
+            [ -e "$p" ] && git add -A "$p"
+          done
           if git diff --staged --quiet; then
             echo '本次没有新产出'
           else
