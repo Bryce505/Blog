@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Base title="关于" description="关于这个站点">
+  <div class="wrap" style="padding-top: 48px; padding-bottom: 72px;">
+    <h1 style="font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0 0 22px;">关于</h1>
+    <div class="prose">
+      <p>这里是生物医药 CMC 与分析方法的工作笔记，内容来自一个个人 Obsidian 知识库。</p>
+
+      <h2>文章是怎么来的</h2>
+      <p>知识库里的笔记按标签成组，由流水线定时整理成文。整理过程只做结构重组
+      —— 打散笔记、重新梳理脉络、补写导读和过渡，但凡含数字、单位、法规条款号、
+      文献引用和图片引用的句子一律原样保留。</p>
+      <p>整理结果要通过四项机械校验才会发布：图片是否齐全、有没有冒出源文中不存在的
+      数据、法规条款是否完整、正文是否被大段丢失。校验不通过的文章不会上线，
+      会留到人工复核。</p>
+
+      <h2>关于引用</h2>
+      <p>文中取自文献和专业书籍的插图均标注出处。他人撰写的文章只在文末以标题和
+      原文链接的形式列出，正文不作转载。</p>
+
+      <h2>联系</h2>
+      <p>发现事实性错误，欢迎通过 <a href="https://github.com/Bryce505">GitHub</a> 指出。</p>
+    </div>
+  </div>
+</Base>

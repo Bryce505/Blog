@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const posts = (await getCollection('posts')).sort((a, b) => b.data.date - a.data.date);
+
+const years = new Map<number, any[]>();
+for (const p of posts) {
+  const y = p.data.date.getFullYear();
+  if (!years.has(y)) years.set(y, []);
+  years.get(y)!.push(p);
+}
+const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+---
+<Base title="归档" description="全部文章按时间归档">
+  <div class="wrap" style="padding-top: 48px; padding-bottom: 72px;">
+    <h1 style="font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0 0 6px;">归档</h1>
+    <p style="margin: 0 0 28px; color: var(--muted); font-size: 14px;">共 <span class="num">{posts.length}</span> 篇</p>
+    {[...years.entries()].sort((a, b) => b[0] - a[0]).map(([year, items]) => (
+      <section style="margin-bottom: 30px;">
+        <h2 class="eyebrow num">{year}</h2>
+        <ul style="list-style: none; margin: 0; padding: 0;">
+          {items.map((p) => (
+            <li style="display: flex; gap: 14px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--border);">
+              <span class="num" style="color: var(--muted); font-size: 13px; min-width: 44px;">{fmt(p.data.date)}</span>
+              <a href={`${base}/posts/${p.id}`} style="color: var(--fg); font-size: 15px;">{p.data.title}</a>
+              <span style="margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap;">{p.data.category}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</Base>

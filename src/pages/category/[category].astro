@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  const cats = [...new Set(posts.map((p) => p.data.category))];
+  return cats.map((category) => ({
+    params: { category },
+    props: {
+      posts: posts
+        .filter((p) => p.data.category === category)
+        .sort((a, b) => b.data.date - a.data.date),
+    },
+  }));
+}
+
+const { category } = Astro.params;
+const { posts } = Astro.props;
+
+// 按二级标签分区，复用笔记原有的分类树而不是另排一遍
+const sections = new Map<string, any[]>();
+for (const p of posts) {
+  const key = (p.data.primaryTag || '').split('/').slice(0, 2).join('/') || '其他';
+  if (!sections.has(key)) sections.set(key, []);
+  sections.get(key)!.push(p);
+}
+const ordered = [...sections.entries()].sort((a, b) => a[0].localeCompare(b[0], 'zh'));
+---
+<Base title={category} description={`${category} 分类下的全部文章`}>
+  <div class="wrap" style="padding-top: 48px; padding-bottom: 72px;">
+    <h1 style="font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0 0 6px;">{category}</h1>
+    <p style="margin: 0 0 24px; color: var(--muted); font-size: 14px;">
+      共 <span class="num">{posts.length}</span> 篇
+    </p>
+    {ordered.map(([name, items]) => (
+      <section style="margin-bottom: 34px;">
+        {ordered.length > 1 && <h2 class="eyebrow">{name}</h2>}
+        {items.map((p) => <PostCard post={p} />)}
+      </section>
+    ))}
+  </div>
+</Base>

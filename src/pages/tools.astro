@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+
+const posts = (await getCollection('posts'))
+  .filter((p) => p.data.category === '工具与效率')
+  .sort((a, b) => b.data.date - a.data.date);
+---
+<Base title="工具与效率" description="Git、Claude Code、PPT 制作等工作方法笔记">
+  <div class="wrap" style="padding-top: 48px; padding-bottom: 72px;">
+    <h1 style="font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0 0 6px;">工具与效率</h1>
+    <p style="max-width: var(--measure); margin: 0 0 24px; color: var(--muted); font-size: 15px; line-height: 1.8;">
+      和生物医药主线无关的另一摊：版本控制、AI 工具、文档与演示。
+    </p>
+    {posts.length === 0
+      ? <p style="color: var(--muted);">这个栏目还没有内容。</p>
+      : posts.map((p) => <PostCard post={p} />)}
+  </div>
+</Base>

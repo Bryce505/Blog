@@ -185,9 +185,13 @@ def main():
     ap.add_argument('--blog', default=str(Path(__file__).parent.parent))
     ap.add_argument('--count', type=int, default=1)
     ap.add_argument('--drafts', action='store_true', help='只处理 drafts/，跳过 AI 通道')
+    ap.add_argument('--routinerun', metavar='REPO', help='把 RoutineRun 笔记接成工具与效率栏目')
     a = ap.parse_args()
 
-    if a.drafts:
+    if a.routinerun:
+        import routinerun
+        rs = routinerun.run(a.routinerun, a.blog)
+    elif a.drafts:
         import drafts
         rs = drafts.run_drafts(a.blog, os.environ['GDRIVE_SA_JSON'])
     else:

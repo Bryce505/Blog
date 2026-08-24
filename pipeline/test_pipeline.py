@@ -879,6 +879,54 @@ def test_run_drafts_refuses_slug_collision():
     assert (blog / 'drafts' / 'dup.md').exists(), '出错时不该删原件'
 
 
+# ---------- routinerun（工具与效率栏目）----------
+
+def test_routinerun_skips_config_dirs_and_stub_readmes():
+    """RoutineRun 285 个 md 里 269 个是技能配置，还有几个几十字符的占位 README。"""
+    import routinerun as rr
+    import shutil
+    repo = TMP / 'rr'
+    shutil.rmtree(repo, ignore_errors=True)
+    (repo / '.claude' / 'skills' / 'x').mkdir(parents=True)
+    (repo / '.claude' / 'skills' / 'x' / 'SKILL.md').write_text('# 技能\n' + 'x' * 2000, encoding='utf-8')
+    (repo / 'docs').mkdir(parents=True)
+    (repo / 'docs' / 'real.md').write_text('# 真笔记\n\n' + '正文' * 400, encoding='utf-8')
+    (repo / 'stub').mkdir()
+    (repo / 'stub' / 'README.md').write_text('# 占位\n\n子项目目录。', encoding='utf-8')
+    (repo / 'CLAUDE.md').write_text('# 给 AI 看的\n' + 'x' * 2000, encoding='utf-8')
+
+    got = {rel for rel, _, _ in rr.collect(repo)}
+    assert got == {'docs/real.md'}, got
+
+
+def test_routinerun_writes_tools_category_and_strips_h1():
+    import routinerun as rr
+    import shutil
+    import yaml as _yaml
+    repo = TMP / 'rr2'
+    blog = TMP / 'rr2-blog'
+    shutil.rmtree(repo, ignore_errors=True)
+    shutil.rmtree(blog, ignore_errors=True)
+    (repo / 'git&github').mkdir(parents=True)
+    (repo / 'git&github' / '笔记.md').write_text(
+        '# Git & GitHub 学习笔记\n\n按时间顺序追加记录每次相关对话的要点。\n\n' + '正文' * 400,
+        encoding='utf-8')
+
+    rs = rr.run(repo, blog)
+    assert rs[0]['status'] == 'published', rs
+    f = blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md"
+    text = f.read_text(encoding='utf-8')
+    fm = _yaml.safe_load(text.split('---')[1])
+    assert fm['category'] == '工具与效率'
+    assert fm['title'] == 'Git & GitHub 学习笔记'
+    assert fm['description']
+    body = text.split('---', 2)[2]
+    assert not body.lstrip().startswith('# '), '标题应从正文摘掉'
+
+    # 重跑不覆盖，避免抹掉人工修改
+    assert rr.run(repo, blog)[0]['status'] == 'skipped'
+
+
 if __name__ == '__main__':
     fns = [(k, v) for k, v in sorted(globals().items()) if k.startswith('test_')]
     bad = 0
