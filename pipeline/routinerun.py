@@ -6,6 +6,7 @@
 """
 import datetime as dt
 import re
+import urllib.parse
 from pathlib import Path
 
 import yaml
@@ -34,7 +35,7 @@ def collect(repo_root):
             continue          # 给 AI 看的配置，不是给人读的笔记
         text = p.read_text(encoding='utf-8', errors='ignore')
         m = vault.FM_RE.match(text)
-        body = text[m.end():] if m else text
+        body = vault.html_img_to_md(text[m.end():] if m else text)
         if len(body.strip()) < MIN_BODY_CHARS:
             continue          # 占位 README
         m1 = H1.search(body)
@@ -57,13 +58,15 @@ def _copy_images(repo_root, src_rel, body, blog_root, slug):
     mapping, missing = {}, []
     for raw in render.IMG_MD.findall(body) + render.IMG_WIKI.findall(body):
         ref = raw[1] if isinstance(raw, tuple) else raw
-        if ref.startswith('http'):
+        name = vault.image_ref_name(ref)
+        if not name:                       # 外链、笔记嵌入、非图片附件
             continue
-        name = render._basename(ref)
-        src = note_dir / ref.split('|')[0].strip()
+        # 引用里的 %20 要解码回空格，否则本地文件按原样拼路径必然找不到
+        src = note_dir / urllib.parse.unquote(
+            ref.split('|')[0].strip().replace('\\', '/'))
         dest = out_dir / (Path(name).stem + '.webp')
         if dest.exists():
-            mapping[name] = f'/images/{slug}/{dest.name}'
+            mapping[name] = f'/images/{slug}/{images.url_safe(dest.name)}'
             continue
         if not src.exists():
             missing.append(name)
@@ -73,7 +76,7 @@ def _copy_images(repo_root, src_rel, body, blog_root, slug):
         except Exception:
             missing.append(name)
             continue
-        mapping[name] = f'/images/{slug}/{dest.name}'
+        mapping[name] = f'/images/{slug}/{images.url_safe(dest.name)}'
     return mapping, missing
 
 

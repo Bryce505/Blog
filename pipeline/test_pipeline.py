@@ -5,6 +5,7 @@
 import io
 import json
 import re
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -41,6 +42,46 @@ def test_parse_wiki_image_with_size():
     assert n.images == ['SEC-peak.png'], n.images
     assert n.title == 'SEC 方法开发要点'
     assert n.wikilinks == [], n.wikilinks
+
+
+def test_html_img_tag_normalised_to_markdown():
+    """Typora 时代的 <img src="D:\...">：不归一化就既取不到图，正文里还留死链。"""
+    out = vault.html_img_to_md(
+        '  <img src="D:\\Knowlege\\image/202201302203668.png" alt="x" style="zoom: 50%;" />')
+    assert out == '  ![](D:\\Knowlege\\image/202201302203668.png)', repr(out)
+    assert vault.image_ref_name('D:\\Knowlege\\image/202201302203668.png') \
+        == '202201302203668.png'
+
+
+def test_zotero_escaped_img_in_alt_left_alone():
+    """Zotero 导出的 alt 里塞着整段 <img>，外层已是 markdown 图片，不能套娃。"""
+    src = '![\\<img src="attachments/T.png" ztype="zimage">](attachments/T.png)'
+    assert vault.html_img_to_md(src) == src
+    # alt 里的 HTML 不该原样输出到站上
+    out = rd.rewrite_images(src, {'T.png': '/images/s/T.webp'}, [], {})
+    assert out == '![](/images/s/T.webp)', out
+
+
+def test_obsidian_size_suffix_stripped_from_alt():
+    """`![|330](x)` 的管道符会把 GFM 表格行劈成两个单元格。"""
+    assert rd.rewrite_images('![|330](../a/x.png)', {'x.png': '/images/s/x.webp'}, [], {}) \
+        == '![](/images/s/x.webp)'
+    assert rd.rewrite_images('![谱图|330](../a/x.png)', {'x.png': '/images/s/x.webp'}, [], {}) \
+        == '![谱图](/images/s/x.webp)'
+
+
+def test_parse_note_keeps_only_real_images():
+    """笔记嵌入、附件、外链都不是要去 Drive 取的图。"""
+    body = ('![[真图.png]]\n![[某笔记#小节]]\n![[画板.excalidraw]]\n'
+            '![](https://x.com/远程.png)\n![](res\\本地图.PNG)\n')
+    p = FIX / '_tmp_refs.md'
+    p.write_text('---\ntitle: t\ntype: note\n---\n' + body, encoding='utf-8')
+    try:
+        n = vault.parse_note(p, FIX)
+        # 顺序按解析顺序：先 markdown 写法后 wiki 写法
+        assert n.images == ['本地图.PNG', '真图.png'], n.images
+    finally:
+        p.unlink()
 
 
 def test_load_vault_filters_nothing_by_itself():
@@ -128,56 +169,43 @@ def test_two_level_tag_used_when_no_third_level():
     assert len(gs) == 1 and gs[0].tag == '06工艺/纯化'
 
 
-def test_small_group_falls_back_to_second_level():
-    """碎组不能直接丢：41% 的可发布笔记卡在不足 3 篇的三级标签里。
+def test_sibling_subtopics_stay_separate_articles():
+    """不同子题不能焊成一篇：这是「一篇文章什么都讲」的根源。
 
-    把它们按二级标签重新归并，凑够 3 篇就能成文。
+    实测归并版把 12 篇横跨定量/测序/碎裂/数据分析/离子源的笔记塞进
+    「05仪器与分析技术/质谱」一篇里，出来只能是大杂烩。
     """
     ns = ([_fake(f'a{i}.md', ['02分子表征/PTM/糖基化']) for i in range(2)] +
           [_fake(f'b{i}.md', ['02分子表征/PTM/二硫键']) for i in range(2)])
     gs = sel.build_groups(ns)
-    assert len(gs) == 1, [(g.tag, len(g.notes)) for g in gs]
-    assert gs[0].tag == '02分子表征/PTM'
-    assert len(gs[0].notes) == 4
+    assert {g.tag: len(g.notes) for g in gs} == {
+        '02分子表征/PTM/糖基化': 2, '02分子表征/PTM/二硫键': 2}, \
+        {g.tag: len(g.notes) for g in gs}
 
 
-def test_still_dropped_when_even_second_level_too_small():
+def test_group_below_minimum_dropped():
     ns = [_fake('a.md', ['02分子表征/PTM/糖基化']), _fake('b.md', ['03质量控制/SEC/柱效'])]
     assert sel.build_groups(ns) == []
 
 
-def test_fallback_does_not_steal_from_valid_third_level_group():
-    """三级标签已够 3 篇的组保持独立，不该被二级回退吸走。"""
-    ns = ([_fake(f'a{i}.md', ['02分子表征/PTM/糖基化']) for i in range(4)] +
-          [_fake(f'b{i}.md', ['02分子表征/PTM/二硫键']) for i in range(2)] +
-          [_fake(f'c{i}.md', ['02分子表征/PTM/氧化']) for i in range(2)])
+def test_two_level_only_notes_still_group():
+    """只打了二级标签的笔记本来就没有更细的粒度，不能永久排除。"""
+    ns = [_fake(f'a{i}.md', ['00基础/生物制品']) for i in range(3)]
+    assert [(g.tag, len(g.notes)) for g in sel.build_groups(ns)] == [('00基础/生物制品', 3)]
+
+
+def test_deeper_than_three_levels_folds_to_three():
+    """四级标签折到三级：再细下去每组只剩一篇。"""
+    ns = ([_fake(f'a{i}.md', ['02分子表征/PTM/糖基化/N-糖']) for i in range(2)] +
+          [_fake(f'b{i}.md', ['02分子表征/PTM/糖基化/O-糖']) for i in range(2)])
     gs = sel.build_groups(ns)
-    tags = {g.tag: len(g.notes) for g in gs}
-    assert tags == {'02分子表征/PTM/糖基化': 4, '02分子表征/PTM': 4}, tags
+    assert [(g.tag, len(g.notes)) for g in gs] == [('02分子表征/PTM/糖基化', 4)]
+    assert len(set(g.slug for g in gs)) == len(gs), 'slug 撞车会让后写的文章静默覆盖先写的'
 
 
 def test_oversized_group_truncated_to_max():
     ns = [_fake(f'n{i:03d}.md', ['02分子表征/PTM/糖基化']) for i in range(40)]
     assert len(sel.build_groups(ns)[0].notes) == 30
-
-
-def test_fallback_never_collapses_to_top_level():
-    """二级碎组不能再降级：「02分子表征」当一篇文章毫无意义。"""
-    ns = [_fake(f'a{i}.md', ['02分子表征/PTM']) for i in range(2)]
-    assert sel.build_groups(ns) == []
-
-
-def test_fallback_merges_into_existing_group_not_duplicate():
-    """四级碎组回退撞上已存在的二级组时必须合并进去，不能产生同名组。
-
-    产生同名组会导致两篇文章抢同一个 slug，后写的静默覆盖先写的。
-    """
-    ns = ([_fake(f'a{i}.md', ['02分子表征/PTM']) for i in range(3)] +
-          [_fake(f'b{i}.md', ['02分子表征/PTM/糖基化/N-糖']) for i in range(2)])
-    gs = sel.build_groups(ns)
-    assert {g.tag: len(g.notes) for g in gs} == {'02分子表征/PTM': 5}, \
-        {g.tag: len(g.notes) for g in gs}
-    assert len(set(g.slug for g in gs)) == len(gs)
 
 
 def test_pick_next_skips_published_unchanged():
@@ -381,7 +409,44 @@ def test_external_image_left_untouched():
 
 def test_missing_image_becomes_note_not_broken_img():
     out = rd.rewrite_images('![](../x/GONE.png)', {}, ['GONE.png'], {})
-    assert out.strip() == '*[图缺失：GONE.png]*' and '![' not in out
+    assert '图片暂缺' in out and '![' not in out
+    # 文件名只留在 HTML 注释里：读者看不见，补图通道认得出
+    assert rd.missing_marks(out) == [('GONE.png', '')], out
+
+
+def test_missing_mark_carries_caption_for_later_repair():
+    out = rd.rewrite_images('![](../x/GONE.png)', {}, ['GONE.png'],
+                            {'GONE.png': '图源：《某书》'})
+    assert rd.missing_marks(out) == [('GONE.png', '图源：《某书》')]
+    back = rd.restore_missing(out, {'GONE.png': '/images/a/GONE.webp'})
+    assert back.strip() == '![](/images/a/GONE.webp)\n*图源：《某书》*', back
+    assert rd.missing_marks(back) == []
+
+
+def test_restore_leaves_still_missing_marks_alone():
+    out = rd.rewrite_images('![](../x/GONE.png)', {}, ['GONE.png'], {})
+    assert rd.restore_missing(out, {}) == out
+
+
+def test_windows_separator_in_image_ref():
+    """vault 里有 Windows 时期留下的 `image\\xxx.png`，反斜杠不当分隔符就丢图。"""
+    assert vault.image_ref_name('../a/image\\202112141122601.png') == '202112141122601.png'
+    out = rd.rewrite_images('![](../a/image\\x.png)', {'x.png': '/images/a/x.webp'}, [], {})
+    assert '/images/a/x.webp' in out, out
+
+
+def test_note_embed_is_not_treated_as_image():
+    """![[笔记#小节]] 与图片同语法，混进来会变成假的「图片暂缺」。"""
+    assert vault.image_ref_name('某笔记#某小节') is None
+    out = rd.rewrite_images('![[某笔记#某小节]]', {}, [], {})
+    assert out == '[[某笔记]]' and '暂缺' not in out, out
+    # 退化成双链后交给 resolve_wikilinks：已发布就链过去，没发布转纯文本
+    assert rd.resolve_wikilinks(out, {'某笔记': 'slug-x'}) == '[某笔记](/posts/slug-x)'
+
+
+def test_non_image_attachment_embed_dropped():
+    out = rd.rewrite_images('![[../Excalidraw/图.excalidraw]]', {}, [], {})
+    assert out == '' and '暂缺' not in out, out
 
 
 def test_image_caption_appended():
@@ -491,6 +556,46 @@ def test_fetch_images_reports_missing_and_is_idempotent():
     assert mapping == {'have.png': '/images/x/have.webp'}, mapping
     assert missing == ['gone.png'], missing
     assert downloads == [], '已存在的图不该重新下载'
+
+
+def test_image_url_escapes_spaces_and_parens():
+    """图片名带空格时，裸 URL 会让整条 markdown 语法印在页面上。"""
+    assert im.url_safe('Pasted image 2026.webp') == 'Pasted%20image%202026.webp'
+    assert im.url_safe('a(1).webp') == 'a%281%29.webp'
+    assert im.url_safe('质谱-图.webp') == '质谱-图.webp', '中文不该转义，md 源文要能读'
+
+    TMP.mkdir(parents=True, exist_ok=True)
+    out = TMP / 'urlsafe'
+    out.mkdir(exist_ok=True)
+    mapping, missing = im.fetch_images(
+        ['Pasted image 20240528.png'], {'Pasted image 20240528.png': 'id1'}, None,
+        out, '/images/x', _download=lambda service, fid: _png(20, 10))
+    assert missing == []
+    assert mapping == {'Pasted image 20240528.png':
+                       '/images/x/Pasted%20image%2020240528.webp'}, mapping
+    # 落盘文件名保持原样，只有 URL 转义
+    assert (out / 'Pasted image 20240528.webp').exists()
+    body = rd.rewrite_images('![[Pasted image 20240528.png]]', mapping, [], {})
+    assert body == '![](/images/x/Pasted%20image%2020240528.webp)', body
+
+
+def test_alias_resolves_renamed_drive_file():
+    """Drive 上改了名、笔记没跟着改：别名表兜住，落盘仍用引用名。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    out = TMP / 'alias'
+    out.mkdir(exist_ok=True)
+    old, actual = '20220120182528049.png', '202201201825137.png'
+    assert config.IMAGE_ALIASES[old] == actual, '别名表被改动，测试要同步'
+    assert im.resolve(old, {actual: 'id9'}) == 'id9'
+    assert im.resolve(old, {}) is None
+    # 真有同名文件时直接命中优先，别名不抢
+    assert im.resolve(old, {old: 'id-real', actual: 'id9'}) == 'id-real'
+
+    mapping, missing = im.fetch_images(
+        [old], {actual: 'id9'}, None, out, '/images/x',
+        _download=lambda service, fid: _png(30, 20))
+    assert missing == [] and mapping == {old: '/images/x/20220120182528049.webp'}, mapping
+    assert (out / '20220120182528049.webp').exists(), '落盘用引用名，不用 Drive 上的名'
 
 
 # ---------- compose ----------
@@ -925,6 +1030,68 @@ def test_routinerun_writes_tools_category_and_strips_h1():
 
     # 重跑不覆盖，避免抹掉人工修改
     assert rr.run(repo, blog)[0]['status'] == 'skipped'
+
+
+# ---------- repair（给已发布文章补图）----------
+
+def test_repair_fills_marks_and_reports_still_missing():
+    """图补传到 Drive 后，已发布的文章要能自己修好，不用重跑 LLM。"""
+    import repair
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'repair-blog'
+    posts = blog / 'src' / 'content' / 'posts'
+    posts.mkdir(parents=True, exist_ok=True)
+    art = posts / 'a-post.md'
+    art.write_text(
+        '---\ntitle: t\ndate: 2026-01-01\n---\n\n正文一\n\n'
+        + rd.MISSING_TPL.format(name='back.png', caption='图源：《某书》') + '\n\n'
+        + rd.MISSING_TPL.format(name='still-gone.png', caption='') + '\n',
+        encoding='utf-8')
+
+    def fake_download(service, fid):
+        return _png(40, 20)
+
+    rs = repair.run(blog, None, _index={'back.png': 'id1'},
+                    _download=fake_download)
+
+    assert rs == [{'slug': 'a-post', 'status': 'repaired',
+                   'repaired': ['back.png'], 'stillMissing': ['still-gone.png']}], rs
+    text = art.read_text(encoding='utf-8')
+    assert '![](/images/a-post/back.webp)\n*图源：《某书》*' in text, text
+    assert (blog / 'public' / 'images' / 'a-post' / 'back.webp').exists()
+    # 补不回来的原样留着，下次补传后还能再修
+    assert rd.missing_marks(text) == [('still-gone.png', '')]
+
+
+def test_repair_without_marks_never_touches_drive():
+    """没占位就一次 Drive 都不碰 —— 每晚白跑一趟索引重建不可接受。"""
+    import repair
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'repair-clean'
+    posts = blog / 'src' / 'content' / 'posts'
+    posts.mkdir(parents=True, exist_ok=True)
+    (posts / 'b-post.md').write_text('---\ntitle: t\n---\n\n没有占位\n', encoding='utf-8')
+    assert repair.run(blog, 'SA-JSON-会炸') == []
+
+
+def test_audit_lists_images_drive_does_not_have():
+    """发文前就能拿到「要往 Drive 补传哪些图」的清单。"""
+    import repair
+    TMP.mkdir(parents=True, exist_ok=True)
+    v = TMP / 'audit-vault'
+    shutil.rmtree(v, ignore_errors=True)      # 上次跑剩的笔记会混进分组
+    v.mkdir(parents=True)
+    for i in range(config.MIN_GROUP):
+        (v / f'n{i}.md').write_text(
+            '---\ntags:\n  - 02分子表征/A/B\ntype: note\n---\n'
+            f'正文 {i}\n![](../img/have{i}.png)\n![](../img/gone{i}.png)\n',
+            encoding='utf-8')
+    index = {f'have{i}.png': f'id{i}' for i in range(config.MIN_GROUP)}
+    rs = repair.audit(v, _index=index)
+    assert len(rs) == config.MIN_GROUP, rs
+    assert [r['missing'] for r in rs] == [[f'gone{i}.png'] for i in range(config.MIN_GROUP)], rs
+    assert repair.audit(v, _index={**index, **{f'gone{i}.png': 'x'
+                                               for i in range(config.MIN_GROUP)}}) == []
 
 
 if __name__ == '__main__':

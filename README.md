@@ -17,7 +17,7 @@ GitHub Pages。
 
 ```
 Obsidian-base ─┐
-RoutineRun    ─┤ ① 选题：按三级标签分组 → 查 published.json 去重
+RoutineRun    ─┤ ① 选题：按最深标签（≤三级）分组 → 查 published.json 去重
 Google Drive  ─┤ ② 取图：Drive 拉图 → WebP(≤1200px) → public/images/
                │ ③ 整理：DeepSeek 结构重组
                │ ④ 校验：四项机械校验，不过则进 _review/ 等人工
@@ -139,7 +139,7 @@ Google Drive 的 `image&attachment` 文件夹。流水线要用服务账号去�
 ### 4. 把 Drive 文件夹共享给服务账号 ← 最容易漏的一步
 
 **漏了会怎样**：流水线能正常跑完，但**一张图都取不到**，全部文章的图片
-变成「图缺失」占位文字，而且报的是 404 而不是「你没共享文件夹」。
+变成「图片暂缺」占位文字，而且报的是 404 而不是「你没共享文件夹」。
 
 1. 从上面 JSON 里找到 **`client_email`** 的值（形如
    `blog-image-reader@xxx.iam.gserviceaccount.com`），复制引号里那一整串
@@ -188,7 +188,7 @@ Google Drive 的 `image&attachment` 文件夹。流水线要用服务账号去�
 - **workflow 是否全绿** —— 红了看是哪一步：checkout 源仓库失败是
   `VAULT_TOKEN` 问题，取图失败是 Drive 共享或 API 没启用，
   整理那步失败看 DeepSeek 的报错（余额、模型名）
-- **文章有没有图** —— 打开生成的文章，如果满屏「图缺失」，回去检查第 4 步
+- **文章有没有图** —— 打开生成的文章，如果满屏「图片暂缺」，回去检查第 4 步
 - **文章内容读一遍** —— 这是唯一没法自动验证的部分，见下
 
 > **首次运行务必人工通读生成的文章。** 机械校验器只能保证数据没被篡改、
@@ -219,6 +219,50 @@ deploy 的 push 事件 —— 文章会一直躺在仓库里不上线。
 > `_review/` 里存在的分组会被自动通道跳过，否则它会一直霸占队首、
 > 后面的文章一篇也发不出去。人工处理掉文件后该组自动重新入列。
 
+### 文章里出现「图片暂缺」怎么办
+
+正文里那行 `[图片暂缺]` 表示这张图在 Drive 的 `image&attachment` 文件夹
+里找不到。文件名藏在同一行的 HTML 注释里（读者看不到），查看文章源码
+或直接跑体检即可拿到清单：
+
+```bash
+python pipeline/main.py --audit-images --vault <vault 路径>
+```
+
+它列出所有待发布笔记里 Drive 上没有的图，按源笔记分组，只读
+`pipeline/drive_index.json` 缓存，不碰 Drive。
+
+**实测大头是笔记同级的 `res/`、`attachments/` 目录** —— 这些是 Typora
+和 Zotero 时代留下的本地图，从来没上传过 Drive。把它们传进
+`image&attachment`（文件名保持不变）即可。
+
+**另一类是图在 Drive 上、但名字对不上** —— 早期 Typora 按截图时刻命名
+（17 位），上传工具按上传时刻重命名成 15 位，笔记里的引用没跟着改。
+这种别去改笔记（已发布的文章不会重跑），往 `pipeline/config.py` 的
+`IMAGE_ALIASES` 加一行「引用名 → Drive 实际文件名」即可，下次跑补图
+通道就会把文章修好。刻意不做时间戳近似匹配：同分钟撞车会把错图发出去。
+
+补传之后：Actions → publish → Run workflow，**勾上「补图前强制重建
+Drive 索引」**（只加别名不必勾，索引里本来就有那个文件）。已发布的文章会被就地修好 —— `published.json` 里已经记了
+账，自动通道不会重跑那篇，靠的是补图通道按占位标记重取，不用再烧一次
+LLM。不勾也行，Drive 索引缓存 7 天一换，到期后自动补上。
+
+### 觉得文章主题太杂 / 太窄
+
+分组规则在 `pipeline/select_.py` 的 `build_groups`：按每篇笔记**自身最深的
+标签层级**（最多三级）分桶，碎组不向上归并。归并才是「一篇文章什么都讲」
+的根源 —— 实测归并版把 12 篇横跨定量、测序、碎裂、数据分析、离子源的笔记
+塞进「05仪器与分析技术/质谱」一组，出来只能是大杂烩。
+
+想调粒度改 `pipeline/config.py` 的 `MIN_GROUP`（实测 209 篇可发布笔记）：
+
+| MIN_GROUP | 组数 | 覆盖笔记 | 效果 |
+|---|---|---|---|
+| 2（当前） | 38 | 150 | 「质谱/数据分析」这种正好 2 篇的紧凑子题也能成文 |
+| 3 | 20 | 126 | 文章更厚实，但近四成笔记永远排不上队 |
+
+单组体量还受 `MAX_GROUP_CHARS`（5 万字符）约束，超了按笔记体量截断。
+
 ### 想让某篇超长的原创笔记也能发布
 
 单篇超过 3 万字符的笔记默认不发（实测超过这个量的绝大多数是整书/整章
@@ -230,7 +274,7 @@ deploy 的 push 事件 —— 文章会一直躺在仓库里不上线。
 ```bash
 # Python 流水线
 uv venv && uv pip install -r pipeline/requirements.txt
-.venv/bin/python pipeline/test_pipeline.py      # 89 项自检
+.venv/bin/python pipeline/test_pipeline.py      # 99 项自检
 
 # 站点
 npm install
@@ -245,12 +289,12 @@ CI 里可以直接跑。
 
 ```
 pipeline/     Python 流水线（config / vault / select_ / verify / render
-              / images / compose / drafts / routinerun / main）
+              / images / compose / drafts / routinerun / repair / main）
   prompt.md   DeepSeek 的系统提示词，改写力度不对就调这里
 src/          Astro 站点
 drafts/       手动发布投递口
 public/images/ 文章图片（WebP）
-published.json 已发布状态，按三级标签组记录
+published.json 已发布状态，按标签组记录
 _review/      校验未通过、等人工复核的文章
 design/       视觉设计源文件
 ```

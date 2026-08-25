@@ -5,7 +5,7 @@
 import re
 import urllib.parse
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import yaml
 
@@ -13,8 +13,18 @@ import config
 
 FM_RE = re.compile(r'^---\n(.*?)\n---\n?', re.S)
 IMG_MD = re.compile(r'!\[[^\]]*\]\(([^)]+)\)')
+# 前面的 (?<!\\) 排掉 Zotero 导出的 `![\<img ...>](x.png)` —— 那个 <img
+# 是 alt 文本的一部分，外层已经是 markdown 图片了，再动一次会套娃
+IMG_HTML = re.compile(r'(?<!\\)<img\b[^>]*?\bsrc=["\']([^"\']+)["\'][^>]*?/?>', re.I)
 IMG_WIKI = re.compile(r'!\[\[([^\]|]+)(?:\|[^\]]*)?\]\]')
 WIKILINK = re.compile(r'(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]')
+
+IMAGE_EXTS = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp',
+              '.svg', '.tif', '.tiff'}
+# ![[...]] 里出现、但发不成图片的附件后缀。列出来是为了跟「笔记嵌入」
+# 区分开：前者删掉，后者退化成双链。
+ATTACH_EXTS = {'.excalidraw', '.canvas', '.pdf', '.docx', '.xlsx', '.pptx',
+               '.mp3', '.mp4', '.mov', '.wav', '.zip'}
 
 
 @dataclass
@@ -30,6 +40,40 @@ class Note:
     body: str = ''
     images: list = field(default_factory=list)
     wikilinks: list = field(default_factory=list)
+
+
+def html_img_to_md(body):
+    """Typora 时代留下的 `<img src="D:\\...\\x.png" style="zoom:50%" />`
+    归一成 markdown 图片语法。
+
+    在解析这一步换掉，后面全链路就只需要认 markdown 和 wiki 两种写法：
+    取图能收集到它、校验器能查它有没有丢、改写能换成站内路径。不换的话
+    这些图既取不到，正文里还留着一条 D: 开头的死链 —— 实测 5 篇待发布
+    笔记里有 20 处，其中 15 处集中在二硫键那组，整篇的图全是这么写的。
+    """
+    return IMG_HTML.sub(lambda m: f'![]({m.group(1)})', body)
+
+
+def image_ref_name(raw):
+    """图片引用 → 文件名；不是图片（或是外链）返回 None。
+
+    解析、正文改写、本地拷贝三处都要同一套规则，所以收在一个函数里。
+    两个坑各修一次就够：
+
+    反斜杠必须显式换成斜杠。vault 里有 Windows 时期留下的
+    `../../image&attachment/image\202112141122601.png`，POSIX 的 Path
+    不把 \ 当分隔符，basename 会带着目录名一起取出来，Drive 上永远查
+    不到 —— 实测因此把一张真实存在的图判成了缺失。
+
+    没有图片后缀的一律返回 None。![[笔记#小节]] 是笔记嵌入，跟图片嵌入
+    同语法，不排掉就会被当成「找不到的图」写进正文（实测 PTM.md 里有
+    一处），还会连累校验器误报丢图。
+    """
+    p = urllib.parse.unquote(raw.split('|')[0].strip())
+    if p.startswith('http'):
+        return None
+    name = PurePosixPath(p.replace('\\', '/')).name
+    return name if PurePosixPath(name).suffix.lower() in IMAGE_EXTS else None
 
 
 def _flat(v):
@@ -60,13 +104,13 @@ def parse_note(path: Path, vault_root: Path):
     if not isinstance(fm, dict):
         return None
 
-    body = text[m.end():]
+    body = html_img_to_md(text[m.end():])
     images = []
     for pat in (IMG_MD, IMG_WIKI):
         for raw in pat.findall(body):
-            p = urllib.parse.unquote(raw.split('|')[0].strip())
-            if not p.startswith('http'):
-                images.append(Path(p).name)
+            name = image_ref_name(raw)
+            if name:
+                images.append(name)
 
     tags = fm.get('tags') or []
     if isinstance(tags, str):

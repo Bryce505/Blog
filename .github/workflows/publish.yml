@@ -10,6 +10,10 @@ on:
       count:
         description: 本次自动通道发布的篇数
         default: '1'
+      refresh_index:
+        description: 补图前强制重建 Drive 索引（刚往 Drive 补传了图就勾上）
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -49,6 +53,15 @@ jobs:
 
       - name: 工具与效率栏目
         run: python pipeline/main.py --routinerun .routinerun --blog . | tee -a report.json
+
+      # 放在自动通道前面：补图会顺手刷新 Drive 索引缓存，后面发新文直接复用
+      - name: 给已发布文章补图
+        env:
+          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+        run: |
+          python pipeline/main.py --repair-images --blog . \
+            ${{ github.event.inputs.refresh_index == 'true' && '--refresh-index' || '' }} \
+            | tee -a report.json
 
       - name: 自动通道发文（仅定时与手动触发）
         if: github.event_name != 'push'

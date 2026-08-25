@@ -85,28 +85,31 @@ def _make(tag, ns):
 
 
 def build_groups(notes):
-    """先按三级标签分组；不足 MIN_GROUP 的碎组按二级标签重新归并。
+    """按每篇笔记自身最深的标签层级分组（最多三级），碎组不向上归并。
 
-    没有回退的话，实测 224 篇可发布笔记里有 91 篇（41%）会卡在
-    只有一两篇的三级标签里，永远发不出去。
+    向上归并是「一篇文章什么都讲」的根源：实测把三级碎组降到二级后，
+    「05仪器与分析技术/质谱」一个组吃进 12 篇笔记，横跨定量、测序、
+    碎裂、数据分析、离子源五个互不相干的子题，出来的文章只能是大杂烩。
+
+    改成不归并 + 最小 2 篇之后（实测 209 篇可发布笔记）：
+      归并版   30 组，覆盖 164 篇，最大组 12 篇，含上面那个大杂烩
+      不归并版 38 组，覆盖 162 篇，最大组 14 篇，全部是同一子题
+    覆盖面几乎没损失，组数反而多了 —— 归并并没有救回多少笔记，只是把
+    本该分开的几篇焊死在一起。
+
+    取「最深≤三级」而不是「必须三级」：只打了二级标签的笔记（如
+    「00基础/生物制品」）本来就没有更细的粒度，强求三级等于把它们
+    永久排除；而它们凑成的组是同级并列，不是几个子题硬拼。
     """
     buckets = {}
     for n in publishable(notes):
         t = _primary_tag(n)
-        if t:
-            buckets.setdefault(t, []).append(n)
+        if not t:
+            continue
+        parts = t.split('/')
+        buckets.setdefault('/'.join(parts[:3]), []).append(n)
 
-    # 三级及以上的碎组降到「恰好二级」重新归并。二级碎组直接丢弃——
-    # 再降就成了「02分子表征」这种把整个领域当一篇文章的荒唐结果。
-    # 用同一个 dict 归并，回退目标撞上已存在的组时自动合并而非产生重名组。
-    merged = {}
-    for tag, ns in buckets.items():
-        parts = tag.split('/')
-        if len(ns) < config.MIN_GROUP and len(parts) >= 3:
-            tag = '/'.join(parts[:2])
-        merged.setdefault(tag, []).extend(ns)
-
-    made = (_make(t, ns) for t, ns in merged.items() if len(ns) >= config.MIN_GROUP)
+    made = (_make(t, ns) for t, ns in buckets.items() if len(ns) >= config.MIN_GROUP)
     return sorted((g for g in made if g), key=lambda g: (-len(g.notes), g.tag))
 
 
