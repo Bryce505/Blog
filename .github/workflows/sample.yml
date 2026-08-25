@@ -1,0 +1,78 @@
+# 引子通道试运行：以单篇笔记为引子扩写，产出落 _review/ 供人工过目。
+# 只能手动触发，且只写 _review/，不碰 src/content/posts/ 与 published.json ——
+# 这条通道还在试，不该有任何自动发布的可能。
+name: sample
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 引子笔记路径（相对 vault 根，一行一条；留空则按体量自动挑）
+        default: ''
+      count:
+        description: 自动挑选时生成几篇
+        default: '1'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sample
+  cancel-in-progress: false
+
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: Bryce505/Obsidian-base
+          token: ${{ secrets.VAULT_TOKEN }}
+          path: .vault
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r pipeline/requirements.txt
+
+      - name: 引子通道扩写
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+          # 走环境变量而不是把输入直接插进脚本：插进去的话输入里的分号
+          # 就成了另一条命令
+          SEED: ${{ github.event.inputs.seed }}
+          COUNT: ${{ github.event.inputs.count || 1 }}
+        run: |
+          # 按行拆而不是按空格：vault 里大量笔记的路径本身带空格
+          SEEDS=()
+          while IFS= read -r line; do
+            [ -n "$line" ] && SEEDS+=("$line")
+          done <<< "$SEED"
+          python pipeline/main.py --vault .vault --blog . \
+            --count "$COUNT" --seed "${SEEDS[@]}" | tee -a sample-report.json
+
+      - name: 提交产出
+        run: |
+          rm -rf .vault
+          git config user.name  'blog-bot'
+          git config user.email 'makejun505@gmail.com'
+          for p in _review public/images pipeline/drive_index.json; do
+            [ -e "$p" ] && git add -A "$p"
+          done
+          if git diff --staged --quiet; then
+            echo '本次没有新产出'
+          else
+            git commit -m "引子通道样稿：$(date -u +%Y-%m-%d)"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sample-report
+          path: sample-report.json
+          if-no-files-found: ignore
