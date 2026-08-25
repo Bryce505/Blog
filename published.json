@@ -1,1 +1,27 @@
-{}
+{
+  "00基础/生物制品/单抗": {
+    "slug": "00基础-生物制品-单抗",
+    "published_at": "2026-08-25",
+    "source_hash": "sha256:f4b68a2e6f7671c330e1923101afbcfadca3e8e43f9b674b477f3e2a898fa04e",
+    "notes": [
+      "Analytical technology/ELISA Assay/1103 Immunological test methods-Enzyme-linked immunosorbent assay.md",
+      "Analytical technology/理化分析/Chapter1 Overview of monoclonal antibodies.md",
+      "Analytical technology/理化分析/Chapter2 Physicochemical characterization of monoclonal antibodies.md",
+      "Analytical technology/理化分析/FcγR受体.md",
+      "Antibody-Characterization/ASKB589原液质量标准.md",
+      "Antibody-Characterization/Analytical Characterization of Biotherapeutics/Chapter1 Introduction to Biotherapeutics.md",
+      "Antibody-Characterization/Antibody-Characterization总目录.md",
+      "Antibody-Characterization/IEX酸性峰调查/大肠杆菌表达蛋白PTM与IEX电荷变体.md"
+    ],
+    "noteTitles": [
+      "1103 Immunological test methods-Enzyme-linked immunosorbent assay",
+      "Chapter1 Overview of monoclonal antibodies",
+      "Chapter2 Physicochemical characterization of monoclonal antibodies",
+      "FcγR受体",
+      "ASKB589原液质量标准",
+      "Chapter1 Introduction to Biotherapeutics",
+      "Antibody-Characterization总目录",
+      "大肠杆菌表达蛋白PTM与IEX电荷变体分析"
+    ]
+  }
+}
