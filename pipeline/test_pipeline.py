@@ -544,6 +544,27 @@ def test_fetch_images_reports_missing_and_is_idempotent():
     assert downloads == [], '已存在的图不该重新下载'
 
 
+def test_image_url_escapes_spaces_and_parens():
+    """图片名带空格时，裸 URL 会让整条 markdown 语法印在页面上。"""
+    assert im.url_safe('Pasted image 2026.webp') == 'Pasted%20image%202026.webp'
+    assert im.url_safe('a(1).webp') == 'a%281%29.webp'
+    assert im.url_safe('质谱-图.webp') == '质谱-图.webp', '中文不该转义，md 源文要能读'
+
+    TMP.mkdir(parents=True, exist_ok=True)
+    out = TMP / 'urlsafe'
+    out.mkdir(exist_ok=True)
+    mapping, missing = im.fetch_images(
+        ['Pasted image 20240528.png'], {'Pasted image 20240528.png': 'id1'}, None,
+        out, '/images/x', _download=lambda service, fid: _png(20, 10))
+    assert missing == []
+    assert mapping == {'Pasted image 20240528.png':
+                       '/images/x/Pasted%20image%2020240528.webp'}, mapping
+    # 落盘文件名保持原样，只有 URL 转义
+    assert (out / 'Pasted image 20240528.webp').exists()
+    body = rd.rewrite_images('![[Pasted image 20240528.png]]', mapping, [], {})
+    assert body == '![](/images/x/Pasted%20image%2020240528.webp)', body
+
+
 def test_alias_resolves_renamed_drive_file():
     """Drive 上改了名、笔记没跟着改：别名表兜住，落盘仍用引用名。"""
     TMP.mkdir(parents=True, exist_ok=True)

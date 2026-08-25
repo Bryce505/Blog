@@ -66,7 +66,7 @@ def _copy_images(repo_root, src_rel, body, blog_root, slug):
             ref.split('|')[0].strip().replace('\\', '/'))
         dest = out_dir / (Path(name).stem + '.webp')
         if dest.exists():
-            mapping[name] = f'/images/{slug}/{dest.name}'
+            mapping[name] = f'/images/{slug}/{images.url_safe(dest.name)}'
             continue
         if not src.exists():
             missing.append(name)
@@ -76,7 +76,7 @@ def _copy_images(repo_root, src_rel, body, blog_root, slug):
         except Exception:
             missing.append(name)
             continue
-        mapping[name] = f'/images/{slug}/{dest.name}'
+        mapping[name] = f'/images/{slug}/{images.url_safe(dest.name)}'
     return mapping, missing
 
 

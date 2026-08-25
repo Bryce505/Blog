@@ -105,6 +105,20 @@ def _download(service, fid):
     return buf.getvalue()
 
 
+def url_safe(name):
+    """转义会撑破 markdown `![](...)` 语法的字符。
+
+    Obsidian 的图片名大量带空格（Pasted image 2026...png、文献标题当文件名），
+    裸空格会让整条图片语法当成纯文本印在页面上 —— 实测线上那篇质谱文章的
+    「2011-Global quantification of mammalian gene expression control.webp」
+    就是这么废掉的。
+
+    中文不转义：浏览器和 Astro 都处理得了，转义了只会让 md 源文没法读。
+    """
+    return (name.replace('%', '%25').replace(' ', '%20')
+                .replace('(', '%28').replace(')', '%29'))
+
+
 def resolve(name, index):
     """文件名 → fileId。直接命中优先，落空再查 config.IMAGE_ALIASES。
 
@@ -126,7 +140,7 @@ def fetch_images(names, index, service, out_dir, url_prefix, _download=None):
     for name in names:
         dest = out_dir / (Path(name).stem + '.webp')
         if dest.exists():
-            mapping[name] = f'{url_prefix}/{dest.name}'
+            mapping[name] = f'{url_prefix}/{url_safe(dest.name)}'
             continue
         fid = resolve(name, index)
         if not fid:
@@ -137,5 +151,5 @@ def fetch_images(names, index, service, out_dir, url_prefix, _download=None):
         except Exception:
             missing.append(name)
             continue
-        mapping[name] = f'{url_prefix}/{dest.name}'
+        mapping[name] = f'{url_prefix}/{url_safe(dest.name)}'
     return mapping, missing

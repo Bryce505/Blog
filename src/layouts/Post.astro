@@ -14,8 +14,8 @@ const toc = (all.length > 14 ? all.filter((h) => h.depth === 2) : all).slice(0, 
 const tail = entry.data.primaryTag?.split('/').slice(1).join(' / ') ?? '';
 ---
 <Base title={entry.data.title} description={entry.data.description}>
-  <div class="wrap two-col" style="display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 64px; padding-top: 44px; padding-bottom: 80px; align-items: start;">
-    <article style="min-width: 0;">
+  <div class="wrap post-grid">
+    <article>
       <div style="font-size: 13px; color: var(--muted); margin-bottom: 14px; display: flex; gap: 7px; align-items: baseline; flex-wrap: wrap;">
         <a href={`${base}/category/${encodeURIComponent(entry.data.category)}`} style="color: var(--muted);">{entry.data.category}</a>
         {tail && <><span aria-hidden="true" style="color: var(--border);">/</span><span>{tail}</span></>}
@@ -74,16 +74,13 @@ const tail = entry.data.primaryTag?.split('/').slice(1).join(' / ') ?? '';
       </div>
     </article>
 
-    <aside style="position: sticky; top: 96px;">
+    <aside class="toc-rail">
       {toc.length > 1 && (
         <>
           <h2 class="eyebrow" style="font-size: 12px; margin-bottom: 10px;">目录</h2>
           <nav aria-label="本页目录">
             {toc.map((h) => (
-              <a href={`#${h.slug}`}
-                 style={`display: block; color: var(--muted); font-size: ${h.depth === 3 ? '13px' : '13.5px'}; padding: 4px 0 4px ${h.depth === 3 ? '22px' : '11px'}; border-left: 2px solid var(--border); line-height: 1.5;`}>
-                {h.text}
-              </a>
+              <a href={`#${h.slug}`} class={h.depth === 3 ? 'd3' : 'd2'}>{h.text}</a>
             ))}
           </nav>
         </>

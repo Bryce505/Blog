@@ -8,8 +8,10 @@
   --sans: "IBM Plex Sans", var(--han);
   --serif: "IBM Plex Serif", var(--han-serif);
   --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
-  --measure: 40rem;
-  --page: 1080px;
+  /* 正文行宽按中文可读性定：16.5px 下 44rem ≈ 42 个汉字/行，超过就该换行了。
+     表格、代码、图片这类宽内容不受这个限制，靠 .prose 的网格越出去占满整栏。 */
+  --measure: 44rem;
+  --page: 1240px;
 
   /* 浅色定义在裸 :root —— 系统「跟随」状态不带 data-theme 属性，
      只靠 prefers-color-scheme 区分，颜色不能只定义在媒体查询里 */
@@ -77,18 +79,62 @@ a:focus-visible, button:focus-visible {
 }
 .skip:focus { left: 8px; top: 8px; }
 
+/* ---- 文章页骨架：目录在左，正文在右 ---- */
+.post-grid {
+  display: grid; grid-template-columns: 210px minmax(0, 1fr);
+  gap: 56px; padding-top: 44px; padding-bottom: 80px; align-items: start;
+}
+/* 正文在 DOM 里排在目录前面，靠网格定位换到右栏：窄屏塌成一列时
+   先出现的是正文而不是二十几条目录 */
+.post-grid > article { grid-column: 2; min-width: 0; }
+.post-grid > .toc-rail { grid-column: 1; grid-row: 1; position: sticky; top: 96px; }
+
+.toc-rail nav { counter-reset: toc2; }
+.toc-rail a {
+  display: block; color: var(--muted); font-size: 13.5px; line-height: 1.5;
+  padding: 4px 0 4px 11px; border-left: 2px solid var(--border);
+}
+.toc-rail a.d3 { font-size: 13px; padding-left: 22px; }
+.toc-rail a.d2::before {
+  counter-increment: toc2; content: counter(toc2) ". ";
+  font-family: var(--mono); font-size: 0.92em;
+}
+
 /* ---- 正文排版：中文行高比英文松，标点挤压交给浏览器 ---- */
-.prose { max-width: var(--measure); font-size: 16.5px; line-height: 1.9; }
-.prose > * { margin: 0 0 1.15em; }
+/* 网格分两栏：文字待在 content（≤ --measure），表格/代码/图片越到满栏。
+   大屏上正文不会拉成一行 80 个字，同时表格也不必挤在 40rem 里横向滚动。 */
+.prose {
+  display: grid;
+  grid-template-columns: [content-start] min(var(--measure), 100%) [content-end] minmax(0, 1fr);
+  font-size: 16.5px; line-height: 1.9;
+  counter-reset: h2;
+}
+.prose > * { grid-column: content; margin: 0 0 1.15em; }
+.prose > table, .prose > pre, .prose > .katex-display,
+.prose > blockquote, .prose > .callout, .prose > h2,
+.prose > p:has(> img) { grid-column: 1 / -1; }
+.prose > p:has(> img) > img { margin-inline: auto; }
 .prose h2 {
   font-family: var(--serif); font-size: 20px; font-weight: 600;
   margin: 2.4em 0 0.7em; letter-spacing: -0.005em;
   padding-bottom: 0.35em; border-bottom: 1px solid var(--border);
   scroll-margin-top: 88px;
+  counter-increment: h2; counter-reset: h3;
+}
+/* 序号用 CSS 计数器而不是写进正文：LLM 编号会跳号、改稿要重排，
+   计数器永远连续，且目录那边用同一套规则对得上 */
+.prose h2::before {
+  content: counter(h2) ". "; color: var(--muted);
+  font-family: var(--mono); font-size: 0.9em;
 }
 .prose h3 {
   font-family: var(--serif); font-size: 17px; font-weight: 600;
   margin: 1.9em 0 0.55em; scroll-margin-top: 88px;
+  counter-increment: h3;
+}
+.prose h3::before {
+  content: counter(h2) "." counter(h3) " "; color: var(--muted);
+  font-family: var(--mono); font-size: 0.9em;
 }
 .prose p { text-wrap: pretty; }
 /* 长 URL 会撑破窄屏：笔记里有大量裸链接（FDA 说明书、DOI），
@@ -118,6 +164,11 @@ a:focus-visible, button:focus-visible {
   font-size: 13px; color: var(--muted); margin-top: 0.6em;
 }
 
+.prose mark {
+  background: color-mix(in oklch, var(--accent) 16%, transparent);
+  color: inherit; padding: 0.05em 0.18em; border-radius: 2px;
+}
+
 .prose code {
   font-family: var(--mono); font-size: 0.88em; background: var(--surface);
   padding: 0.12em 0.34em; border-radius: 2px; border: 1px solid var(--border);
@@ -128,7 +179,11 @@ a:focus-visible, button:focus-visible {
 }
 .prose pre code { background: none; border: 0; padding: 0; font-size: 1em; }
 
-.prose table { border-collapse: collapse; font-size: 14.5px; }
+.prose table {
+  border-collapse: collapse; font-size: 14.5px;
+  /* 越栏后大屏基本放得下；真放不下的宽表还是自己横向滚，页面不跟着滚 */
+  scrollbar-width: thin;
+}
 .prose th, .prose td {
   border: 1px solid var(--border); padding: 7px 11px;
   text-align: left; vertical-align: top;
@@ -164,5 +219,18 @@ a:focus-visible, button:focus-visible {
   .wrap { padding: 0 20px; }
   .two-col { grid-template-columns: minmax(0, 1fr) !important; gap: 40px !important; }
   .two-col aside { position: static !important; }
+  .post-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .post-grid > article { grid-column: 1; }
+  /* 目录改回正文之后：手机上先看正文，目录当页尾索引 */
+  .post-grid > .toc-rail { grid-column: 1; grid-row: auto; position: static; }
   .prose { font-size: 16px; }
+}
+
+/* 手机：版心留白再收一点，正文/表格字号跟着降，避免横向滚动 */
+@media (max-width: 520px) {
+  .wrap { padding: 0 16px; }
+  .prose { font-size: 15.5px; line-height: 1.85; }
+  .prose table { font-size: 13.5px; }
+  .prose th, .prose td { padding: 6px 8px; }
+  .prose th { white-space: normal; }
 }
