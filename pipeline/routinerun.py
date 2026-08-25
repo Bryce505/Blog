@@ -35,7 +35,7 @@ def collect(repo_root):
             continue          # 给 AI 看的配置，不是给人读的笔记
         text = p.read_text(encoding='utf-8', errors='ignore')
         m = vault.FM_RE.match(text)
-        body = text[m.end():] if m else text
+        body = vault.html_img_to_md(text[m.end():] if m else text)
         if len(body.strip()) < MIN_BODY_CHARS:
             continue          # 占位 README
         m1 = H1.search(body)

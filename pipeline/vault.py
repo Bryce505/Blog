@@ -13,6 +13,9 @@ import config
 
 FM_RE = re.compile(r'^---\n(.*?)\n---\n?', re.S)
 IMG_MD = re.compile(r'!\[[^\]]*\]\(([^)]+)\)')
+# 前面的 (?<!\\) 排掉 Zotero 导出的 `![\<img ...>](x.png)` —— 那个 <img
+# 是 alt 文本的一部分，外层已经是 markdown 图片了，再动一次会套娃
+IMG_HTML = re.compile(r'(?<!\\)<img\b[^>]*?\bsrc=["\']([^"\']+)["\'][^>]*?/?>', re.I)
 IMG_WIKI = re.compile(r'!\[\[([^\]|]+)(?:\|[^\]]*)?\]\]')
 WIKILINK = re.compile(r'(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]')
 
@@ -37,6 +40,18 @@ class Note:
     body: str = ''
     images: list = field(default_factory=list)
     wikilinks: list = field(default_factory=list)
+
+
+def html_img_to_md(body):
+    """Typora 时代留下的 `<img src="D:\\...\\x.png" style="zoom:50%" />`
+    归一成 markdown 图片语法。
+
+    在解析这一步换掉，后面全链路就只需要认 markdown 和 wiki 两种写法：
+    取图能收集到它、校验器能查它有没有丢、改写能换成站内路径。不换的话
+    这些图既取不到，正文里还留着一条 D: 开头的死链 —— 实测 5 篇待发布
+    笔记里有 20 处，其中 15 处集中在二硫键那组，整篇的图全是这么写的。
+    """
+    return IMG_HTML.sub(lambda m: f'![]({m.group(1)})', body)
 
 
 def image_ref_name(raw):
@@ -89,7 +104,7 @@ def parse_note(path: Path, vault_root: Path):
     if not isinstance(fm, dict):
         return None
 
-    body = text[m.end():]
+    body = html_img_to_md(text[m.end():])
     images = []
     for pat in (IMG_MD, IMG_WIKI):
         for raw in pat.findall(body):

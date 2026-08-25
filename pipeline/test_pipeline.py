@@ -44,6 +44,32 @@ def test_parse_wiki_image_with_size():
     assert n.wikilinks == [], n.wikilinks
 
 
+def test_html_img_tag_normalised_to_markdown():
+    """Typora 时代的 <img src="D:\...">：不归一化就既取不到图，正文里还留死链。"""
+    out = vault.html_img_to_md(
+        '  <img src="D:\\Knowlege\\image/202201302203668.png" alt="x" style="zoom: 50%;" />')
+    assert out == '  ![](D:\\Knowlege\\image/202201302203668.png)', repr(out)
+    assert vault.image_ref_name('D:\\Knowlege\\image/202201302203668.png') \
+        == '202201302203668.png'
+
+
+def test_zotero_escaped_img_in_alt_left_alone():
+    """Zotero 导出的 alt 里塞着整段 <img>，外层已是 markdown 图片，不能套娃。"""
+    src = '![\\<img src="attachments/T.png" ztype="zimage">](attachments/T.png)'
+    assert vault.html_img_to_md(src) == src
+    # alt 里的 HTML 不该原样输出到站上
+    out = rd.rewrite_images(src, {'T.png': '/images/s/T.webp'}, [], {})
+    assert out == '![](/images/s/T.webp)', out
+
+
+def test_obsidian_size_suffix_stripped_from_alt():
+    """`![|330](x)` 的管道符会把 GFM 表格行劈成两个单元格。"""
+    assert rd.rewrite_images('![|330](../a/x.png)', {'x.png': '/images/s/x.webp'}, [], {}) \
+        == '![](/images/s/x.webp)'
+    assert rd.rewrite_images('![谱图|330](../a/x.png)', {'x.png': '/images/s/x.webp'}, [], {}) \
+        == '![谱图](/images/s/x.webp)'
+
+
 def test_parse_note_keeps_only_real_images():
     """笔记嵌入、附件、外链都不是要去 Drive 取的图。"""
     body = ('![[真图.png]]\n![[某笔记#小节]]\n![[画板.excalidraw]]\n'

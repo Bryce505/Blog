@@ -57,11 +57,22 @@ MISSING_TPL = '*[图片暂缺]*<!--missing-image: {name}|{caption}-->'
 MISSING_RE = re.compile(r'\*\[图片暂缺\]\*<!--missing-image:\s*(.+?)\|(.*?)-->')
 
 
+def _alt(raw):
+    """清理 alt。
+
+    Obsidian 用 `![alt|330](x)` 表示显示宽度，管道符必须去掉 —— 它会把
+    GFM 表格行劈成两个单元格，实测肽图那篇的 `![|330]` 就是这么把一张图
+    变成两格乱码的。Zotero 导出的 alt 里塞着整段 <img> HTML，同样丢掉。
+    """
+    alt = raw.split('|')[0]
+    return '' if '<' in alt else alt.strip()
+
+
 def _one(name, alt, image_map, missing, caption_of):
     if name in missing or name not in image_map:
         # 不留破图：换成一行说明，读者知道这里本该有图
         return MISSING_TPL.format(name=name, caption=caption_of.get(name, ''))
-    md = f'![{alt}]({image_map[name]})'
+    md = f'![{_alt(alt)}]({image_map[name]})'
     cap = caption_of.get(name, '')
     return f'{md}\n*{cap}*' if cap else md
 
