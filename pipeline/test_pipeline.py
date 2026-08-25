@@ -253,6 +253,23 @@ def test_verify_passes_identical():
     assert vf.verify(SRC, SRC, IMGS).ok
 
 
+def test_numbers_adjacent_to_chinese_are_seen():
+    """紧挨汉字的数字必须提取得到 —— Python 的 \\w 把汉字算词字符，
+    用它当边界会让中文正文里的多数数据对校验器不可见。"""
+    nums = vf.data_numbers('准确度在1.5倍至1.8倍范围内，流速0.05 mL/min，回收率95%。')
+    # 小数分支排在带单位分支前面，所以 0.05 提取出来不带单位——本来如此
+    assert {'1.5', '1.8', '0.05', '95%'} <= nums, nums
+    # 反过来不能把长数字切开：18.5 里不该冒出 8.5
+    assert '8.5' not in vf.data_numbers('取 IAM 18.5 mg 溶解')
+
+
+def test_reformatting_alone_is_not_a_new_number():
+    """模型给数字前后加空格是排版行为，不该被当成编造数据。"""
+    src = '准确度在真实值的1.5倍至1.8倍范围内'
+    out = '准确度在真实值的 1.5 倍至 1.8 倍范围内'
+    assert vf.verify(src, out, [], min_ratio=0.1).ok
+
+
 def test_verify_catches_changed_flowrate():
     r = vf.verify(SRC, SRC.replace('0.5 mL/min', '0.8 mL/min', 1), IMGS)
     assert not r.ok and any('数据' in f for f in r.failures), r.failures
