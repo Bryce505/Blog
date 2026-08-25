@@ -105,6 +105,15 @@ def _download(service, fid):
     return buf.getvalue()
 
 
+def resolve(name, index):
+    """文件名 → fileId。直接命中优先，落空再查 config.IMAGE_ALIASES。
+
+    落盘仍用笔记里的引用名，不用 Drive 上的实际名：正文引用、占位标记、
+    已下载文件三者对得上，重跑才幂等。
+    """
+    return index.get(name) or index.get(config.IMAGE_ALIASES.get(name, ''))
+
+
 def fetch_images(names, index, service, out_dir, url_prefix, _download=None):
     """返回 (文件名 → 站内路径, 找不到的文件名列表)。
 
@@ -119,7 +128,7 @@ def fetch_images(names, index, service, out_dir, url_prefix, _download=None):
         if dest.exists():
             mapping[name] = f'{url_prefix}/{dest.name}'
             continue
-        fid = index.get(name)
+        fid = resolve(name, index)
         if not fid:
             missing.append(name)
             continue

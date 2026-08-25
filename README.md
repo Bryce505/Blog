@@ -236,8 +236,14 @@ python pipeline/main.py --audit-images --vault <vault 路径>
 和 Zotero 时代留下的本地图，从来没上传过 Drive。把它们传进
 `image&attachment`（文件名保持不变）即可。
 
+**另一类是图在 Drive 上、但名字对不上** —— 早期 Typora 按截图时刻命名
+（17 位），上传工具按上传时刻重命名成 15 位，笔记里的引用没跟着改。
+这种别去改笔记（已发布的文章不会重跑），往 `pipeline/config.py` 的
+`IMAGE_ALIASES` 加一行「引用名 → Drive 实际文件名」即可，下次跑补图
+通道就会把文章修好。刻意不做时间戳近似匹配：同分钟撞车会把错图发出去。
+
 补传之后：Actions → publish → Run workflow，**勾上「补图前强制重建
-Drive 索引」**。已发布的文章会被就地修好 —— `published.json` 里已经记了
+Drive 索引」**（只加别名不必勾，索引里本来就有那个文件）。已发布的文章会被就地修好 —— `published.json` 里已经记了
 账，自动通道不会重跑那篇，靠的是补图通道按占位标记重取，不用再烧一次
 LLM。不勾也行，Drive 索引缓存 7 天一换，到期后自动补上。
 

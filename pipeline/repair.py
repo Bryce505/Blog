@@ -72,7 +72,7 @@ def audit(vault_root, _index=None):
     out = []
     for g in sel.build_groups(vault.load_vault(Path(vault_root))):
         for n in g.notes:
-            gone = [i for i in n.images if i not in index]
+            gone = [i for i in n.images if not images.resolve(i, index)]
             if gone:
                 out.append({'slug': g.slug, 'note': n.path, 'missing': gone})
     return out

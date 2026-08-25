@@ -544,6 +544,25 @@ def test_fetch_images_reports_missing_and_is_idempotent():
     assert downloads == [], '已存在的图不该重新下载'
 
 
+def test_alias_resolves_renamed_drive_file():
+    """Drive 上改了名、笔记没跟着改：别名表兜住，落盘仍用引用名。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    out = TMP / 'alias'
+    out.mkdir(exist_ok=True)
+    old, actual = '20220120182528049.png', '202201201825137.png'
+    assert config.IMAGE_ALIASES[old] == actual, '别名表被改动，测试要同步'
+    assert im.resolve(old, {actual: 'id9'}) == 'id9'
+    assert im.resolve(old, {}) is None
+    # 真有同名文件时直接命中优先，别名不抢
+    assert im.resolve(old, {old: 'id-real', actual: 'id9'}) == 'id-real'
+
+    mapping, missing = im.fetch_images(
+        [old], {actual: 'id9'}, None, out, '/images/x',
+        _download=lambda service, fid: _png(30, 20))
+    assert missing == [] and mapping == {old: '/images/x/20220120182528049.webp'}, mapping
+    assert (out / '20220120182528049.webp').exists(), '落盘用引用名，不用 Drive 上的名'
+
+
 # ---------- compose ----------
 
 def _grp(notes, tag='t/x/y'):
