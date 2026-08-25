@@ -192,6 +192,23 @@ a:focus-visible, button:focus-visible {
 }
 .prose th { background: var(--surface); font-weight: 600; white-space: nowrap; }
 
+/* ---- mermaid：remark-mermaid.mjs 产出，Post.astro 的脚本渲染 ---- */
+/* 渲染前保持代码块外观：脚本没跑起来（禁用 JS、加载失败）时至少还能读源码 */
+.prose pre.mermaid { white-space: pre; }
+.prose pre.mermaid[data-processed] {
+  background: none; border: 0; padding: 0;
+  text-align: center; line-height: 0;
+}
+.prose pre.mermaid[data-processed] svg { max-width: 100%; height: auto; }
+/* 手机上整张图缩到 358px 宽的话字只剩几像素，还不如让它保持可读尺寸、
+   在自己的容器里横向滚 —— 页面本身仍然不滚 */
+@media (max-width: 640px) {
+  .prose pre.mermaid[data-processed] { overflow-x: auto; text-align: left; }
+  /* 定宽 560px 覆盖 mermaid 的 width="100%"；它自己内联的 max-width 就是
+     图的原始宽度，天然封顶 —— 小图不会被拉大，大图缩到 560 还读得清 */
+  .prose pre.mermaid[data-processed] svg { width: 560px; }
+}
+
 /* ---- Obsidian callout：remark-callout.mjs 产出 ---- */
 .callout {
   border-left: 3px solid var(--accent); background: var(--surface);

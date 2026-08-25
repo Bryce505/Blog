@@ -5,6 +5,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkCallout from './src/plugins/remark-callout.mjs';
 import remarkMark from './src/plugins/remark-mark.mjs';
+import remarkMermaid from './src/plugins/remark-mermaid.mjs';
 import remarkBaseUrl from './src/plugins/remark-base-url.mjs';
 import { SITE, BASE } from './site.config.mjs';
 
@@ -18,7 +19,7 @@ export default defineConfig({
     // 分组里。不渲染的话七成文章会显示成一堆反斜杠。
     processor: unified({
       // remarkBaseUrl 必须排在最后：前面的插件可能新增链接节点
-      remarkPlugins: [remarkCallout, remarkMath, remarkMark, remarkBaseUrl],
+      remarkPlugins: [remarkCallout, remarkMath, remarkMark, remarkMermaid, remarkBaseUrl],
       rehypePlugins: [[rehypeKatex, { throwOnError: false, strict: false }]],
     }),
     shikiConfig: {

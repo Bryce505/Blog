@@ -88,3 +88,33 @@ const tail = entry.data.primaryTag?.split('/').slice(1).join(' / ') ?? '';
     </aside>
   </div>
 </Base>
+
+<script>
+  // 只有正文里真出现 mermaid 块才去加载它：mermaid 有 2MB 量级，
+  // 绝大多数文章一张图都没有，不该为它付流量。动态 import 让打包器
+  // 把它切成单独的 chunk，按需下载。
+  const nodes = [...document.querySelectorAll('pre.mermaid')];
+  if (nodes.length) {
+    // 先把源码存起来：渲染后 <pre> 的内容会被 SVG 替换掉，
+    // 系统深浅色一换就得拿原文重画
+    nodes.forEach((n) => { n.dataset.src = n.textContent ?? ''; });
+    const { default: mermaid } = await import('mermaid');
+    const media = matchMedia('(prefers-color-scheme: dark)');
+    const draw = async () => {
+      const forced = document.documentElement.dataset.theme;
+      const dark = forced === 'dark' || (forced !== 'light' && media.matches);
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: dark ? 'dark' : 'neutral',
+        fontFamily: getComputedStyle(document.body).fontFamily,
+      });
+      nodes.forEach((n) => {
+        n.removeAttribute('data-processed');
+        n.textContent = n.dataset.src ?? '';
+      });
+      await mermaid.run({ nodes });
+    };
+    await draw();
+    media.addEventListener('change', draw);
+  }
+</script>
