@@ -17,7 +17,7 @@ GitHub Pages。
 
 ```
 Obsidian-base ─┐
-RoutineRun    ─┤ ① 选题：按三级标签分组 → 查 published.json 去重
+RoutineRun    ─┤ ① 选题：按最深标签（≤三级）分组 → 查 published.json 去重
 Google Drive  ─┤ ② 取图：Drive 拉图 → WebP(≤1200px) → public/images/
                │ ③ 整理：DeepSeek 结构重组
                │ ④ 校验：四项机械校验，不过则进 _review/ 等人工
@@ -247,6 +247,22 @@ Drive 索引」**（只加别名不必勾，索引里本来就有那个文件）
 账，自动通道不会重跑那篇，靠的是补图通道按占位标记重取，不用再烧一次
 LLM。不勾也行，Drive 索引缓存 7 天一换，到期后自动补上。
 
+### 觉得文章主题太杂 / 太窄
+
+分组规则在 `pipeline/select_.py` 的 `build_groups`：按每篇笔记**自身最深的
+标签层级**（最多三级）分桶，碎组不向上归并。归并才是「一篇文章什么都讲」
+的根源 —— 实测归并版把 12 篇横跨定量、测序、碎裂、数据分析、离子源的笔记
+塞进「05仪器与分析技术/质谱」一组，出来只能是大杂烩。
+
+想调粒度改 `pipeline/config.py` 的 `MIN_GROUP`（实测 209 篇可发布笔记）：
+
+| MIN_GROUP | 组数 | 覆盖笔记 | 效果 |
+|---|---|---|---|
+| 2（当前） | 38 | 150 | 「质谱/数据分析」这种正好 2 篇的紧凑子题也能成文 |
+| 3 | 20 | 126 | 文章更厚实，但近四成笔记永远排不上队 |
+
+单组体量还受 `MAX_GROUP_CHARS`（5 万字符）约束，超了按笔记体量截断。
+
 ### 想让某篇超长的原创笔记也能发布
 
 单篇超过 3 万字符的笔记默认不发（实测超过这个量的绝大多数是整书/整章
@@ -258,7 +274,7 @@ LLM。不勾也行，Drive 索引缓存 7 天一换，到期后自动补上。
 ```bash
 # Python 流水线
 uv venv && uv pip install -r pipeline/requirements.txt
-.venv/bin/python pipeline/test_pipeline.py      # 98 项自检
+.venv/bin/python pipeline/test_pipeline.py      # 99 项自检
 
 # 站点
 npm install
@@ -278,7 +294,7 @@ pipeline/     Python 流水线（config / vault / select_ / verify / render
 src/          Astro 站点
 drafts/       手动发布投递口
 public/images/ 文章图片（WebP）
-published.json 已发布状态，按三级标签组记录
+published.json 已发布状态，按标签组记录
 _review/      校验未通过、等人工复核的文章
 design/       视觉设计源文件
 ```

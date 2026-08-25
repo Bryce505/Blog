@@ -5,6 +5,7 @@
 import io
 import json
 import re
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -142,56 +143,43 @@ def test_two_level_tag_used_when_no_third_level():
     assert len(gs) == 1 and gs[0].tag == '06工艺/纯化'
 
 
-def test_small_group_falls_back_to_second_level():
-    """碎组不能直接丢：41% 的可发布笔记卡在不足 3 篇的三级标签里。
+def test_sibling_subtopics_stay_separate_articles():
+    """不同子题不能焊成一篇：这是「一篇文章什么都讲」的根源。
 
-    把它们按二级标签重新归并，凑够 3 篇就能成文。
+    实测归并版把 12 篇横跨定量/测序/碎裂/数据分析/离子源的笔记塞进
+    「05仪器与分析技术/质谱」一篇里，出来只能是大杂烩。
     """
     ns = ([_fake(f'a{i}.md', ['02分子表征/PTM/糖基化']) for i in range(2)] +
           [_fake(f'b{i}.md', ['02分子表征/PTM/二硫键']) for i in range(2)])
     gs = sel.build_groups(ns)
-    assert len(gs) == 1, [(g.tag, len(g.notes)) for g in gs]
-    assert gs[0].tag == '02分子表征/PTM'
-    assert len(gs[0].notes) == 4
+    assert {g.tag: len(g.notes) for g in gs} == {
+        '02分子表征/PTM/糖基化': 2, '02分子表征/PTM/二硫键': 2}, \
+        {g.tag: len(g.notes) for g in gs}
 
 
-def test_still_dropped_when_even_second_level_too_small():
+def test_group_below_minimum_dropped():
     ns = [_fake('a.md', ['02分子表征/PTM/糖基化']), _fake('b.md', ['03质量控制/SEC/柱效'])]
     assert sel.build_groups(ns) == []
 
 
-def test_fallback_does_not_steal_from_valid_third_level_group():
-    """三级标签已够 3 篇的组保持独立，不该被二级回退吸走。"""
-    ns = ([_fake(f'a{i}.md', ['02分子表征/PTM/糖基化']) for i in range(4)] +
-          [_fake(f'b{i}.md', ['02分子表征/PTM/二硫键']) for i in range(2)] +
-          [_fake(f'c{i}.md', ['02分子表征/PTM/氧化']) for i in range(2)])
+def test_two_level_only_notes_still_group():
+    """只打了二级标签的笔记本来就没有更细的粒度，不能永久排除。"""
+    ns = [_fake(f'a{i}.md', ['00基础/生物制品']) for i in range(3)]
+    assert [(g.tag, len(g.notes)) for g in sel.build_groups(ns)] == [('00基础/生物制品', 3)]
+
+
+def test_deeper_than_three_levels_folds_to_three():
+    """四级标签折到三级：再细下去每组只剩一篇。"""
+    ns = ([_fake(f'a{i}.md', ['02分子表征/PTM/糖基化/N-糖']) for i in range(2)] +
+          [_fake(f'b{i}.md', ['02分子表征/PTM/糖基化/O-糖']) for i in range(2)])
     gs = sel.build_groups(ns)
-    tags = {g.tag: len(g.notes) for g in gs}
-    assert tags == {'02分子表征/PTM/糖基化': 4, '02分子表征/PTM': 4}, tags
+    assert [(g.tag, len(g.notes)) for g in gs] == [('02分子表征/PTM/糖基化', 4)]
+    assert len(set(g.slug for g in gs)) == len(gs), 'slug 撞车会让后写的文章静默覆盖先写的'
 
 
 def test_oversized_group_truncated_to_max():
     ns = [_fake(f'n{i:03d}.md', ['02分子表征/PTM/糖基化']) for i in range(40)]
     assert len(sel.build_groups(ns)[0].notes) == 30
-
-
-def test_fallback_never_collapses_to_top_level():
-    """二级碎组不能再降级：「02分子表征」当一篇文章毫无意义。"""
-    ns = [_fake(f'a{i}.md', ['02分子表征/PTM']) for i in range(2)]
-    assert sel.build_groups(ns) == []
-
-
-def test_fallback_merges_into_existing_group_not_duplicate():
-    """四级碎组回退撞上已存在的二级组时必须合并进去，不能产生同名组。
-
-    产生同名组会导致两篇文章抢同一个 slug，后写的静默覆盖先写的。
-    """
-    ns = ([_fake(f'a{i}.md', ['02分子表征/PTM']) for i in range(3)] +
-          [_fake(f'b{i}.md', ['02分子表征/PTM/糖基化/N-糖']) for i in range(2)])
-    gs = sel.build_groups(ns)
-    assert {g.tag: len(g.notes) for g in gs} == {'02分子表征/PTM': 5}, \
-        {g.tag: len(g.notes) for g in gs}
-    assert len(set(g.slug for g in gs)) == len(gs)
 
 
 def test_pick_next_skips_published_unchanged():
@@ -1065,7 +1053,8 @@ def test_audit_lists_images_drive_does_not_have():
     import repair
     TMP.mkdir(parents=True, exist_ok=True)
     v = TMP / 'audit-vault'
-    v.mkdir(exist_ok=True)
+    shutil.rmtree(v, ignore_errors=True)      # 上次跑剩的笔记会混进分组
+    v.mkdir(parents=True)
     for i in range(config.MIN_GROUP):
         (v / f'n{i}.md').write_text(
             '---\ntags:\n  - 02分子表征/A/B\ntype: note\n---\n'

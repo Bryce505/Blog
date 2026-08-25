@@ -33,7 +33,7 @@ const tail = entry.data.primaryTag?.split('/').slice(1).join(' / ') ?? '';
         )}
       </div>
 
-      <div class="prose" style="padding-top: 26px;">
+      <div class:list={['prose', count > 0 && 'numbered']} style="padding-top: 26px;">
         <slot />
       </div>
 
@@ -78,7 +78,7 @@ const tail = entry.data.primaryTag?.split('/').slice(1).join(' / ') ?? '';
       {toc.length > 1 && (
         <>
           <h2 class="eyebrow" style="font-size: 12px; margin-bottom: 10px;">目录</h2>
-          <nav aria-label="本页目录">
+          <nav aria-label="本页目录" class:list={[count > 0 && 'numbered']}>
             {toc.map((h) => (
               <a href={`#${h.slug}`} class={h.depth === 3 ? 'd3' : 'd2'}>{h.text}</a>
             ))}

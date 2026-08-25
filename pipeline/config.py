@@ -7,7 +7,10 @@ PUBLISHABLE_TYPES = {'note', 'sci-note', 'book-note', '综述', 'lit-review',
                      'reference', 'regulatory-strategy', '项目报告', '实验',
                      'reference-table'}
 
-MIN_GROUP, MAX_GROUP = 3, 30
+# 一组最少 2 篇：宁可短而聚焦，也不要为了凑篇数把几个子题焊成一篇。
+# 实测 2 篇起 38 组覆盖 162 篇，3 篇起只剩 20 组覆盖 126 篇 —— 差的那
+# 36 篇全是「质谱/数据分析」「质谱/测序」这种正好 2 篇的紧凑子题。
+MIN_GROUP, MAX_GROUP = 2, 30
 
 # 体量上限。按篇数限制是错的指标：实测有单篇 158 万字符的笔记（整本书
 # 导入），一篇就撑爆 1M 上下文；也有 9 篇加起来 170 万字符的组。
