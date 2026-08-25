@@ -3,6 +3,8 @@
 两条通道：
   自动通道  python main.py --vault <路径> [--count N]
   手动通道  python main.py --drafts
+引子通道（试运行，产出落 _review/）：
+  python main.py --seed [笔记路径...] --vault <路径> [--count N]
 另有两条辅助通道：
   补图      python main.py --repair-images
   图片体检  python main.py --audit-images --vault <路径>
@@ -195,9 +197,18 @@ def main():
                     help='强制重建 Drive 索引，不吃 7 天缓存')
     ap.add_argument('--audit-images', action='store_true',
                     help='列出待发布笔记里 Drive 上没有的图（只读索引缓存）')
+    ap.add_argument('--seed', nargs='*', metavar='NOTE',
+                    help='引子通道：以单篇笔记为引子扩写成文章，产出落 _review/。'
+                         '可指定一或多个笔记路径，省略则按体量自动挑')
     a = ap.parse_args()
 
-    if a.audit_images:
+    if a.seed is not None:
+        import seed as seed_channel
+        if not a.vault:
+            ap.error('引子通道需要 --vault')
+        rs = seed_channel.run(a.vault, a.blog, os.environ['DEEPSEEK_API_KEY'],
+                              os.environ['GDRIVE_SA_JSON'], a.seed, a.count)
+    elif a.audit_images:
         import repair
         if not a.vault:
             ap.error('体检要读 vault，需要 --vault')

@@ -18,6 +18,7 @@ import main as mn
 import config
 import images as im
 import render as rd
+import seed as sd
 import select_ as sel
 import vault
 import verify as vf
@@ -1030,6 +1031,80 @@ def test_routinerun_writes_tools_category_and_strips_h1():
 
     # 重跑不覆盖，避免抹掉人工修改
     assert rr.run(repo, blog)[0]['status'] == 'skipped'
+
+
+# ---------- seed（引子通道）----------
+
+def _seed_note(body_chars=3000, path='a/b/n.md'):
+    return vault.Note(path=path, title='引子笔记', tags=['03质量控制/残留/HCP'],
+                      type='note', book='某书',
+                      body='HCP 残留控制。回收率 85.3%，限度 100 ng/mg。\n\n'
+                           + 'x' * body_chars)
+
+
+def test_seed_candidates_skip_short_and_used():
+    """太短的笔记撑不起主题，扩写就成了模型自由发挥。"""
+    short = _seed_note(10, 'a/short.md')
+    good = _seed_note(3000, 'a/good.md')
+    assert [n.path for n in sd.candidates([short, good])] == ['a/good.md']
+    assert sd.candidates([good], used=['a/good.md']) == []
+
+
+def test_seed_run_writes_to_review_only():
+    """引子通道还在试，产出只落 _review/，不碰 posts 和 published.json。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-blog'
+    shutil.rmtree(blog, ignore_errors=True)
+    (blog / 'src' / 'content' / 'posts').mkdir(parents=True)
+    v = TMP / 'seed-vault'
+    shutil.rmtree(v, ignore_errors=True)
+    v.mkdir(parents=True)
+    (v / 'n.md').write_text(
+        '---\ntags:\n  - 03质量控制/残留/HCP\ntype: note\nbook: 某书\n---\n'
+        '回收率 85.3%，限度 100 ng/mg。\n' + 'x' * 3000, encoding='utf-8')
+
+    def fake(note, api_key):
+        # 扩写：保留源文数据，只补定性叙述
+        return ('# HCP 残留控制：从检测原理到限度设定\n\n导读一段。\n\n'
+                '## 原理\n\n' + note.body.split("---")[-1].strip() +
+                '\n\n覆盖率不足会系统性低估残留水平。\n')
+
+    rs = sd.run(v, blog, 'k', None, _index={}, _compose=fake)
+    assert len(rs) == 1 and rs[0]['ok'], rs
+    assert rs[0]['articleChars'] > rs[0]['seedChars'], '扩写应当变长'
+    out = blog / '_review' / f"seed-{rs[0]['slug']}.md"
+    assert out.exists() and '校验：全部通过' in out.read_text(encoding='utf-8')
+    assert not list((blog / 'src' / 'content' / 'posts').glob('*.md')), '不该写进 posts'
+    assert not (blog / 'published.json').exists(), '不该动 published.json'
+
+
+def test_seed_run_catches_fabricated_numbers():
+    """扩写编出源文没有的数值必须被校验器拦下 —— 这是这条通道的红线。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-blog2'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+    v = TMP / 'seed-vault2'
+    shutil.rmtree(v, ignore_errors=True)
+    v.mkdir(parents=True)
+    (v / 'n.md').write_text(
+        '---\ntags:\n  - 03质量控制/残留/HCP\ntype: note\n---\n'
+        '回收率 85.3%。\n' + 'x' * 3000, encoding='utf-8')
+
+    def fake(note, api_key):
+        return ('# 标题\n\n导读。\n\n## 一节\n\n' + note.body.strip()
+                + '\n\n通常流速设为 0.5 mL/min，柱温 30 °C。\n')
+
+    rs = sd.run(v, blog, 'k', None, _index={}, _compose=fake)
+    assert not rs[0]['ok'], rs
+    assert any('出现源文没有的数据' in f for f in rs[0]['failures']), rs[0]['failures']
+    assert '校验未通过' in (blog / '_review' / f"seed-{rs[0]['slug']}.md").read_text(encoding='utf-8')
+
+
+def test_seed_message_carries_book_and_body():
+    n = _seed_note()
+    msg = cp.build_seed_message(n)
+    assert '引子' in msg and '出处：《某书》' in msg and '85.3%' in msg
 
 
 # ---------- repair（给已发布文章补图）----------
