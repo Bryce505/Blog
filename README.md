@@ -139,7 +139,7 @@ Google Drive 的 `image&attachment` 文件夹。流水线要用服务账号去�
 ### 4. 把 Drive 文件夹共享给服务账号 ← 最容易漏的一步
 
 **漏了会怎样**：流水线能正常跑完，但**一张图都取不到**，全部文章的图片
-变成「图缺失」占位文字，而且报的是 404 而不是「你没共享文件夹」。
+变成「图片暂缺」占位文字，而且报的是 404 而不是「你没共享文件夹」。
 
 1. 从上面 JSON 里找到 **`client_email`** 的值（形如
    `blog-image-reader@xxx.iam.gserviceaccount.com`），复制引号里那一整串
@@ -188,7 +188,7 @@ Google Drive 的 `image&attachment` 文件夹。流水线要用服务账号去�
 - **workflow 是否全绿** —— 红了看是哪一步：checkout 源仓库失败是
   `VAULT_TOKEN` 问题，取图失败是 Drive 共享或 API 没启用，
   整理那步失败看 DeepSeek 的报错（余额、模型名）
-- **文章有没有图** —— 打开生成的文章，如果满屏「图缺失」，回去检查第 4 步
+- **文章有没有图** —— 打开生成的文章，如果满屏「图片暂缺」，回去检查第 4 步
 - **文章内容读一遍** —— 这是唯一没法自动验证的部分，见下
 
 > **首次运行务必人工通读生成的文章。** 机械校验器只能保证数据没被篡改、
@@ -219,6 +219,28 @@ deploy 的 push 事件 —— 文章会一直躺在仓库里不上线。
 > `_review/` 里存在的分组会被自动通道跳过，否则它会一直霸占队首、
 > 后面的文章一篇也发不出去。人工处理掉文件后该组自动重新入列。
 
+### 文章里出现「图片暂缺」怎么办
+
+正文里那行 `[图片暂缺]` 表示这张图在 Drive 的 `image&attachment` 文件夹
+里找不到。文件名藏在同一行的 HTML 注释里（读者看不到），查看文章源码
+或直接跑体检即可拿到清单：
+
+```bash
+python pipeline/main.py --audit-images --vault <vault 路径>
+```
+
+它列出所有待发布笔记里 Drive 上没有的图，按源笔记分组，只读
+`pipeline/drive_index.json` 缓存，不碰 Drive。
+
+**实测大头是笔记同级的 `res/`、`attachments/` 目录** —— 这些是 Typora
+和 Zotero 时代留下的本地图，从来没上传过 Drive。把它们传进
+`image&attachment`（文件名保持不变）即可。
+
+补传之后：Actions → publish → Run workflow，**勾上「补图前强制重建
+Drive 索引」**。已发布的文章会被就地修好 —— `published.json` 里已经记了
+账，自动通道不会重跑那篇，靠的是补图通道按占位标记重取，不用再烧一次
+LLM。不勾也行，Drive 索引缓存 7 天一换，到期后自动补上。
+
 ### 想让某篇超长的原创笔记也能发布
 
 单篇超过 3 万字符的笔记默认不发（实测超过这个量的绝大多数是整书/整章
@@ -230,7 +252,7 @@ deploy 的 push 事件 —— 文章会一直躺在仓库里不上线。
 ```bash
 # Python 流水线
 uv venv && uv pip install -r pipeline/requirements.txt
-.venv/bin/python pipeline/test_pipeline.py      # 89 项自检
+.venv/bin/python pipeline/test_pipeline.py      # 98 项自检
 
 # 站点
 npm install
@@ -245,7 +267,7 @@ CI 里可以直接跑。
 
 ```
 pipeline/     Python 流水线（config / vault / select_ / verify / render
-              / images / compose / drafts / routinerun / main）
+              / images / compose / drafts / routinerun / repair / main）
   prompt.md   DeepSeek 的系统提示词，改写力度不对就调这里
 src/          Astro 站点
 drafts/       手动发布投递口

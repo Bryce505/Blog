@@ -3,6 +3,9 @@
 两条通道：
   自动通道  python main.py --vault <路径> [--count N]
   手动通道  python main.py --drafts
+另有两条辅助通道：
+  补图      python main.py --repair-images
+  图片体检  python main.py --audit-images --vault <路径>
 """
 import argparse
 import collections
@@ -186,9 +189,23 @@ def main():
     ap.add_argument('--count', type=int, default=1)
     ap.add_argument('--drafts', action='store_true', help='只处理 drafts/，跳过 AI 通道')
     ap.add_argument('--routinerun', metavar='REPO', help='把 RoutineRun 笔记接成工具与效率栏目')
+    ap.add_argument('--repair-images', action='store_true',
+                    help='给已发布文章补取当时没取到的图（Drive 补传后跑）')
+    ap.add_argument('--refresh-index', action='store_true',
+                    help='强制重建 Drive 索引，不吃 7 天缓存')
+    ap.add_argument('--audit-images', action='store_true',
+                    help='列出待发布笔记里 Drive 上没有的图（只读索引缓存）')
     a = ap.parse_args()
 
-    if a.routinerun:
+    if a.audit_images:
+        import repair
+        if not a.vault:
+            ap.error('体检要读 vault，需要 --vault')
+        rs = repair.audit(a.vault)
+    elif a.repair_images:
+        import repair
+        rs = repair.run(a.blog, os.environ['GDRIVE_SA_JSON'], a.refresh_index)
+    elif a.routinerun:
         import routinerun
         rs = routinerun.run(a.routinerun, a.blog)
     elif a.drafts:

@@ -164,7 +164,8 @@ Note = namedtuple('Note', 'path title tags type description book paper link body
 2. 通过 Drive API 在 `image&attachment` 下**递归**按文件名查找（`image-laptop` 是主力子目录，但不写死，遍历所有子目录建一次 `文件名 → fileId` 索引并缓存到 `pipeline/drive_index.json`，**该文件提交进仓库**，让每次 Actions 运行复用，避免每晚重新遍历整个 Drive 文件夹；内容只是文件名到 fileId 的映射，非敏感信息）
 3. 下载 → Pillow 处理：限宽 1200px（等比，不放大）、转 WebP quality 82 → 存 `public/images/<slug>/<原名>.webp`
 4. 已存在的文件跳过（幂等，重跑不重复下载）
-5. **找不到的图**：不留破图。正文里该图片替换为一行斜体说明 `*[图缺失：<原文件名>]*`，并计入运行报告
+5. **找不到的图**：不留破图。正文里该图片替换为一行斜体说明 `*[图片暂缺]*`，原文件名与图注写进同一行的 HTML 注释（读者看不到），并计入运行报告
+6. **补图通道**（`repair.py`）：图补传到 Drive 之后，已发布的文章不会被自动通道重跑（`published.json` 里已记账），占位会永远留着。补图通道扫 `src/content/posts/` 里的占位标记，凭注释里的文件名重取一次并换回图片，不必再走一次 LLM。另有 `--audit-images` 在发文前列出 Drive 上缺哪些图
 
 图注生成：每张图后自动追加 `<figcaption>`，内容按优先级从笔记 frontmatter 取 `book` → `paper` → `link`，格式 `图源：《书名》` / `图源：<论文标题>` / `图源：<链接>`。三者皆空则不加图注。
 

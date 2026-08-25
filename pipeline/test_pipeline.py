@@ -43,6 +43,20 @@ def test_parse_wiki_image_with_size():
     assert n.wikilinks == [], n.wikilinks
 
 
+def test_parse_note_keeps_only_real_images():
+    """笔记嵌入、附件、外链都不是要去 Drive 取的图。"""
+    body = ('![[真图.png]]\n![[某笔记#小节]]\n![[画板.excalidraw]]\n'
+            '![](https://x.com/远程.png)\n![](res\\本地图.PNG)\n')
+    p = FIX / '_tmp_refs.md'
+    p.write_text('---\ntitle: t\ntype: note\n---\n' + body, encoding='utf-8')
+    try:
+        n = vault.parse_note(p, FIX)
+        # 顺序按解析顺序：先 markdown 写法后 wiki 写法
+        assert n.images == ['本地图.PNG', '真图.png'], n.images
+    finally:
+        p.unlink()
+
+
 def test_load_vault_filters_nothing_by_itself():
     notes = vault.load_vault(FIX)
     assert len(notes) == 3, len(notes)
@@ -381,7 +395,44 @@ def test_external_image_left_untouched():
 
 def test_missing_image_becomes_note_not_broken_img():
     out = rd.rewrite_images('![](../x/GONE.png)', {}, ['GONE.png'], {})
-    assert out.strip() == '*[图缺失：GONE.png]*' and '![' not in out
+    assert '图片暂缺' in out and '![' not in out
+    # 文件名只留在 HTML 注释里：读者看不见，补图通道认得出
+    assert rd.missing_marks(out) == [('GONE.png', '')], out
+
+
+def test_missing_mark_carries_caption_for_later_repair():
+    out = rd.rewrite_images('![](../x/GONE.png)', {}, ['GONE.png'],
+                            {'GONE.png': '图源：《某书》'})
+    assert rd.missing_marks(out) == [('GONE.png', '图源：《某书》')]
+    back = rd.restore_missing(out, {'GONE.png': '/images/a/GONE.webp'})
+    assert back.strip() == '![](/images/a/GONE.webp)\n*图源：《某书》*', back
+    assert rd.missing_marks(back) == []
+
+
+def test_restore_leaves_still_missing_marks_alone():
+    out = rd.rewrite_images('![](../x/GONE.png)', {}, ['GONE.png'], {})
+    assert rd.restore_missing(out, {}) == out
+
+
+def test_windows_separator_in_image_ref():
+    """vault 里有 Windows 时期留下的 `image\\xxx.png`，反斜杠不当分隔符就丢图。"""
+    assert vault.image_ref_name('../a/image\\202112141122601.png') == '202112141122601.png'
+    out = rd.rewrite_images('![](../a/image\\x.png)', {'x.png': '/images/a/x.webp'}, [], {})
+    assert '/images/a/x.webp' in out, out
+
+
+def test_note_embed_is_not_treated_as_image():
+    """![[笔记#小节]] 与图片同语法，混进来会变成假的「图片暂缺」。"""
+    assert vault.image_ref_name('某笔记#某小节') is None
+    out = rd.rewrite_images('![[某笔记#某小节]]', {}, [], {})
+    assert out == '[[某笔记]]' and '暂缺' not in out, out
+    # 退化成双链后交给 resolve_wikilinks：已发布就链过去，没发布转纯文本
+    assert rd.resolve_wikilinks(out, {'某笔记': 'slug-x'}) == '[某笔记](/posts/slug-x)'
+
+
+def test_non_image_attachment_embed_dropped():
+    out = rd.rewrite_images('![[../Excalidraw/图.excalidraw]]', {}, [], {})
+    assert out == '' and '暂缺' not in out, out
 
 
 def test_image_caption_appended():
@@ -925,6 +976,67 @@ def test_routinerun_writes_tools_category_and_strips_h1():
 
     # 重跑不覆盖，避免抹掉人工修改
     assert rr.run(repo, blog)[0]['status'] == 'skipped'
+
+
+# ---------- repair（给已发布文章补图）----------
+
+def test_repair_fills_marks_and_reports_still_missing():
+    """图补传到 Drive 后，已发布的文章要能自己修好，不用重跑 LLM。"""
+    import repair
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'repair-blog'
+    posts = blog / 'src' / 'content' / 'posts'
+    posts.mkdir(parents=True, exist_ok=True)
+    art = posts / 'a-post.md'
+    art.write_text(
+        '---\ntitle: t\ndate: 2026-01-01\n---\n\n正文一\n\n'
+        + rd.MISSING_TPL.format(name='back.png', caption='图源：《某书》') + '\n\n'
+        + rd.MISSING_TPL.format(name='still-gone.png', caption='') + '\n',
+        encoding='utf-8')
+
+    def fake_download(service, fid):
+        return _png(40, 20)
+
+    rs = repair.run(blog, None, _index={'back.png': 'id1'},
+                    _download=fake_download)
+
+    assert rs == [{'slug': 'a-post', 'status': 'repaired',
+                   'repaired': ['back.png'], 'stillMissing': ['still-gone.png']}], rs
+    text = art.read_text(encoding='utf-8')
+    assert '![](/images/a-post/back.webp)\n*图源：《某书》*' in text, text
+    assert (blog / 'public' / 'images' / 'a-post' / 'back.webp').exists()
+    # 补不回来的原样留着，下次补传后还能再修
+    assert rd.missing_marks(text) == [('still-gone.png', '')]
+
+
+def test_repair_without_marks_never_touches_drive():
+    """没占位就一次 Drive 都不碰 —— 每晚白跑一趟索引重建不可接受。"""
+    import repair
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'repair-clean'
+    posts = blog / 'src' / 'content' / 'posts'
+    posts.mkdir(parents=True, exist_ok=True)
+    (posts / 'b-post.md').write_text('---\ntitle: t\n---\n\n没有占位\n', encoding='utf-8')
+    assert repair.run(blog, 'SA-JSON-会炸') == []
+
+
+def test_audit_lists_images_drive_does_not_have():
+    """发文前就能拿到「要往 Drive 补传哪些图」的清单。"""
+    import repair
+    TMP.mkdir(parents=True, exist_ok=True)
+    v = TMP / 'audit-vault'
+    v.mkdir(exist_ok=True)
+    for i in range(config.MIN_GROUP):
+        (v / f'n{i}.md').write_text(
+            '---\ntags:\n  - 02分子表征/A/B\ntype: note\n---\n'
+            f'正文 {i}\n![](../img/have{i}.png)\n![](../img/gone{i}.png)\n',
+            encoding='utf-8')
+    index = {f'have{i}.png': f'id{i}' for i in range(config.MIN_GROUP)}
+    rs = repair.audit(v, _index=index)
+    assert len(rs) == config.MIN_GROUP, rs
+    assert [r['missing'] for r in rs] == [[f'gone{i}.png'] for i in range(config.MIN_GROUP)], rs
+    assert repair.audit(v, _index={**index, **{f'gone{i}.png': 'x'
+                                               for i in range(config.MIN_GROUP)}}) == []
 
 
 if __name__ == '__main__':
