@@ -4,12 +4,21 @@ on:
   schedule:
     - cron: '0 13 * * *'      # UTC 13:00 = 北京时间 21:00
   push:
-    paths: ['drafts/**']      # 往 drafts/ 扔稿子即刻发布
+    paths: ['drafts/**']      # 往 drafts/ 扔稿子即刻处理
   workflow_dispatch:
     inputs:
+      mode:
+        description: 跑哪条通道
+        type: choice
+        options: [seed, manual, auto]
+        default: seed
       count:
-        description: 本次自动通道发布的篇数
+        description: 本次发布的篇数（seed / auto 通道）
         default: '1'
+      publish:
+        description: 校验全过就直接发布（不勾则一律落 _review/ 等人工放行）
+        type: boolean
+        default: true
       refresh_index:
         description: 补图前强制重建 Drive 索引（刚往 Drive 补传了图就勾上）
         type: boolean
@@ -17,6 +26,7 @@ on:
 
 permissions:
   contents: write
+  issues: write               # 校验未通过时开 issue 通知
 
 concurrency:
   group: publish
@@ -25,6 +35,11 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      MODE: ${{ github.event.inputs.mode || (github.event_name == 'push' && 'manual' || 'seed') }}
+      COUNT: ${{ github.event.inputs.count || 1 }}
+      # 手动触发时不勾「直接发布」就只落 _review/；定时与 drafts 推送默认直接发布
+      PUBLISH: ${{ github.event.inputs.publish == 'false' && '' || '--publish' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -46,15 +61,10 @@ jobs:
           cache: pip
       - run: pip install -r pipeline/requirements.txt
 
-      - name: 处理 drafts（两种触发都先跑）
-        env:
-          GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
-        run: python pipeline/main.py --drafts --blog . | tee -a report.json
-
       - name: 工具与效率栏目
         run: python pipeline/main.py --routinerun .routinerun --blog . | tee -a report.json
 
-      # 放在自动通道前面：补图会顺手刷新 Drive 索引缓存，后面发新文直接复用
+      # 放在发文前面：补图会顺手刷新 Drive 索引缓存，后面发新文直接复用
       - name: 给已发布文章补图
         env:
           GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
@@ -63,14 +73,22 @@ jobs:
             ${{ github.event.inputs.refresh_index == 'true' && '--refresh-index' || '' }} \
             | tee -a report.json
 
-      - name: 自动通道发文（仅定时与手动触发）
-        if: github.event_name != 'push'
+      - name: 发文
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           GDRIVE_SA_JSON: ${{ secrets.GDRIVE_SA_JSON }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
         run: |
-          python pipeline/main.py --vault .vault --blog . \
-            --count "${{ github.event.inputs.count || 1 }}" | tee -a report.json
+          case "$MODE" in
+            manual) ARGS="--manual" ;;
+            auto)   ARGS="--count $COUNT" ;;
+            *)      ARGS="--seed --count $COUNT" ;;
+          esac
+          python pipeline/main.py --vault .vault --blog . $ARGS $PUBLISH | tee -a report.json
 
       - name: 提交产出
         run: |
@@ -78,10 +96,8 @@ jobs:
           git config user.name  'blog-bot'
           git config user.email 'makejun505@gmail.com'
           # 逐个添加：git add 遇到任一不存在的路径会整条中止、一个文件都不暂存。
-          # 校验失败时 published.json 不会生成，之前因此把 _review/ 里的文章和
-          # 刚从 Drive 取回的图片一起丢了。
           for p in src/content/posts public/images published.json \
-                   pipeline/drive_index.json _review drafts; do
+                   pipeline/drive_index.json _review drafts logs; do
             [ -e "$p" ] && git add -A "$p"
           done
           if git diff --staged --quiet; then

@@ -4,13 +4,21 @@
 某个流速、某条法规编号改错了，是专业性错误而不是排版问题。校验拦不住
 篡改，这条流水线就不该上线。
 
-四项检查任一不过，文章进 _review/ 等人工复核，不发布。
+两组检查：
+
+- `verify()`：数据保真。源文的数值、法规条款号、文献引用、图片引用有没有
+  被改动或丢失。自动通道与引子通道都跑这一组。
+- `review()`：可发表性。结构、格式、选材重复、关联文章链接、扩展内容的
+  来源核验（转交 evidence.py）。引子通道跑这一组。
+
+任一项不过，文章进 _review/ 等人工放行，并记日志、发通知。
 """
 import re
 import urllib.parse
 from dataclasses import dataclass, field
 
 import config
+import evidence
 
 # 只抓「承载数据」的数字：带单位、含小数点、或三位以上整数。
 #
@@ -137,3 +145,111 @@ def verify(src, out, images, min_ratio=None):
         failures.append(f'正文过短: {out_len}/{src_len}={out_len / src_len:.0%} < {min_ratio:.0%}')
 
     return VerifyResult(ok=not failures, failures=failures)
+
+
+# ---------- review：可发表性检查 ----------
+
+ARTICLE_H1 = re.compile(r'^#\s+\S', re.M)
+ARTICLE_H2 = re.compile(r'^##\s+(.+?)\s*$', re.M)
+SELF_NUMBERED = re.compile(r'^#{2,3}\s*(?:\d+[.、]|[一二三四五六七八九十]+[、.])', re.M)
+# 指向知识库内部 md 的相对链接：发到站上是死链
+VAULT_MD_LINK = re.compile(r'\[[^\]]*\]\((?!https?://|/)[^)]*\.md(?:#[^)]*)?\)')
+LEFTOVER_WIKILINK = re.compile(r'(?<!!)\[\[[^\]]+\]\]')
+MISSING_IMAGE = re.compile(r'\*\[图片暂缺\]\*')
+EVIDENCE_HEAD = re.compile(r'^##\s*依据与出处\s*$', re.M)
+RELATED_HEAD = re.compile(r'^##\s*相关阅读\s*$', re.M)
+
+MIN_SECTIONS, MAX_SECTIONS = 3, 10
+MIN_SECTION_CHARS = 120      # 低于此的是空壳章节，不是章节
+MIN_LEAD_CHARS = 40          # 导读段
+# 减法模式的篇幅区间：缩到一半以下说明删掉了不该删的，几乎没缩说明没做减法
+SHRINK_RANGE = (0.55, 0.95)
+# 加法模式：一点没长说明没做加法；翻三倍以上是过度扩展
+GROW_RANGE = (1.05, 3.0)
+
+
+def _sections(article):
+    """[(标题, 该节正文去空白后的字数)]，按 H2 切。"""
+    heads = list(ARTICLE_H2.finditer(article))
+    out = []
+    for i, m in enumerate(heads):
+        end = heads[i + 1].start() if i + 1 < len(heads) else len(article)
+        body = article[m.end():end]
+        out.append((m.group(1).strip(), len(re.sub(r'\s', '', body))))
+    return out
+
+
+def structure(article):
+    """结构性检查：章节数、空壳章节、自带序号、导读。"""
+    fails = []
+    secs = [(t, n) for t, n in _sections(article)
+            if not t.startswith(('依据与出处', '相关阅读'))]
+    if not MIN_SECTIONS <= len(secs) <= MAX_SECTIONS:
+        fails.append(f'二级章节 {len(secs)} 个，应在 {MIN_SECTIONS}～{MAX_SECTIONS} 之间')
+    thin = [t for t, n in secs if n < MIN_SECTION_CHARS]
+    if thin:
+        fails.append(f'空壳章节（正文不足 {MIN_SECTION_CHARS} 字）: {thin[:5]}')
+    if SELF_NUMBERED.search(article):
+        fails.append('章节标题自带序号，站点会再编一次号，出现「1. 1. 概述」')
+    if ARTICLE_H1.search(article):
+        fails.append('正文里出现一级标题，文章标题应由 frontmatter 承载')
+    first = ARTICLE_H2.search(article)
+    lead = article[:first.start()] if first else article
+    if len(re.sub(r'\s', '', lead)) < MIN_LEAD_CHARS:
+        fails.append('缺少导读段：第一个二级标题之前应有两三句话交代脉络')
+    return fails
+
+
+def formatting(article):
+    """格式检查：死链、残留语法、缺图。"""
+    fails = []
+    dead = VAULT_MD_LINK.findall(article)
+    if dead:
+        fails.append(f'正文有指向知识库内部 md 的相对链接（站上是死链）{len(dead)} 处: {dead[:3]}')
+    left = LEFTOVER_WIKILINK.findall(article)
+    if left:
+        fails.append(f'残留未解析的双链 {len(left)} 处: {left[:3]}')
+    gone = MISSING_IMAGE.findall(article)
+    if gone:
+        fails.append(f'{len(gone)} 张图没取到，正文里留着「图片暂缺」占位')
+    return fails
+
+
+def proportion(mode, seed_chars, article_chars):
+    """加减法是否按原则执行 —— 用篇幅比例做确定性判定。"""
+    if not seed_chars:
+        return []
+    ratio = article_chars / seed_chars
+    lo, hi = SHRINK_RANGE if mode == 'shrink' else GROW_RANGE
+    if not lo <= ratio <= hi:
+        word = '减法' if mode == 'shrink' else '加法'
+        return [f'{word}模式下篇幅比例 {ratio:.0%} 不在 {lo:.0%}～{hi:.0%} 区间']
+    return []
+
+
+def selection(seed_path, used_seeds):
+    """选材重复：这篇引子笔记是不是已经用过。"""
+    return ([f'选材重复：{seed_path} 已经用过'] if seed_path in set(used_seeds) else [])
+
+
+def related(article, related_slugs):
+    """有关联的已发布文章必须都在正文里有链接。"""
+    missing = [s for s in related_slugs if f'/posts/{s}' not in article]
+    return ([f'关联文章缺链接: {missing}'] if missing else [])
+
+
+def review(article, *, mode=None, seed_chars=0, seed_path=None, used_seeds=(),
+           related_slugs=(), note_bodies=None, source_text=''):
+    """可发表性检查。返回 VerifyResult。"""
+    fails = structure(article) + formatting(article)
+    if mode:
+        fails += proportion(mode, seed_chars, len(article))
+    if seed_path:
+        fails += selection(seed_path, used_seeds)
+    fails += related(article, related_slugs)
+    if mode == 'grow':
+        ev_fails, n = evidence.check(article, note_bodies or {}, source_text)
+        fails += ev_fails
+        if n == 0:
+            fails.append('加法模式却没有「依据与出处」一节：扩展内容必须标注来源')
+    return VerifyResult(ok=not fails, failures=fails)

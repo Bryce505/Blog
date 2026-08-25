@@ -18,6 +18,9 @@ import main as mn
 import config
 import images as im
 import render as rd
+import evidence as ev
+import manual as mnl
+import notify as nt
 import seed as sd
 import select_ as sel
 import vault
@@ -1052,76 +1055,175 @@ def test_routinerun_writes_tools_category_and_strips_h1():
 
 # ---------- seed（引子通道）----------
 
-def _seed_note(body_chars=3000, path='a/b/n.md'):
-    return vault.Note(path=path, title='引子笔记', tags=['03质量控制/残留/HCP'],
-                      type='note', book='某书',
-                      body='HCP 残留控制。回收率 85.3%，限度 100 ng/mg。\n\n'
-                           + 'x' * body_chars)
+LEAD = '本文围绕某个主题展开，先交代脉络，再讨论边界条件，最后归拢结论与尚未解决的问题。'
 
 
-def test_seed_candidates_skip_short_and_used():
-    """太短的笔记撑不起主题，扩写就成了模型自由发挥。"""
-    short = _seed_note(10, 'a/short.md')
-    good = _seed_note(3000, 'a/good.md')
-    assert [n.path for n in sd.candidates([short, good])] == ['a/good.md']
-    assert sd.candidates([good], used=['a/good.md']) == []
+def _article(sections=3, extra='', evidence_block=''):
+    parts = [LEAD]
+    for i in range(sections):
+        parts.append(f'\n\n## 第 {"一二三四五六"[i]} 节：讲清楚一个问题\n\n' + '正文内容。' * 40)
+    return ''.join(parts) + extra + evidence_block
 
 
-def test_seed_run_writes_to_review_only():
-    """引子通道还在试，产出只落 _review/，不碰 posts 和 published.json。"""
+def _mkvault(tmp, name, body, tag='03质量控制/残留/HCP'):
+    shutil.rmtree(tmp, ignore_errors=True)
+    tmp.mkdir(parents=True)
+    (tmp / name).write_text(f'---\ntags:\n  - {tag}\ntype: note\n---\n{body}',
+                            encoding='utf-8')
+    return tmp
+
+
+def test_mode_is_decided_by_note_size():
+    """长笔记做减法，短笔记做加法。"""
+    assert sd.decide_mode(vault.Note('a', 't', [], 'note', body='x' * 20000)) == 'shrink'
+    assert sd.decide_mode(vault.Note('a', 't', [], 'note', body='x' * 3000)) == 'grow'
+
+
+def test_shrink_mode_publishes_when_clean():
     TMP.mkdir(parents=True, exist_ok=True)
-    blog = TMP / 'seed-blog'
+    blog = TMP / 'seed-shrink'
     shutil.rmtree(blog, ignore_errors=True)
     (blog / 'src' / 'content' / 'posts').mkdir(parents=True)
-    v = TMP / 'seed-vault'
-    shutil.rmtree(v, ignore_errors=True)
-    v.mkdir(parents=True)
-    (v / 'n.md').write_text(
-        '---\ntags:\n  - 03质量控制/残留/HCP\ntype: note\nbook: 某书\n---\n'
-        '回收率 85.3%，限度 100 ng/mg。\n' + 'x' * 3000, encoding='utf-8')
+    v = _mkvault(TMP / 'v-shrink', 'n.md', '回收率 85.3%。' + '正' * 20000)
 
-    def fake(note, api_key):
-        # 扩写：保留源文数据，只补定性叙述
-        return ('# HCP 残留控制：从检测原理到限度设定\n\n导读一段。\n\n'
-                '## 原理\n\n' + note.body.split("---")[-1].strip() +
-                '\n\n覆盖率不足会系统性低估残留水平。\n')
+    def fake(msg, key):
+        assert '【减法模式】' in msg, '模式没交代给模型'
+        return '# 标题\n\n' + _article() + '\n\n回收率 85.3%。' + '正' * 12000
 
-    rs = sd.run(v, blog, 'k', None, _index={}, _compose=fake)
-    assert len(rs) == 1 and rs[0]['ok'], rs
-    assert rs[0]['articleChars'] > rs[0]['seedChars'], '扩写应当变长'
-    out = blog / '_review' / f"seed-{rs[0]['slug']}.md"
-    assert out.exists() and '校验：全部通过' in out.read_text(encoding='utf-8')
-    assert not list((blog / 'src' / 'content' / 'posts').glob('*.md')), '不该写进 posts'
-    assert not (blog / 'published.json').exists(), '不该动 published.json'
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={}, _chat=fake)
+    assert rs[0]['ok'] and rs[0]['status'] == 'published', rs[0]['failures']
+    assert (blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md").exists()
+    # 记账里存了引子路径，下次选材才能去重
+    import json as _json
+    rec = _json.loads((blog / 'published.json').read_text(encoding='utf-8'))
+    assert list(rec.values())[0]['seed'] == 'n.md'
 
 
-def test_seed_run_catches_fabricated_numbers():
-    """扩写编出源文没有的数值必须被校验器拦下 —— 这是这条通道的红线。"""
+def test_shrink_that_deletes_too_much_is_blocked():
     TMP.mkdir(parents=True, exist_ok=True)
-    blog = TMP / 'seed-blog2'
+    blog = TMP / 'seed-cut'
     shutil.rmtree(blog, ignore_errors=True)
     blog.mkdir(parents=True)
-    v = TMP / 'seed-vault2'
-    shutil.rmtree(v, ignore_errors=True)
-    v.mkdir(parents=True)
-    (v / 'n.md').write_text(
-        '---\ntags:\n  - 03质量控制/残留/HCP\ntype: note\n---\n'
-        '回收率 85.3%。\n' + 'x' * 3000, encoding='utf-8')
-
-    def fake(note, api_key):
-        return ('# 标题\n\n导读。\n\n## 一节\n\n' + note.body.strip()
-                + '\n\n通常流速设为 0.5 mL/min，柱温 30 °C。\n')
-
-    rs = sd.run(v, blog, 'k', None, _index={}, _compose=fake)
-    assert not rs[0]['ok'], rs
-    assert any('出现源文没有的数据' in f for f in rs[0]['failures']), rs[0]['failures']
-    assert '校验未通过' in (blog / '_review' / f"seed-{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    v = _mkvault(TMP / 'v-cut', 'n.md', '正' * 20000)
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article())
+    assert not rs[0]['ok']
+    assert any('减法模式下篇幅比例' in f for f in rs[0]['failures']), rs[0]['failures']
+    assert rs[0]['status'] == 'review'
 
 
-def test_seed_message_carries_book_and_body():
-    n = _seed_note()
-    msg = cp.build_seed_message(n)
-    assert '引子' in msg and '出处：《某书》' in msg and '85.3%' in msg
+def test_grow_mode_requires_evidence_section():
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-noev'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+    v = _mkvault(TMP / 'v-noev', 'n.md', '正' * 3000)
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article(4) + '正' * 2000)
+    assert not rs[0]['ok']
+    assert any('依据与出处' in f for f in rs[0]['failures']), rs[0]['failures']
+
+
+def test_grow_mode_fabricated_source_is_blocked():
+    """编一个知识库里不存在的路径当出处，必须当场拦下。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-fake'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+    v = _mkvault(TMP / 'v-fake', 'n.md', '正' * 3000)
+    ev_block = ('\n\n## 依据与出处\n\n'
+                '1. 笔记：`不存在的/路径.md` —— 引用要点：某个说法\n')
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article(4) + '结论[依据 1]。' + '正' * 2000 + ev_block)
+    assert not rs[0]['ok']
+    assert any('不存在' in f for f in rs[0]['failures']), rs[0]['failures']
+
+
+def test_related_published_articles_get_links():
+    """同二级标签的已发布文章要自动带上链接，链接由流水线生成不让模型编。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-rel'
+    shutil.rmtree(blog, ignore_errors=True)
+    posts = blog / 'src' / 'content' / 'posts'
+    posts.mkdir(parents=True)
+    (posts / 'old-one.md').write_text('---\ntitle: "旧文"\n---\n正文', encoding='utf-8')
+    (blog / 'published.json').write_text(
+        '{"03质量控制/残留/HCP": {"slug": "old-one", "source_hash": "h"}}', encoding='utf-8')
+    v = _mkvault(TMP / 'v-rel', 'n.md', '正' * 20000)
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article() + '正' * 12000)
+    assert rs[0]['related'] == ['old-one'], rs[0]
+    text = (posts / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    assert '## 相关阅读' in text and '](/posts/old-one)' in text
+
+
+# ---------- manual（人工投稿通道）----------
+
+def test_manual_draft_uses_local_images_then_publishes():
+    """随稿上传的图就地转 WebP，稿子走同一套加减法与校验。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'manual-blog'
+    shutil.rmtree(blog, ignore_errors=True)
+    (blog / 'src' / 'content' / 'posts').mkdir(parents=True)
+    d = blog / 'drafts'
+    (d / 'images' / '我的稿子').mkdir(parents=True)
+    (d / 'images' / '我的稿子' / '图一.png').write_bytes(_png(60, 40))
+    (d / '我的稿子.md').write_text(
+        '---\ntitle: 手写稿\ntags:\n  - 03质量控制/残留/HCP\n---\n'
+        '![](图一.png)\n' + '正' * 20000, encoding='utf-8')
+
+    def fake(msg, key):
+        return '# 手写稿标题\n\n' + _article() + '\n\n![](图一.png)\n' + '正' * 12000
+
+    rs = mnl.run(None, blog, 'k', None, publish=True, _index={}, _chat=fake)
+    assert rs[0]['ok'], rs[0]['failures']
+    assert rs[0]['images'] == 1 and rs[0]['missingImages'] == []
+    assert (blog / 'public' / 'images' / rs[0]['slug'] / '图一.webp').exists()
+    assert not (d / '我的稿子.md').exists(), '处理完的原稿要撤走，否则下次重复处理'
+
+
+def test_manual_note_parsing_without_frontmatter():
+    TMP.mkdir(parents=True, exist_ok=True)
+    d = TMP / 'manual-parse'
+    shutil.rmtree(d, ignore_errors=True)
+    d.mkdir(parents=True)
+    f = d / '稿子.md'
+    f.write_text('# 正文标题\n\n内容 ![](a.png)', encoding='utf-8')
+    n = mnl.as_note(f, d)
+    assert n.title == '正文标题' and n.images == ['a.png']
+    assert '# 正文标题' not in n.body, 'H1 应被摘掉，标题由 frontmatter 承载'
+
+
+# ---------- evidence / notify ----------
+
+def test_evidence_paraphrase_passes_fabrication_fails():
+    art = ('结论[依据 1]。\n\n## 依据与出处\n\n'
+           '1. 笔记：`a/b.md` —— 引用要点：亲和富集会同时富集与抗体结合的 HCP\n')
+    real = {'a/b.md': '做抗体亲和富集时，会同时富集那些与抗体结合的 HCP 分子。'}
+    assert ev.check(art, real, '')[0] == []
+    assert ev.check(art, {'a/b.md': '本节讨论柱效与塔板数的计算'}, '')[0]
+
+
+def test_evidence_doi_must_come_from_input():
+    art = ('结论[依据 1]。\n\n## 依据与出处\n\n'
+           '1. 文献：DOI:10.1016/j.ab.2004.08.008 —— 引用要点：NTCB 断裂位点\n')
+    assert ev.check(art, {}, '……DOI:10.1016/j.ab.2004.08.008……')[0] == []
+    assert any('疑似编造' in f for f in ev.check(art, {}, '毫无关系的输入')[0])
+
+
+def test_notify_writes_log_and_skips_when_unconfigured():
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'notify-blog'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+    rs = [{'slug': 'a', 'title': '甲', 'ok': False, 'mode': 'grow',
+           'seedChars': 100, 'articleChars': 300, 'file': '_review/a.md',
+           'failures': ['空壳章节']}]
+    out = nt.notify(blog, rs)
+    log = Path(out['log']).read_text(encoding='utf-8')
+    assert '甲' in log and '空壳章节' in log
+    # 没配 token / SMTP 时静默跳过，不能抛异常把已落盘的产出带垮
+    assert out['issue'] is None and out['mail'] is None
 
 
 # ---------- repair（给已发布文章补图）----------

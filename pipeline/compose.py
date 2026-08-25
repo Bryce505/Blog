@@ -79,5 +79,10 @@ def compose(group, api_key, model=None, _post=None):
 
 
 def compose_seed(note, api_key, model=None, _post=None):
-    """单篇笔记当引子，围绕主题扩写（引子通道）。"""
+    """单篇笔记当引子（引子通道）。"""
     return _chat(SEED_PROMPT, build_seed_message(note), api_key, model, _post)
+
+
+def compose_seed_message(user_message, api_key, model=None, _post=None):
+    """引子通道：user message 由 seed.py 拼好（含加减法模式与相关片段）。"""
+    return _chat(SEED_PROMPT, user_message, api_key, model, _post)

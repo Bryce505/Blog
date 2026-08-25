@@ -128,6 +128,32 @@ def resolve(name, index):
     return index.get(name) or index.get(config.IMAGE_ALIASES.get(name, ''))
 
 
+def copy_local(names, src_dir, out_dir, url_prefix):
+    """本地目录里的图搬进 public/images/<slug>/ 并转 WebP。
+
+    人工投稿用：随稿上传的图片放在 drafts/images/<稿件名>/ 下，按文件名
+    对上就地转换，对不上的留给 Drive 那条路继续找。
+    """
+    src_dir, out_dir = Path(src_dir), Path(out_dir)
+    mapping, missing = {}, []
+    for name in names:
+        dest = out_dir / (Path(name).stem + '.webp')
+        if dest.exists():
+            mapping[name] = f'{url_prefix}/{url_safe(dest.name)}'
+            continue
+        src = src_dir / name
+        if not src.exists():
+            missing.append(name)
+            continue
+        try:
+            to_webp(src.read_bytes(), dest)
+        except Exception:
+            missing.append(name)
+            continue
+        mapping[name] = f'{url_prefix}/{url_safe(dest.name)}'
+    return mapping, missing
+
+
 def fetch_images(names, index, service, out_dir, url_prefix, _download=None):
     """返回 (文件名 → 站内路径, 找不到的文件名列表)。
 
