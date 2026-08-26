@@ -164,8 +164,12 @@ MIN_SECTION_CHARS = 120      # 低于此的是空壳章节，不是章节
 MIN_LEAD_CHARS = 40          # 导读段
 # 减法模式的篇幅区间：缩到一半以下说明删掉了不该删的，几乎没缩说明没做减法
 SHRINK_RANGE = (0.55, 0.95)
-# 加法模式：一点没长说明没做加法；翻三倍以上是过度扩展
+# 加法模式：一点没长说明没做加法；翻三倍以上是过度扩展。
+# 但比例上限要配一个绝对下限：实测一篇 201 字符的短稿，3 倍上限只有
+# 600 字符，根本成不了文章 —— 比例是用来拦「跑飞」的，不是用来惩罚
+# 「引子短」的。取两者较大值。
 GROW_RANGE = (1.05, 3.0)
+MIN_ARTICLE_CHARS = 4_000
 
 
 def _sections(article):
@@ -221,9 +225,11 @@ def proportion(mode, seed_chars, article_chars):
         return []
     ratio = article_chars / seed_chars
     lo, hi = SHRINK_RANGE if mode == 'shrink' else GROW_RANGE
-    if not lo <= ratio <= hi:
+    cap = max(seed_chars * hi, MIN_ARTICLE_CHARS) if mode == 'grow' else seed_chars * hi
+    if article_chars < seed_chars * lo or article_chars > cap:
         word = '减法' if mode == 'shrink' else '加法'
-        return [f'{word}模式下篇幅比例 {ratio:.0%} 不在 {lo:.0%}～{hi:.0%} 区间']
+        return [f'{word}模式下篇幅 {article_chars:,} 字符（原文 {seed_chars:,}，'
+                f'比例 {ratio:.0%}）超出 {seed_chars * lo:,.0f}～{cap:,.0f} 字符的区间']
     return []
 
 

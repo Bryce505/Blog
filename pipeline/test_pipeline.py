@@ -1073,6 +1073,15 @@ def _mkvault(tmp, name, body, tag='03质量控制/残留/HCP'):
     return tmp
 
 
+def test_grow_cap_has_an_absolute_floor():
+    """短稿的比例上限要有绝对下限：201 字符 × 3 倍只有 600 字，成不了文章。"""
+    assert vf.proportion('grow', 201, 3314) == []          # 3,314 < 4,000 的绝对下限
+    assert vf.proportion('grow', 201, 9000)                 # 真跑飞了还是要拦
+    # 正常体量的引子仍按 3 倍卡
+    assert vf.proportion('grow', 4000, 11000) == []
+    assert vf.proportion('grow', 4000, 13000)
+
+
 def test_mode_is_decided_by_note_size():
     """长笔记做减法，短笔记做加法。"""
     assert sd.decide_mode(vault.Note('a', 't', [], 'note', body='x' * 20000)) == 'shrink'
@@ -1108,7 +1117,7 @@ def test_shrink_that_deletes_too_much_is_blocked():
     rs = sd.run(v, blog, 'k', None, publish=True, _index={},
                 _chat=lambda m, k: '# 标题\n\n' + _article())
     assert not rs[0]['ok']
-    assert any('减法模式下篇幅比例' in f for f in rs[0]['failures']), rs[0]['failures']
+    assert any('减法模式下篇幅' in f for f in rs[0]['failures']), rs[0]['failures']
     assert rs[0]['status'] == 'review'
 
 
