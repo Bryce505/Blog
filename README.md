@@ -3,24 +3,201 @@
 把 Obsidian 知识库里的原创笔记，按主题自动整理成技术文章，定时发布到
 GitHub Pages。
 
-- **站点**：https://bryce505.github.io/Blog
-- **数据源**：`Bryce505/Obsidian-base`（生物医药 CMC 与分析方法）、
-  `Bryce505/RoutineRun`（工具与效率栏目）
-- **图片**：Google Drive `image&attachment` 文件夹
-- **整理**：DeepSeek `deepseek-v4-pro`
-- **发布节奏**：每晚 21:00（北京时间）一篇
+## 目录
 
-设计文档见 [`docs/superpowers/specs/`](docs/superpowers/specs/)，
-实施计划见 [`docs/superpowers/plans/`](docs/superpowers/plans/)，
-**开发日志见 [`docs/devlog/`](docs/devlog/)**（每次改动必写，规矩在 [`CLAUDE.md`](CLAUDE.md)）。
+- [这是什么](#这是什么)
+- [架构总览](#架构总览)
+- [仓库目录结构](#仓库目录结构)
+- [快速上手](#快速上手)
+- [内容流水线](#内容流水线)
+- [校验器](#校验器)
+- [日常使用](#日常使用)
+- [首次部署](#首次部署)
+- [开发规范](#开发规范)
+- [延伸阅读](#延伸阅读)
 
-## 它是怎么跑的
+## 这是什么
+
+**这是仓库所有者个人的内容自动化系统，不是通用博客框架。** 它把一个私有
+Obsidian 知识库里的生物医药 CMC（化学、生产与控制）与分析方法笔记，通过
+LLM 整理成结构完整的中文技术文章，经机械校验后定时发布到 GitHub Pages。
+
+面向的读者是生物医药 CMC / 分析方法的同行，不是泛读者——这决定了流水线
+的第一优先级：**内容是专业内容，一个流速、一条法规条款号被 AI 改错是
+专业性错误，不是排版问题**。校验器（[`pipeline/verify.py`](pipeline/verify.py)）
+因此是整条流水线里最关键的代码，细节见「[校验器](#校验器)」一节。
+
+| | |
+|---|---|
+| **站点** | https://bryce505.github.io/Blog |
+| **数据源** | `Bryce505/Obsidian-base`（生物医药 CMC 与分析方法笔记，私有）、`Bryce505/RoutineRun`（工具与效率栏目，私有） |
+| **图片** | Google Drive `image&attachment` 文件夹，取下来转 WebP 自托管 |
+| **整理模型** | DeepSeek（当前默认见 [`pipeline/config.py`](pipeline/config.py) 的 `DEEPSEEK_MODEL`，写这份文档时是 `deepseek-v4-flash`） |
+| **发布节奏** | 每晚 21:00（北京时间）自动发一篇；`drafts/` 推送即时处理 |
+| **托管与调度** | GitHub Pages + GitHub Actions（定时 / 手动 / push 触发） |
+
+## 架构总览
+
+```
+                ┌─ Bryce505/Obsidian-base（私有，CMC/分析笔记）
+       数据源 ──┤
+                └─ Bryce505/RoutineRun（私有，工具与效率笔记）
+                         │
+                         │  GitHub Actions（publish.yml：定时 / 手动 / drafts 推送触发）
+                         ▼
+                  pipeline/ 五步走：选材 → 取图 → 整理 → 校验 → 落盘
+                         │
+              ┌──────────┴──────────┐
+          校验通过                 校验不过
+              │                      │
+              ▼                      ▼
+   src/content/posts/*.md       _review/*.md
+   public/images/<slug>/        + GitHub Issue / 邮件通知
+   published.json 记账
+              │
+              ▼
+     git push → GitHub Actions（deploy.yml）
+              │
+              ▼
+      npm run build（Astro）→ GitHub Pages
+              │
+              ▼
+     https://bryce505.github.io/Blog
+```
+
+**为什么是单仓库**：流水线只读两个私有笔记仓库、只写这一个仓库。拆成
+「流水线仓库」与「站点仓库」两个，只是多配一层跨仓库 token；而流水线的
+产出（文章、图片、发布状态）本来就要长期存在于这个仓库里，拆分没有收益。
+
+### 技术栈
+
+| 层 | 技术 | 说明 |
+|---|---|---|
+| 内容流水线 | Python 3.11+ | 零测试框架依赖，`assert` + `pipeline/test_pipeline.py` 自检 |
+| 整理模型 | DeepSeek API | OpenAI 兼容接口，见 `pipeline/compose.py` |
+| 图片处理 | Pillow | Drive 原图 → 限宽 1200px WebP |
+| 数据源接入 | google-api-python-client / google-auth | 只读 Google Drive |
+| 站点 | Astro 7（静态生成，无客户端框架） | |
+| 数学公式 | KaTeX（`remark-math` / `rehype-katex`） | 实测待发布内容含 648 处 LaTeX |
+| 图表 | Mermaid（自定义 remark 插件） | |
+| 代码高亮 | Shiki（`github-light` / `github-dark` 双主题） | |
+| SEO / 订阅 | `@astrojs/sitemap` + 自定义 `src/pages/rss.xml.js` | |
+| CI/CD | GitHub Actions | 三个 workflow，见下表 |
+| 托管 | GitHub Pages | |
+
+### 三个 workflow
+
+| workflow | 触发方式 | 做什么 |
+|---|---|---|
+| [`publish.yml`](.github/workflows/publish.yml) | 定时（每晚 UTC 13:00）/ `workflow_dispatch` / push 到 `drafts/**` | 跑内容流水线，产出通过就 commit + push |
+| [`deploy.yml`](.github/workflows/deploy.yml) | push 到 `master`（忽略 `drafts/` `pipeline/` `docs/` `design/` `README.md` 等不影响构建产物的路径）/ `publish` 运行完 / `workflow_dispatch` | `npm run build` → 部署到 GitHub Pages |
+| [`sample.yml`](.github/workflows/sample.yml) | 仅 `workflow_dispatch` | 引子通道试运行，只写 `_review/`，不接自动发布——试验性质 |
+
+> **GitHub 的坑**：workflow 用内置 `GITHUB_TOKEN` 推的提交不会触发其他
+> workflow 的 `push` 事件（防递归安全规则），所以 `deploy.yml` 额外监听
+> `publish` 的 `workflow_run` 事件——否则每晚发的文章会一直躺在仓库里不上线。
+
+## 仓库目录结构
+
+```
+Blog/
+├─ .github/workflows/        publish · deploy · sample 三个 workflow
+├─ .claude/                  Claude Code 技能包与项目设置（brainstorming / TDD / 分支管理等）
+├─ pipeline/                  Python 内容流水线
+│  ├─ main.py                  入口：串起 选材→取图→整理→校验→落盘，见「内容流水线」
+│  ├─ config.py                 全局常量：过滤范围、分组阈值、图片别名、模型 ID
+│  ├─ vault.py                  Obsidian 笔记解析（frontmatter / 正文 / 图片引用 / 双链）
+│  ├─ select_.py                自动通道：按标签分组选题
+│  ├─ seed.py                   引子通道：单篇笔记按加减法整理
+│  ├─ manual.py                 人工投稿通道：drafts/ 复用引子通道的加减法与校验
+│  ├─ drafts.py                 手动发布通道：drafts/ → 取图 + 双链解析，不经过 AI
+│  ├─ routinerun.py             工具与效率栏目：接 RoutineRun 笔记
+│  ├─ repair.py                  补图通道 + `--audit-images` 图片体检
+│  ├─ compose.py                调 DeepSeek 把笔记整理成文章
+│  ├─ verify.py                  机械校验器——整条流水线最关键的代码
+│  ├─ evidence.py               核验引子通道「依据与出处」标注是否编造
+│  ├─ images.py                 Google Drive 取图 → WebP 转换
+│  ├─ render.py                  Obsidian 语法 → 站点 markdown
+│  ├─ notify.py                  校验未通过时写日志 / 开 issue / 发邮件
+│  ├─ prompt.md / prompt_seed.md  两条通道各自的系统提示词
+│  ├─ test_pipeline.py           自检：assert + 文件底部 runner，零依赖
+│  ├─ fixtures/                  自检用的样本笔记，不依赖真实 vault
+│  ├─ requirements.txt
+│  └─ drive_index.json           Drive 文件名 → fileId 索引缓存（提交进仓库，非敏感）
+├─ src/                        Astro 站点
+│  ├─ content/posts/            流水线产出的文章（.md）
+│  ├─ content/series.json       系列栏目的归属与顺序，唯一真相来源
+│  ├─ content.config.ts         posts / series 两个 collection 的 zod schema
+│  ├─ layouts/                  Base（全局骨架）/ Post（文章页）
+│  ├─ components/               Header / Footer / PostCard
+│  ├─ pages/                    路由：index / archive / category / posts / series / tags / tools / about / rss.xml
+│  ├─ lib/series.ts             系列解析、上下篇计算
+│  ├─ plugins/                  自定义 remark 插件（callout / 高亮 / mermaid / base path 补全）
+│  └─ styles/global.css
+├─ public/images/<slug>/      文章配图（WebP），按文章分目录
+├─ drafts/                     人工投稿投递口：放 md（+ images/ 子目录）push 即发布
+├─ _review/                    校验未通过、等人工复核的文章
+├─ logs/                       按月归档的校验运行日志（`verify-YYYY-MM.md`）
+├─ docs/
+│  ├─ devlog/                   开发日志，每次改动必写，见「开发规范」
+│  └─ superpowers/specs·plans/  设计文档与实施计划
+├─ design/                     视觉设计源文件（Claude Design 画布 `.dc.html`）
+├─ published.json              发布状态账本：标签组/引子笔记 → slug、日期、来源哈希
+├─ site.config.mjs             站点地址与 base path 的唯一来源
+├─ astro.config.mjs            Astro 配置：remark/rehype 插件挂载
+├─ obsidian-publish-pipeline.html  最早期的架构探索稿，历史参考，非当前实现
+├─ CLAUDE.md                   开发约定：分支、日志、代码规范
+└─ README.md                   本文件
+```
+
+## 快速上手
+
+### 前置要求
+
+- Python 3.11+（推荐用 [uv](https://github.com/astral-sh/uv) 管理虚拟环境，也可以用标准 `venv` + `pip`）
+- Node.js 22+
+
+**不需要真实的 Obsidian vault、DeepSeek key 或 Google 服务账号就能跑通下面
+两步**——流水线自检用的是 `pipeline/fixtures/` 里的样本数据，Astro 本地
+开发/构建读的是已经发布的 `src/content/posts/`。真要接入真实数据源发布
+新文章，见「[首次部署](#首次部署)」。
+
+### 跑通流水线自检
+
+```bash
+uv venv && uv pip install -r pipeline/requirements.txt
+.venv/bin/python pipeline/test_pipeline.py
+```
+
+跑完终端会打印 `通过数/总数`（写这份文档时是 118/118；这个数字会随新增
+自检增长，**以终端实际输出为准**，不要以本文的数字为准）。这套自检不
+引入测试框架，纯 `assert` + 文件底部的 runner，CI 里直接
+`python pipeline/test_pipeline.py` 就能跑。
+
+### 本地跑站点
+
+```bash
+npm install
+npm run dev      # 本地预览，默认 http://localhost:4321
+npm run build    # 构建到 dist/，验证 Astro 页面能否正确生成
+```
+
+### 改了流水线代码之后
+
+按 [`CLAUDE.md`](CLAUDE.md) 的要求，合并前 `pipeline/test_pipeline.py` 必须
+全绿、`npm run build` 通过；动了流水线**行为**的还要在分支上找一组真实
+数据实跑一次（需要真实密钥，见「[首次部署](#首次部署)」）。
+
+## 内容流水线
+
+设计文档见 [`docs/superpowers/specs/`](docs/superpowers/specs/)，实施计划见
+[`docs/superpowers/plans/`](docs/superpowers/plans/)。
 
 ```
 Obsidian-base ─┐ ① 选材：挑一篇没用过的笔记当引子
 drafts/       ─┤ ② 加减法：笔记够完整→浓缩归纳；不完整→补齐并标注来源
 Google Drive  ─┤ ③ 取图：本地图 / Drive → WebP(≤1200px) → public/images/
-               │ ④ 校验：数据保真 + 可发表性两组检查
+               │ ④ 校验：数据保真 + 可发表性两组检查（见「校验器」）
                │      过 → 写 src/content/posts/ + 记账 + push
                │      不过 → 进 _review/，写日志、开 issue、发邮件
                └─↓
@@ -62,171 +239,78 @@ Google Drive  ─┤ ③ 取图：本地图 / Drive → WebP(≤1200px) → publ
 | **补图** | 每次运行 | 给已发布文章补取当时没取到的图 |
 | **多篇重组**（旧） | 手动选 `auto` | 按标签组把多篇笔记重组成一篇。产出拼接感强，已不作为默认 |
 
-## 配置（首次部署必做）
+## 校验器
 
-三个 Secret + 一次 Drive 共享 + 开启 Pages。全程免费，Drive API 只读和
-GitHub Actions 在这个用量下都在免费额度内。
+`pipeline/verify.py` 是这条流水线的安全阀。内容是生物医药 CMC 与分析方法，
+AI 把某个流速、某条法规编号改错了是专业性错误而不是排版问题——**校验拦
+不住篡改，这条流水线就不该上线。**
 
-> 下面每一步都标了**为什么需要**和**漏了会怎样**。这套配置踩坑的地方在于
-> 报错信息普遍不指向真正的原因，所以按顺序做完再手动跑一次验证。
+> **workflow 显示成功 ≠ 文章发布了。** 这条流水线是「失败关闭」设计：
+> 校验不过就转入 `_review/`，不会让 workflow 报错。判断"今晚有没有真的
+> 发新文章"，看 `published.json` 有没有新记录、或 `_review/` 有没有新增
+> 文件——光看 Actions 的绿勾会误判，本仓库真实踩过这个坑，见
+> [实测记录](docs/devlog/2026-08-26-定时发布排查.md)。
 
-### 1. `DEEPSEEK_API_KEY`
+### 两组检查
 
-**做什么用**：调 DeepSeek 把笔记整理成文章。
+两组，任一项不过就不发布。
 
-1. 打开 https://platform.deepseek.com/ 登录
-2. 左侧 **API keys** → **创建 API key**，名字随便起
-3. 复制生成的字符串（**只显示这一次**）
+**第一组：数据保真**（`verify.verify`，所有 AI 通道都跑）
 
-模型在 `pipeline/config.py` 里配置，默认 `deepseek-v4-pro`。想省钱可以
-改成 `deepseek-v4-flash`，机械校验器会兜底。模型 ID 以
-`GET https://api.deepseek.com/models` 返回的清单为准 —— 早期的
-`deepseek-chat` / `deepseek-reasoner` 已经不在清单里了。
-
-### 2. `VAULT_TOKEN`
-
-**做什么用**：GitHub Actions 自带的令牌只能访问它自己所在的仓库（本仓库），
-碰不到 `Obsidian-base` 和 `RoutineRun`。而这两个源仓库都是**私有**的，
-所以要单独给一个只能读它们的令牌。
-
-**漏了会怎样**：workflow 在 checkout 源仓库那步就失败，报 404 或
-authentication failed。
-
-1. 打开 https://github.com/settings/personal-access-tokens/new
-   （手点路径：头像 → Settings → 最底部 **Developer settings** →
-   **Personal access tokens** → **Fine-grained tokens** → **Generate new token**）
-2. 按下表填：
-
-   | 项 | 填什么 |
-   |---|---|
-   | Token name | 随便起，如 `blog-vault-read` |
-   | Expiration | 建议 1 year。**到期后流水线会停**，记一下时间 |
-   | Resource owner | 选你自己（Bryce505） |
-   | Repository access | 选 **Only select repositories** |
-   | └ Select repositories | 勾上 **Obsidian-base** 和 **RoutineRun** |
-   | Permissions → Repository permissions → **Contents** | 改成 **Read-only** |
-
-   `Metadata: Read-only` 会自动跟着勾上，那是必需项。其他权限一个都别给。
-
-3. **Generate token** → 立刻复制那串 `github_pat_` 开头的字符串
-   （**只显示这一次**，刷新就没了，只能重新生成）
-
-> 如果 Fine-grained 那页填不出来，退路是同一个 Developer settings 里的
-> **Tokens (classic)** → Generate new token → 只勾 `repo`。缺点是它能读写
-> 你**所有**仓库，不如细粒度安全。
-
-### 3. `GDRIVE_SA_JSON`
-
-**做什么用**：笔记正文里的图片（实测 1235 张）不在 git 仓库里，只在
-Google Drive 的 `image&attachment` 文件夹。流水线要用服务账号去读。
-
-**这一项步骤最多，也最容易在中途卡住。**
-
-#### 3.1 建项目并开启 Drive API
-
-1. 打开 https://console.cloud.google.com/ ，**用拥有那个 Drive 文件夹的
-   账号登录**（登错账号后面共享那步会没权限）
-2. 顶部项目选择器 → **新建项目**，名字如 `obsidian-blog` → 创建
-3. **确保顶部项目选择器里选中的就是这个新项目** ← 常见卡点：不选中项目的话，
-   服务账号页面只会显示「要查看此页面，请选择一个项目」，根本看不到
-   「创建服务账号」按钮
-4. 打开 https://console.cloud.google.com/apis/library/drive.googleapis.com
-   → 点 **启用**（ENABLE）
-
-   已经启用的话这里显示「API 已启用」或 **管理**（MANAGE）。
-   **没启用的话服务账号建得再对也读不了 Drive，而且报 403 不会说是 API 没开。**
-
-#### 3.2 建服务账号
-
-打开 https://console.cloud.google.com/iam-admin/serviceaccounts →
-**+ 创建服务账号**
-
-| 步骤 | 怎么做 |
+| 检查 | 拦什么 |
 |---|---|
-| 服务账号名称 | 如 `blog-image-reader`，ID 自动生成不用改 |
-| 第 2 步「授予角色」 | **直接跳过**（点继续）—— 它不需要任何 GCP 角色，权限来自 Drive 的文件夹共享 |
-| 第 3 步「用户访问权限」 | 也跳过，点完成 |
+| 图片引用 | 源文的图在成稿里丢了 |
+| 数据数字 | 出现源文没有的数值 —— 编造的流速、限度、回收率 |
+| 法规条款号 | ICH / 21 CFR / USP / Ph. Eur. 丢失，**零容忍** |
+| 文献 DOI | 大批量丢失（允许少量，合并重复论述时折叠掉是正常的） |
+| 篇幅 | 正文短于源文的 40%，说明模型退化成了摘要 |
 
-#### 3.3 生成 JSON 密钥
+**第二组：可发表性**（`verify.review`，引子通道与人工投稿通道跑）
 
-在服务账号列表点刚建的那个 → 顶部 **密钥**（KEYS）标签 →
-**添加密钥** → **创建新密钥** → 选 **JSON** → 创建。
-
-浏览器自动下载一个 .json 文件，内容形如：
-
-```json
-{
-  "type": "service_account",
-  "project_id": "obsidian-blog-506523",
-  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
-  "client_email": "blog-image-reader@obsidian-blog-506523.iam.gserviceaccount.com",
-  ...
-}
-```
-
-**把整个文件内容全选复制**（从第一个 `{` 到最后一个 `}`），一个字符都别漏。
-
-> ⚠️ 这个文件里有私钥。**别提交进任何仓库、别发到聊天工具里。**
-> 粘进 GitHub Secret 之后本地那份可以删掉，要用再重新生成一个密钥。
-
-### 4. 把 Drive 文件夹共享给服务账号 ← 最容易漏的一步
-
-**漏了会怎样**：流水线能正常跑完，但**一张图都取不到**，全部文章的图片
-变成「图片暂缺」占位文字，而且报的是 404 而不是「你没共享文件夹」。
-
-1. 从上面 JSON 里找到 **`client_email`** 的值（形如
-   `blog-image-reader@xxx.iam.gserviceaccount.com`），复制引号里那一整串
-2. 打开文件夹
-   https://drive.google.com/drive/folders/1jwf_lkCo-Rq42VwWToyTeu2ciJTRg4zT
-   ，确认登录的是文件夹所有者账号
-3. 点页面**顶部中间的文件夹名** → 下拉菜单 → **共享** → **共享**
-   （或在「我的云端硬盘」列表里右键该文件夹 → 共享）
-4. 在「添加成员和群组」里粘贴那个邮箱
-   - 可能提示「此收件人不是 Google 账号」之类的警告 —— **正常，无视**，
-     服务账号本来就不是真人账号
-   - 角色选 **查看者**（Viewer）
-   - **把「通知用户」的勾去掉** ← 服务账号收不了邮件，勾着可能直接报错
-5. 点 **共享** / **发送**
-
-### 5. 把三个 Secret 填进仓库
-
-本仓库 → **Settings** → **Secrets and variables** → **Actions** →
-**New repository secret**，依次建三条：
-
-| Name | Secret |
+| 检查 | 拦什么 |
 |---|---|
-| `DEEPSEEK_API_KEY` | 第 1 步复制的 key |
-| `VAULT_TOKEN` | 第 2 步复制的 `github_pat_...` |
-| `GDRIVE_SA_JSON` | 第 3 步 JSON 文件的**全文** |
+| 扩展来源 | `[依据 N]` 与来源清单对不上；笔记路径在知识库里不存在；引用要点在那篇笔记里找不到（二元组重合度 < 50%）；DOI 格式不合法或没在输入材料里出现过 |
+| 加减法 | 减法删过头或根本没删，加法没长或翻了三倍以上 |
+| 结构 | 二级章节不在 3～8 个；空壳章节（正文不足 120 字）；标题自带序号；正文里有一级标题；缺导读段 |
+| 格式 | 指向知识库内部 md 的相对链接（站上是死链）；残留未解析的双链；有图没取到 |
+| 选材重复 | 这篇引子笔记已经用过 |
+| 关联文章 | 同二级标签的已发布文章没在「相关阅读」里出现 |
 
-名字必须一字不差，workflow 里是按这三个名字取的。
+关联文章的链接由**流水线生成**而不是让模型写 —— 模型不知道站上发过什么，
+让它写必然编 slug。
 
-### 6. 开启 Pages
+### 校验没过怎么办
 
-**Settings** → **Pages** → Source 选 **GitHub Actions**
-（不是 Deploy from a branch）。
+三件事同时发生：
 
-站点地址是 `https://<用户名>.github.io/<仓库名>/`。
-**GitHub Pages 的路径区分大小写** —— 仓库叫 `Blog` 站点就在 `/Blog/`，
-所以 `astro.config.mjs` 里的 `base` 必须和仓库名大小写完全一致。
-改仓库名的话记得同步改这一行。
+1. 文章写进 `_review/seed-<slug>.md`，**开头的注释里逐条列着没过哪些项**
+2. 追加一行到 `logs/verify-YYYY-MM.md`，随产出一起提交进仓库
+3. 开一个 GitHub Issue（标签 `校验未通过`），配了 SMTP 的话同时发邮件
 
-### 7. 验证：先手动跑一次
+处理：打开 `_review/` 下的文件，按注释里的问题逐条改，确认没问题后移到
+`src/content/posts/`、删掉开头的注释即可发布。
 
-**别配完就直接等定时。** Actions → **publish** → **Run workflow**，
-篇数填 1。
+> `_review/` 里存在的组会被跳过，否则它会一直霸占队首、后面的文章一篇也
+> 发不出去。人工处理掉文件后自动重新入列。
 
-跑完检查三处：
+### 通知怎么配
 
-- **workflow 是否全绿** —— 红了看是哪一步：checkout 源仓库失败是
-  `VAULT_TOKEN` 问题，取图失败是 Drive 共享或 API 没启用，
-  整理那步失败看 DeepSeek 的报错（余额、模型名）
-- **文章有没有图** —— 打开生成的文章，如果满屏「图片暂缺」，回去检查第 4 步
-- **文章内容读一遍** —— 这是唯一没法自动验证的部分，见下
+**GitHub Issue：零配置，已经能用。** workflow 用的是 Actions 自带的
+`GITHUB_TOKEN`。手机装 GitHub App 就有推送，还能直接在 issue 里记录处理
+结果 —— 比邮件更适合追踪，推荐优先用这个。
 
-> **首次运行务必人工通读生成的文章。** 机械校验器只能保证数据没被篡改、
-> 图片没丢，保证不了文章好不好读。觉得改写力度不对（太放飞或太保守），
-> 调 `pipeline/prompt.md` 里的提示词即可。
+**邮件：要配 Secret。** 仓库 Settings → Secrets and variables → Actions →
+New repository secret：
+
+| Secret | 填什么 |
+|---|---|
+| `MAIL_USER` | 发信邮箱，如 `708838228@qq.com` |
+| `MAIL_PASSWORD` | **QQ 邮箱的「授权码」**，不是登录密码。QQ 邮箱 设置 → 账号 → POP3/IMAP/SMTP 服务里开启并生成 |
+| `MAIL_TO` | 收信邮箱 |
+| `MAIL_HOST` | 可不填，默认 `smtp.qq.com`（SSL 465） |
+
+没配就静默跳过，只写日志和开 issue。**通知发不出去不影响文章产出** ——
+文章已经落盘了，为了通知把产出丢掉是本末倒置。
 
 ## 日常使用
 
@@ -328,71 +412,8 @@ Actions → publish → Run workflow，四个开关：
 | `publish` | 勾上=校验全过就直接发布；不勾=一律落 `_review/` 等人工放行 |
 | `refresh_index` | 刚往 Drive 补传了图就勾上，强制重建索引 |
 
-发布成功后 `deploy` 会自动跟着跑（靠 `workflow_run` 触发）。这里有个
-GitHub 的坑：**workflow 用内置 `GITHUB_TOKEN` 推的提交不会触发其他
-workflow**（防递归的安全规则），所以不能指望 publish 的 push 去触发
-deploy 的 push 事件 —— 文章会一直躺在仓库里不上线。
-
-### 校验都查什么
-
-两组，任一项不过就不发布。
-
-**第一组：数据保真**（`verify.verify`，所有 AI 通道都跑）
-
-| 检查 | 拦什么 |
-|---|---|
-| 图片引用 | 源文的图在成稿里丢了 |
-| 数据数字 | 出现源文没有的数值 —— 编造的流速、限度、回收率 |
-| 法规条款号 | ICH / 21 CFR / USP / Ph. Eur. 丢失，**零容忍** |
-| 文献 DOI | 大批量丢失（允许少量，合并重复论述时折叠掉是正常的） |
-| 篇幅 | 正文短于源文的 40%，说明模型退化成了摘要 |
-
-**第二组：可发表性**（`verify.review`，引子通道与人工投稿通道跑）
-
-| 检查 | 拦什么 |
-|---|---|
-| 扩展来源 | `[依据 N]` 与来源清单对不上；笔记路径在知识库里不存在；引用要点在那篇笔记里找不到（二元组重合度 < 50%）；DOI 格式不合法或没在输入材料里出现过 |
-| 加减法 | 减法删过头或根本没删，加法没长或翻了三倍以上 |
-| 结构 | 二级章节不在 3～8 个；空壳章节（正文不足 120 字）；标题自带序号；正文里有一级标题；缺导读段 |
-| 格式 | 指向知识库内部 md 的相对链接（站上是死链）；残留未解析的双链；有图没取到 |
-| 选材重复 | 这篇引子笔记已经用过 |
-| 关联文章 | 同二级标签的已发布文章没在「相关阅读」里出现 |
-
-关联文章的链接由**流水线生成**而不是让模型写 —— 模型不知道站上发过什么，
-让它写必然编 slug。
-
-### 校验没过怎么办
-
-三件事同时发生：
-
-1. 文章写进 `_review/seed-<slug>.md`，**开头的注释里逐条列着没过哪些项**
-2. 追加一行到 `logs/verify-YYYY-MM.md`，随产出一起提交进仓库
-3. 开一个 GitHub Issue（标签 `校验未通过`），配了 SMTP 的话同时发邮件
-
-处理：打开 `_review/` 下的文件，按注释里的问题逐条改，确认没问题后移到
-`src/content/posts/`、删掉开头的注释即可发布。
-
-> `_review/` 里存在的组会被跳过，否则它会一直霸占队首、后面的文章一篇也
-> 发不出去。人工处理掉文件后自动重新入列。
-
-### 校验未通过的通知怎么配
-
-**GitHub Issue：零配置，已经能用。** workflow 用的是 Actions 自带的
-`GITHUB_TOKEN`。手机装 GitHub App 就有推送，还能直接在 issue 里记录处理
-结果 —— 比邮件更适合追踪，推荐优先用这个。
-
-**邮件：要配 Secret。** 仓库 Settings → Secrets and variables → Actions →
-New repository secret：
-
-| Secret | 填什么 |
-|---|---|
-| `MAIL_USER` | 发信邮箱，如 `708838228@qq.com` |
-| `MAIL_PASSWORD` | **QQ 邮箱的「授权码」**，不是登录密码。QQ 邮箱 设置 → 账号 → POP3/IMAP/SMTP 服务里开启并生成 |
-| `MAIL_TO` | 收信邮箱 |
-| `MAIL_HOST` | 可不填，默认 `smtp.qq.com`（SSL 465） |
-
-没配就静默跳过，只写日志和开 issue。**通知发不出去不影响文章产出** ——
-文章已经落盘了，为了通知把产出丢掉是本末倒置。
+发布成功后 `deploy` 会自动跟着跑（靠 `workflow_run` 触发，见「[架构总览](#架构总览)」
+里的 GitHub 递归坑说明）。
 
 ### 文章里出现「图片暂缺」怎么办
 
@@ -444,32 +465,205 @@ LLM。不勾也行，Drive 索引缓存 7 天一换，到期后自动补上。
 转录，有版权问题）。自己写的长文把路径加进 `pipeline/config.py` 的
 `SIZE_EXEMPT_NOTES` 即可。
 
-## 本地开发
+## 首次部署
 
-```bash
-# Python 流水线
-uv venv && uv pip install -r pipeline/requirements.txt
-.venv/bin/python pipeline/test_pipeline.py      # 115 项自检
+**给要在自己的 fork 上跑起来的人。** 仓库所有者已经配好了下面这些
+secret，日常开发或改流水线代码不需要重新走一遍这一节；只有你想让流水线
+接自己的 Obsidian vault、自己的 DeepSeek key、自己的 Google Drive 时才
+需要。
 
-# 站点
-npm install
-npm run dev        # 本地预览
-npm run build      # 构建到 dist/
+三个 Secret + 一次 Drive 共享 + 开启 Pages（顺序：`DEEPSEEK_API_KEY` →
+`VAULT_TOKEN` → `GDRIVE_SA_JSON` → 共享 Drive 文件夹 → 填入仓库 Secret →
+开启 Pages → 手动验证）。全程免费，Drive API 只读和 GitHub Actions 在
+这个用量下都在免费额度内。
+
+> 下面每一步都标了**为什么需要**和**漏了会怎样**。这套配置踩坑的地方在于
+> 报错信息普遍不指向真正的原因，所以按顺序做完再手动跑一次验证。
+
+### DEEPSEEK_API_KEY
+
+**做什么用**：调 DeepSeek 把笔记整理成文章。
+
+1. 打开 https://platform.deepseek.com/ 登录
+2. 左侧 **API keys** → **创建 API key**，名字随便起
+3. 复制生成的字符串（**只显示这一次**）
+
+模型在 `pipeline/config.py` 里配置。想省钱可以用 `deepseek-v4-flash`，
+机械校验器会兜底；对保真度要求更高时可换回 `deepseek-v4-pro`。模型 ID 以
+`GET https://api.deepseek.com/models` 返回的清单为准 —— 早期的
+`deepseek-chat` / `deepseek-reasoner` 已经不在清单里了。
+
+### VAULT_TOKEN
+
+**做什么用**：GitHub Actions 自带的令牌只能访问它自己所在的仓库（本仓库），
+碰不到 `Obsidian-base` 和 `RoutineRun`。而这两个源仓库都是**私有**的，
+所以要单独给一个只能读它们的令牌。
+
+**漏了会怎样**：workflow 在 checkout 源仓库那步就失败，报 404 或
+authentication failed。
+
+1. 打开 https://github.com/settings/personal-access-tokens/new
+   （手点路径：头像 → Settings → 最底部 **Developer settings** →
+   **Personal access tokens** → **Fine-grained tokens** → **Generate new token**）
+2. 按下表填：
+
+   | 项 | 填什么 |
+   |---|---|
+   | Token name | 随便起，如 `blog-vault-read` |
+   | Expiration | 建议 1 year。**到期后流水线会停**，记一下时间 |
+   | Resource owner | 选你自己（Bryce505） |
+   | Repository access | 选 **Only select repositories** |
+   | └ Select repositories | 勾上 **Obsidian-base** 和 **RoutineRun** |
+   | Permissions → Repository permissions → **Contents** | 改成 **Read-only** |
+
+   `Metadata: Read-only` 会自动跟着勾上，那是必需项。其他权限一个都别给。
+
+3. **Generate token** → 立刻复制那串 `github_pat_` 开头的字符串
+   （**只显示这一次**，刷新就没了，只能重新生成）
+
+> 如果 Fine-grained 那页填不出来，退路是同一个 Developer settings 里的
+> **Tokens (classic)** → Generate new token → 只勾 `repo`。缺点是它能读写
+> 你**所有**仓库，不如细粒度安全。
+
+### GDRIVE_SA_JSON
+
+**做什么用**：笔记正文里的图片（实测 1235 张）不在 git 仓库里，只在
+Google Drive 的 `image&attachment` 文件夹。流水线要用服务账号去读。
+
+**这一项步骤最多，也最容易在中途卡住。**
+
+#### 1. 建项目并开启 Drive API
+
+1. 打开 https://console.cloud.google.com/ ，**用拥有那个 Drive 文件夹的
+   账号登录**（登错账号后面共享那步会没权限）
+2. 顶部项目选择器 → **新建项目**，名字如 `obsidian-blog` → 创建
+3. **确保顶部项目选择器里选中的就是这个新项目** ← 常见卡点：不选中项目的话，
+   服务账号页面只会显示「要查看此页面，请选择一个项目」，根本看不到
+   「创建服务账号」按钮
+4. 打开 https://console.cloud.google.com/apis/library/drive.googleapis.com
+   → 点 **启用**（ENABLE）
+
+   已经启用的话这里显示「API 已启用」或 **管理**（MANAGE）。
+   **没启用的话服务账号建得再对也读不了 Drive，而且报 403 不会说是 API 没开。**
+
+#### 2. 建服务账号
+
+打开 https://console.cloud.google.com/iam-admin/serviceaccounts →
+**+ 创建服务账号**
+
+| 步骤 | 怎么做 |
+|---|---|
+| 服务账号名称 | 如 `blog-image-reader`，ID 自动生成不用改 |
+| 第 2 步「授予角色」 | **直接跳过**（点继续）—— 它不需要任何 GCP 角色，权限来自 Drive 的文件夹共享 |
+| 第 3 步「用户访问权限」 | 也跳过，点完成 |
+
+#### 3. 生成 JSON 密钥
+
+在服务账号列表点刚建的那个 → 顶部 **密钥**（KEYS）标签 →
+**添加密钥** → **创建新密钥** → 选 **JSON** → 创建。
+
+浏览器自动下载一个 .json 文件，内容形如：
+
+```json
+{
+  "type": "service_account",
+  "project_id": "obsidian-blog-506523",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+  "client_email": "blog-image-reader@obsidian-blog-506523.iam.gserviceaccount.com",
+  ...
+}
 ```
 
-流水线的自检不依赖真实 vault，跑的是 `pipeline/fixtures/` 里的样本，
-CI 里可以直接跑。
+**把整个文件内容全选复制**（从第一个 `{` 到最后一个 `}`），一个字符都别漏。
 
-## 目录
+> ⚠️ 这个文件里有私钥。**别提交进任何仓库、别发到聊天工具里。**
+> 粘进 GitHub Secret 之后本地那份可以删掉，要用再重新生成一个密钥。
 
-```
-pipeline/     Python 流水线（config / vault / select_ / verify / render
-              / images / compose / drafts / routinerun / repair / main）
-  prompt.md   DeepSeek 的系统提示词，改写力度不对就调这里
-src/          Astro 站点
-drafts/       手动发布投递口
-public/images/ 文章图片（WebP）
-published.json 已发布状态，按标签组记录
-_review/      校验未通过、等人工复核的文章
-design/       视觉设计源文件
-```
+### 共享Drive文件夹给服务账号
+
+**← 最容易漏的一步。漏了会怎样**：流水线能正常跑完，但**一张图都取不到**，
+全部文章的图片变成「图片暂缺」占位文字，而且报的是 404 而不是「你没共享
+文件夹」。
+
+1. 从上面 JSON 里找到 **`client_email`** 的值（形如
+   `blog-image-reader@xxx.iam.gserviceaccount.com`），复制引号里那一整串
+2. 打开文件夹
+   https://drive.google.com/drive/folders/1jwf_lkCo-Rq42VwWToyTeu2ciJTRg4zT
+   ，确认登录的是文件夹所有者账号
+3. 点页面**顶部中间的文件夹名** → 下拉菜单 → **共享** → **共享**
+   （或在「我的云端硬盘」列表里右键该文件夹 → 共享）
+4. 在「添加成员和群组」里粘贴那个邮箱
+   - 可能提示「此收件人不是 Google 账号」之类的警告 —— **正常，无视**，
+     服务账号本来就不是真人账号
+   - 角色选 **查看者**（Viewer）
+   - **把「通知用户」的勾去掉** ← 服务账号收不了邮件，勾着可能直接报错
+5. 点 **共享** / **发送**
+
+### 填入仓库Secret
+
+本仓库 → **Settings** → **Secrets and variables** → **Actions** →
+**New repository secret**，依次建三条：
+
+| Name | Secret |
+|---|---|
+| `DEEPSEEK_API_KEY` | 第一步复制的 key |
+| `VAULT_TOKEN` | 第二步复制的 `github_pat_...` |
+| `GDRIVE_SA_JSON` | 第三步 JSON 文件的**全文** |
+
+名字必须一字不差，workflow 里是按这三个名字取的。
+
+### 开启Pages
+
+**Settings** → **Pages** → Source 选 **GitHub Actions**
+（不是 Deploy from a branch）。
+
+站点地址是 `https://<用户名>.github.io/<仓库名>/`。
+**GitHub Pages 的路径区分大小写** —— 仓库叫 `Blog` 站点就在 `/Blog/`，
+所以 `astro.config.mjs` 里的 `base` 必须和仓库名大小写完全一致。
+改仓库名的话记得同步改这一行。
+
+### 手动验证一次
+
+**别配完就直接等定时。** Actions → **publish** → **Run workflow**，
+篇数填 1。
+
+跑完检查三处：
+
+- **workflow 是否全绿** —— 红了看是哪一步：checkout 源仓库失败是
+  `VAULT_TOKEN` 问题，取图失败是 Drive 共享或 API 没启用，
+  整理那步失败看 DeepSeek 的报错（余额、模型名）
+- **文章有没有图** —— 打开生成的文章，如果满屏「图片暂缺」，回去检查
+  「共享 Drive 文件夹给服务账号」那步
+- **文章内容读一遍** —— 这是唯一没法自动验证的部分，见下
+
+> **首次运行务必人工通读生成的文章。** 机械校验器只能保证数据没被篡改、
+> 图片没丢，保证不了文章好不好读。觉得改写力度不对（太放飞或太保守），
+> 调 `pipeline/prompt.md` / `pipeline/prompt_seed.md` 里的提示词即可。
+
+## 开发规范
+
+给贡献者（含 AI agent）的约定，完整规则见 [`CLAUDE.md`](CLAUDE.md)。这里
+只列最容易忽略、忽略了会导致 PR 被打回的几条：
+
+1. **开发日志硬性要求。** 每次改动都要在 [`docs/devlog/`](docs/devlog/) 下
+   新增一个 `YYYY-MM-DD-<短标题>.md`，写背景（实测现象，不是「优化一下」）、
+   变更、实现取舍、动了哪些文件、怎么验证的。这是本仓库唯一的连续记忆——
+   模板见 [`docs/devlog/README.md`](docs/devlog/README.md)。
+2. **一个分支只开发一个功能。** 分支名 `claude/<功能>-<短标识>`，从最新
+   master 起；一个分支对应一篇开发日志；合并前必须
+   `python pipeline/test_pipeline.py` 全绿、`npm run build` 通过，动了流水线
+   行为的还要在分支上实跑一次。
+3. **注释写"为什么"，不写"做了什么"。** 尤其是阈值、正则、异常分支——
+   带具体数字的判断要有实测依据（这份 README 和 `pipeline/config.py` 里
+   大量「实测 XX 篇里 XX 篇会怎样」式的注释就是这个约定的产物）。
+4. **校验器是安全阀，不是可有可无的检查。** 放宽 `pipeline/verify.py` 的
+   规则前，先想清楚这条规则当初拦的是什么；拦不住就别上线。
+
+## 延伸阅读
+
+- [`CLAUDE.md`](CLAUDE.md) —— 开发约定全文
+- [`docs/devlog/`](docs/devlog/) —— 开发日志，按时间倒序的真实踩坑记录
+- [`docs/superpowers/specs/`](docs/superpowers/specs/) —— 设计文档
+- [`docs/superpowers/plans/`](docs/superpowers/plans/) —— 实施计划
+- [`logs/`](logs/) —— 按月归档的校验运行日志
+- 站点：https://bryce505.github.io/Blog
