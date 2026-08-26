@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import { loadSeries } from '../../lib/series';
+
+export async function getStaticPaths() {
+  const all = await loadSeries();
+  return all.map((s) => ({ params: { series: s.id }, props: { s } }));
+}
+
+const { s } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const fmt = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+---
+<Base title={s.title} description={s.description}>
+  <div class="wrap" style="padding-top: 48px; padding-bottom: 72px;">
+    <p style="margin: 0 0 8px; font-size: 13px; color: var(--muted);">
+      <a href={`${base}/series`} style="color: var(--muted);">系列</a>
+    </p>
+    <h1 style="font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0 0 10px;">{s.title}</h1>
+    <p style="margin: 0 0 6px; max-width: var(--measure); font-size: 15.5px; color: var(--muted); line-height: 1.85; text-wrap: pretty;">
+      {s.description}
+    </p>
+    <p style="margin: 0 0 28px; font-size: 13px; color: var(--muted);">
+      已发布 <span class="num">{s.publishedCount}</span> / 共 <span class="num">{s.items.length}</span> 篇
+    </p>
+
+    <ol style="list-style: none; margin: 0; padding: 0;">
+      {s.items.map((i) => (
+        <li style="display: flex; gap: 14px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid var(--border);">
+          <span class="num" style="color: var(--muted); font-size: 13px; min-width: 24px;">{i.no}</span>
+          <div style="min-width: 0;">
+            {i.post ? (
+              <>
+                <a href={`${base}/posts/${i.post.id}`} style="color: var(--fg); font-size: 16px;">{i.title}</a>
+                {i.post.data.description && (
+                  <p style="margin: 5px 0 0; max-width: var(--measure); font-size: 14px; color: var(--muted); line-height: 1.75; text-wrap: pretty;">
+                    {i.post.data.description}
+                  </p>
+                )}
+              </>
+            ) : (
+              <span style="color: var(--muted); font-size: 16px;">{i.title}</span>
+            )}
+          </div>
+          <span style="margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap;">
+            {i.post ? <time class="num" datetime={fmt(i.post.data.date)}>{fmt(i.post.data.date)}</time> : '待发布'}
+          </span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</Base>
