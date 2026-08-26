@@ -161,5 +161,20 @@
     "title": "蛋白质与多肽测序的碎裂离子解析：命名体系、质荷比计算与手动谱图解读",
     "seed": "Antibody-Characterization/protein sequencing与离子类型.md",
     "draft": true
+  },
+  "cge_peak_area_instability_literature_review": {
+    "slug": "cge_peak_area_instability_literature_review",
+    "tag": "02分子表征/Size-variant/CE-SDS",
+    "published_at": "2026-08-26",
+    "source_hash": "sha256:5a2744d3c021a0590c735685086129ca94174174e024971949f4266694206020",
+    "notes": [
+      "Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CGE_Peak_Area_Instability_Literature_Review.md"
+    ],
+    "noteTitles": [
+      "CGE_Peak_Area_Instability_Literature_Review"
+    ],
+    "title": "CE-SDS 蛋白定量中峰面积逐针下降与迁移时间漂移：文献证据、机制分析与对策",
+    "seed": "Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CGE_Peak_Area_Instability_Literature_Review.md",
+    "draft": true
   }
 }
