@@ -1,8 +1,8 @@
 ---
 import Base from './Base.astro';
 
-interface Props { entry: any; headings: any[]; related: any[]; }
-const { entry, headings, related } = Astro.props;
+interface Props { entry: any; headings: any[]; related: any[]; series?: any; }
+const { entry, headings, related, series } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const d = entry.data.date;
 const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -31,6 +31,13 @@ const tail = entry.data.primaryTag?.split('/').slice(1).join(' / ') ?? '';
           <><span aria-hidden="true" style="color: var(--border);">·</span>
           <span>由 <span class="num">{count}</span> 篇笔记整理</span></>
         )}
+        {series && (
+          <><span aria-hidden="true" style="color: var(--border);">·</span>
+          <span>
+            <a href={`${base}/series/${encodeURIComponent(series.series.id)}`} style="color: var(--muted);">{series.series.title}</a>
+            　第 <span class="num">{series.no}</span> / <span class="num">{series.total}</span> 篇
+          </span></>
+        )}
       </div>
 
       <div class:list={['prose', count > 0 && 'numbered']} style="padding-top: 26px;">
@@ -57,6 +64,24 @@ const tail = entry.data.primaryTag?.split('/').slice(1).join(' / ') ?? '';
                 <a href={`${base}/tags/${encodeURIComponent(t)}`}
                    style="font-size: 12.5px; color: var(--muted); border: 1px solid var(--border); padding: 3px 9px; border-radius: 3px;">{t}</a>
               ))}
+            </div>
+          </section>
+        )}
+
+        {series && (series.prev || series.next) && (
+          <section>
+            <h2 class="eyebrow">本系列</h2>
+            <div style="display: grid; gap: 10px;">
+              {series.prev && (
+                <a href={`${base}/posts/${series.prev.post.id}`} style="font-size: 14.5px;">
+                  ← 上一篇　{series.prev.title}
+                </a>
+              )}
+              {series.next && (
+                <a href={`${base}/posts/${series.next.post.id}`} style="font-size: 14.5px;">
+                  下一篇 →　{series.next.title}
+                </a>
+              )}
             </div>
           </section>
         )}

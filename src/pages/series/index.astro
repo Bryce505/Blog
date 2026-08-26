@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import { loadSeries } from '../../lib/series';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const all = await loadSeries();
+---
+<Base title="系列" description="按顺序成组的文章">
+  <div class="wrap" style="padding-top: 48px; padding-bottom: 72px;">
+    <h1 style="font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0 0 6px;">系列</h1>
+    <p style="margin: 0 0 28px; color: var(--muted); font-size: 14px; max-width: var(--measure); line-height: 1.8;">
+      同一主题下按顺序成组的文章。标为「待发布」的是已经规划、还没写完的篇目。
+    </p>
+
+    {all.length === 0 && (
+      <p style="color: var(--muted);">还没有系列。在 <code>src/content/series.json</code> 里加一条即可。</p>
+    )}
+
+    {all.map((s) => (
+      <article style="padding: 22px 0; border-bottom: 1px solid var(--border);">
+        <h2 style="margin: 0 0 7px; font-family: var(--serif); font-size: 20px; font-weight: 600;">
+          <a href={`${base}/series/${encodeURIComponent(s.id)}`} style="color: var(--fg);">{s.title}</a>
+        </h2>
+        <p style="margin: 0 0 8px; max-width: var(--measure); font-size: 15px; color: var(--muted); line-height: 1.8; text-wrap: pretty;">
+          {s.description}
+        </p>
+        <p style="margin: 0; font-size: 12.5px; color: var(--muted);">
+          已发布 <span class="num">{s.publishedCount}</span> / 共 <span class="num">{s.items.length}</span> 篇
+        </p>
+      </article>
+    ))}
+  </div>
+</Base>
