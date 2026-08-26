@@ -110,19 +110,7 @@
       "Quality_and_Regulation/验证相关/ELISA方法开发-稀释线性和平行性.md"
     ],
     "title": "ELISA 方法开发中的稀释线性与平行性：MRD 建立、HCP 专属考量与非线性排查",
-    "seed": "Quality_and_Regulation/验证相关/ELISA方法开发-稀释线性和平行性.md",
-    "draft": true
-  },
-  "qc检测流程梳理": {
-    "slug": "qc检测流程梳理",
-    "tag": "02分子表征/Size-variant/SEC",
-    "published_at": "2026-08-26",
-    "notes": [
-      "Antibody-Characterization/QC检测流程梳理.md"
-    ],
-    "title": "QC 放行检测实验室方法手册：蛋白定量、免疫印迹、电泳、内毒素与 SEC-HPLC 操作要点",
-    "seed": "Antibody-Characterization/QC检测流程梳理.md",
-    "draft": true
+    "seed": "Quality_and_Regulation/验证相关/ELISA方法开发-稀释线性和平行性.md"
   },
   "tools-claude-code-cloud-notes": {
     "slug": "tools-claude-code-cloud-notes",
@@ -157,18 +145,21 @@
       "Antibody-Characterization/前处理/切胶覆盖率.md"
     ],
     "title": "切胶覆盖率样品前处理：银染凝胶条带胶内酶切与nLC-MS/MS分析的完整SOP",
-    "seed": "Antibody-Characterization/前处理/切胶覆盖率.md",
-    "draft": true
+    "seed": "Antibody-Characterization/前处理/切胶覆盖率.md"
   },
-  "重组尿酸氧化酶活性分析方法开发": {
-    "slug": "重组尿酸氧化酶活性分析方法开发",
-    "tag": "05仪器与分析技术/生化检测/HRP偶联",
+  "protein-sequencing与离子类型": {
+    "slug": "protein-sequencing与离子类型",
+    "tag": "05仪器与分析技术/质谱/测序sequencing",
     "published_at": "2026-08-26",
+    "source_hash": "sha256:9bd067b762aacd3945bc8713f23f4c5fa97c83688b2eece5a05f366cddbd5b4f",
     "notes": [
-      "Bio-analysis/酶活性/重组尿酸氧化酶活性分析方法开发.md"
+      "Antibody-Characterization/protein sequencing与离子类型.md"
     ],
-    "title": "重组尿酸氧化酶（XTEN融合）的动力学表征、QC活性检测方法开发与标准品赋值策略",
-    "seed": "Bio-analysis/酶活性/重组尿酸氧化酶活性分析方法开发.md",
+    "noteTitles": [
+      "protein sequencing与离子类型"
+    ],
+    "title": "蛋白质与多肽测序的碎裂离子解析：命名体系、质荷比计算与手动谱图解读",
+    "seed": "Antibody-Characterization/protein sequencing与离子类型.md",
     "draft": true
   }
 }
