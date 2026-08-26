@@ -410,6 +410,30 @@ def test_dropped_unit_is_not_fabrication():
     assert not vf.verify('加入 50 mM IAA', '掺入 50 pmol 标准品', [], min_ratio=0.1).ok
 
 
+def test_attaching_a_unit_to_a_bare_source_value_is_not_fabrication():
+    """源文裸写的数值，模型补上上下文里明确的单位，是复述不是编造。
+
+    实测踩坑（master 上手动触发 publish 抓到的回归）：源笔记写
+    「precursor mass is 574.3」，旁边就是「573.3Da（574.3-1）」，模型写
+    小标题时补成「案例一：574.3 Da 单电荷前体」—— 被判成编造数据。
+    旧版校验器在这篇上一个都没拦，是这次改动引入的新误报。
+
+    判定改成：数值本身源文没有 → 拦；数值有、且源文就是裸写的 → 放行
+    （补单位或去单位都算复述）；数值有、但源文只带着别的单位 → 拦（调包）。
+    """
+    assert vf.verify('precursor mass is 574.3，完整多肽离子质量为 573.3Da',
+                     '案例一：574.3 Da 单电荷前体', [], min_ratio=0.1).ok
+
+
+def test_unit_swap_still_caught_when_source_never_wrote_it_bare():
+    """源文只以「50 mM」出现过，输出改成「50 pmol」仍然是调包，必须拦。
+
+    这条和上一条是一体两面：放行的前提是源文本身裸写过这个值。
+    """
+    assert not vf.verify('加入 50 mM IAA', '掺入 50 pmol 标准品', [], min_ratio=0.1).ok
+    assert not vf.verify('流速 0.5 mL/min', '流速 0.5 L/min', [], min_ratio=0.1).ok
+
+
 def test_micro_and_celsius_variants_are_the_same_number():
     """µ(U+00B5) 与 μ(U+03BC)、℃(U+2103) 与 °C 在语料里并存
     （实测 127 vs 588、168 vs 198），是字符编码差异不是数据差异。"""

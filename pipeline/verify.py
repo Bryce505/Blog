@@ -82,6 +82,12 @@ VERSION_YEAR = re.compile(r'\s*(?:年版|版|Edition|edition)')
 # 纯数值（不带单位）
 BARE_NUM = re.compile(r'^\d+(?:\.\d+)?$')
 
+
+def _value(tok):
+    """token 的数值部分，'4000da' → '4000'。"""
+    m = re.match(r'\d+(?:\.\d+)?', tok)
+    return m.group() if m else tok
+
 # DOI 用否定字符类而非 \S+：\S+ 会把 markdown 链接语法、右括号、中文
 # 全角括号一起吞进来，同一个 DOI 因上下文不同提取出不同字符串。
 # 法规条款号与文献 DOI 分开处理，严格程度不同：
@@ -177,19 +183,29 @@ def verify(src, out, images, min_ratio=None, extra_src=''):
     # 只查「新增」不查「减少」：重组时删掉重复论述是正常的，
     # 凭空冒出源文没有的数据才是危险信号。
     #
-    # 源文里带单位的数字，其裸数值也算「源文出现过」：模型把「4000Da」复述成
-    # 「4000 道尔顿」不是编造，HPLC 那篇实测就栽在这上面。
-    # **单向** —— 输出自己带了单位就必须原样对上。否则源文「50 mM」被改成
-    # 「50 pmol」这种单位调包会漏过去，而那是实测真出现过的（label-free 那篇）。
+    # 单位的写法差异不是编造，值本身对不上才是。三种情形分开判：
+    #
+    #   数值源文根本没有            → 拦。这是这条规则的本职
+    #   输出裸写                    → 值对上就放行。源文「4000Da」模型写成
+    #                                「4000 道尔顿」是复述（HPLC 那篇实测）
+    #   输出带单位，源文裸写过该值   → 放行。源文「precursor mass is 574.3」
+    #                                模型补成「574.3 Da」也是复述
+    #                                （master 手动触发 publish 抓到的回归）
+    #   输出带单位，源文只带别的单位 → 拦。源文「50 mM」改成「50 pmol」是
+    #                                单位调包，实测真出现过（label-free 那篇）
     pool_nums = data_numbers(pool)
     out_nums = data_numbers(out)
-    pool_values = set()
-    for tok in pool_nums:
-        head = re.match(r'\d+(?:\.\d+)?', tok)
-        if head:
-            pool_values.add(head.group())
-    new_nums = {t for t in out_nums - pool_nums
-                if not (BARE_NUM.match(t) and t in pool_values)}
+    # 源文里裸写过的数值。裸写意味着源文自己就没把单位绑死，此时输出补个
+    # 单位算复述；只带单位出现过的数值，则必须连单位一起对上。
+    pool_bare = {t for t in pool_nums if BARE_NUM.match(t)}
+    pool_values = {_value(t) for t in pool_nums}
+    new_nums = set()
+    for tok in out_nums - pool_nums:
+        val = _value(tok)
+        if val not in pool_values:
+            new_nums.add(tok)            # 值本身源文没有 —— 编造
+        elif not BARE_NUM.match(tok) and val not in pool_bare:
+            new_nums.add(tok)            # 值有，但两边单位不同 —— 调包
     if new_nums:
         failures.append(f'出现源文没有的数据: {sorted(new_nums)[:10]}')
 
