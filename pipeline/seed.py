@@ -31,6 +31,13 @@ import verify
 # 超过这个体量的笔记按「已经足够完整」处理，走减法。实测 12k 字符以上的
 # 笔记基本都已经自成体系，再让模型加东西只会稀释密度。
 SHRINK_THRESHOLD = 12_000
+# 自动选材的体量区间。实测两头都不行：
+#   太短（< 2k）—— 撑不起一个主题，模型只能自由发挥，扩写变成命题作文
+#   太长（> 40k）—— 减法要求保留 55% 以上，一篇 105k 的笔记就是要模型
+#                    输出 6 万字，超出输出上限，实测直接压到 13% 并丢掉
+#                    10 个数值。这不是模型不听话，是要求本身不现实
+# 区间外的笔记不参与自动选材，但仍可以用 --seed 显式指定。
+SEED_BAND = (2_000, 40_000)
 MAX_FRAGMENTS = 6            # 喂给模型的相关片段篇数
 FRAGMENT_CHARS = 3_000       # 每篇片段截取长度
 
@@ -40,10 +47,14 @@ def decide_mode(note):
 
 
 def candidates(notes, used=()):
-    """还没当过引子的可发布笔记，长的排前面。字数不限 —— 长的走减法，
-    短的走加法，两头都有出路。"""
+    """还没当过引子、且体量落在 SEED_BAND 内的可发布笔记，长的排前面。
+
+    区间内取长的：同样是合格的引子，内容多的那篇成文质量更高。
+    """
     used = set(used)
-    return sorted((n for n in sel.publishable(notes) if n.path not in used),
+    lo, hi = SEED_BAND
+    return sorted((n for n in sel.publishable(notes)
+                   if n.path not in used and lo <= len(n.body) <= hi),
                   key=lambda n: -len(n.body))
 
 
