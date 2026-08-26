@@ -120,3 +120,18 @@ def restore_missing(text, image_map):
         md = f'![]({image_map[name]})'
         return f'{md}\n*{cap}*' if cap else md
     return MISSING_RE.sub(sub, text)
+
+
+def append_related(body, items):
+    """在文末追加「相关阅读」一节。
+
+    关联文章的链接由流水线生成而不是让模型写：模型不知道站上已经发过
+    什么，让它写必然编 slug。确定性生成的链接不会错，校验器那条
+    「关联文章都要加链接」也就永远能过。
+    """
+    items = [(s, t) for s, t in items if s]
+    if not items:
+        return body
+    lines = ['', '## 相关阅读', '']
+    lines += [f'- [{t}](/posts/{s})' for s, t in items]
+    return body.rstrip() + '\n' + '\n'.join(lines) + '\n'

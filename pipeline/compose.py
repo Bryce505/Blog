@@ -13,6 +13,9 @@ import requests
 import config
 
 SYSTEM_PROMPT = (Path(__file__).parent / 'prompt.md').read_text(encoding='utf-8')
+# 引子通道用另一套提示词：多篇重组要求「只重排不新增」，单篇扩写要求
+# 「补原理与脉络、但一个新数字都不许出现」，两者的红线不同，不能共用。
+SEED_PROMPT = (Path(__file__).parent / 'prompt_seed.md').read_text(encoding='utf-8')
 
 
 class ComposeError(RuntimeError):
@@ -32,19 +35,29 @@ def build_user_message(group):
     return ''.join(parts)
 
 
+def build_seed_message(note):
+    meta = ' | '.join(x for x in (
+        f'出处：《{note.book}》' if note.book else '',
+        f'论文：{note.paper}' if note.paper else '',
+        f'摘要：{note.description}' if note.description else '',
+    ) if x)
+    return (f'以下这篇笔记是引子，请围绕它的主题写成一篇完整的文章。\n\n'
+            f'### 笔记：{note.title}\n{meta}\n\n{note.body.strip()}\n')
+
+
 def _post(url, headers, payload):
     r = requests.post(url, headers=headers, json=payload, timeout=600)
     r.raise_for_status()
     return r.json()
 
 
-def compose(group, api_key, model=None, _post=None):
+def _chat(system, user, api_key, model=None, _post=None):
     post = _post or globals()['_post']
     payload = {
         'model': model or config.DEEPSEEK_MODEL,
         'messages': [
-            {'role': 'system', 'content': SYSTEM_PROMPT},
-            {'role': 'user', 'content': build_user_message(group)},
+            {'role': 'system', 'content': system},
+            {'role': 'user', 'content': user},
         ],
         'temperature': config.DEEPSEEK_TEMPERATURE,
         'max_tokens': config.DEEPSEEK_MAX_TOKENS,
@@ -58,3 +71,18 @@ def compose(group, api_key, model=None, _post=None):
     except (KeyError, IndexError, TypeError, AttributeError) as e:
         # 静默返回空文章会让下游校验报「正文过短」，掩盖真正的原因
         raise ComposeError(f'DeepSeek 响应缺少 choices: {resp}') from e
+
+
+def compose(group, api_key, model=None, _post=None):
+    """多篇笔记打散重组（自动通道）。"""
+    return _chat(SYSTEM_PROMPT, build_user_message(group), api_key, model, _post)
+
+
+def compose_seed(note, api_key, model=None, _post=None):
+    """单篇笔记当引子（引子通道）。"""
+    return _chat(SEED_PROMPT, build_seed_message(note), api_key, model, _post)
+
+
+def compose_seed_message(user_message, api_key, model=None, _post=None):
+    """引子通道：user message 由 seed.py 拼好（含加减法模式与相关片段）。"""
+    return _chat(SEED_PROMPT, user_message, api_key, model, _post)

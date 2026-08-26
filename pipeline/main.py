@@ -3,6 +3,10 @@
 两条通道：
   自动通道  python main.py --vault <路径> [--count N]
   手动通道  python main.py --drafts
+引子通道（单篇笔记做引子，按加减法整理）：
+  python main.py --seed [笔记路径...] --vault <路径> [--count N] [--publish]
+人工投稿通道（处理 drafts/ 下的稿子）：
+  python main.py --manual --vault <路径> [--publish]
 另有两条辅助通道：
   补图      python main.py --repair-images
   图片体检  python main.py --audit-images --vault <路径>
@@ -104,6 +108,29 @@ def first_paragraph(md, limit=140):
 
 
 
+def record_published(blog_root, published, group, seed=None, title=None):
+    """把一组记进 published.json 并落盘。
+
+    seed 字段是引子通道用的：选材去重按引子笔记路径判定，跟自动通道
+    按标签组判定是两套口径，得分开存。
+    """
+    rec = {
+        'slug': group.slug,
+        'published_at': dt.date.today().isoformat(),
+        'source_hash': group.source_hash,
+        'notes': [n.path for n in group.notes],
+        'noteTitles': [n.title for n in group.notes],
+    }
+    if title:
+        rec['title'] = title
+    if seed:
+        rec['seed'] = seed
+    published[group.tag] = rec
+    (Path(blog_root) / 'published.json').write_text(
+        json.dumps(published, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    return rec
+
+
 def load_published(blog_root):
     p = Path(blog_root) / 'published.json'
     return json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
@@ -160,15 +187,7 @@ def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
             out = blog_root / 'src' / 'content' / 'posts' / f'{g.slug}.md'
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(doc, encoding='utf-8')
-            published[g.tag] = {
-                'slug': g.slug,
-                'published_at': dt.date.today().isoformat(),
-                'source_hash': g.source_hash,
-                'notes': [n.path for n in g.notes],
-                'noteTitles': [n.title for n in g.notes],
-            }
-            pub_path.write_text(
-                json.dumps(published, ensure_ascii=False, indent=2), encoding='utf-8')
+            record_published(blog_root, published, g)
         else:
             out = blog_root / '_review' / f'{g.slug}.md'
             out.parent.mkdir(parents=True, exist_ok=True)
@@ -195,9 +214,27 @@ def main():
                     help='强制重建 Drive 索引，不吃 7 天缓存')
     ap.add_argument('--audit-images', action='store_true',
                     help='列出待发布笔记里 Drive 上没有的图（只读索引缓存）')
+    ap.add_argument('--seed', nargs='*', metavar='NOTE',
+                    help='引子通道：单篇笔记做引子，按加减法整理成文章。'
+                         '可指定一或多个笔记路径，省略则自动挑')
+    ap.add_argument('--manual', action='store_true',
+                    help='人工投稿通道：处理 drafts/ 下的稿子，同样走加减法与校验')
+    ap.add_argument('--publish', action='store_true',
+                    help='校验全过就直接发布；不加则一律落 _review/ 等人工放行')
     a = ap.parse_args()
 
-    if a.audit_images:
+    if a.manual:
+        import manual
+        rs = manual.run(a.vault, a.blog, os.environ['DEEPSEEK_API_KEY'],
+                        os.environ['GDRIVE_SA_JSON'], publish=a.publish)
+    elif a.seed is not None:
+        import seed as seed_channel
+        if not a.vault:
+            ap.error('引子通道需要 --vault')
+        rs = seed_channel.run(a.vault, a.blog, os.environ['DEEPSEEK_API_KEY'],
+                              os.environ['GDRIVE_SA_JSON'], a.seed, a.count,
+                              publish=a.publish)
+    elif a.audit_images:
         import repair
         if not a.vault:
             ap.error('体检要读 vault，需要 --vault')
@@ -216,6 +253,10 @@ def main():
             ap.error('自动通道需要 --vault')
         rs = run_auto(a.vault, a.blog, os.environ['DEEPSEEK_API_KEY'],
                       os.environ['GDRIVE_SA_JSON'], a.count)
+    # 写日志；有未通过的就开 issue、发邮件。通知失败不影响已经落盘的产出。
+    if rs and isinstance(rs, list) and any(isinstance(r, dict) and 'ok' in r for r in rs):
+        import notify
+        print(json.dumps({'notify': notify.notify(a.blog, rs)}, ensure_ascii=False))
     print(json.dumps(rs, ensure_ascii=False, indent=2))
     return 0
 
