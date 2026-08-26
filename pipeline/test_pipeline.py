@@ -273,6 +273,17 @@ def test_reformatting_alone_is_not_a_new_number():
     assert vf.verify(src, out, [], min_ratio=0.1).ok
 
 
+def test_numbers_from_supplied_fragments_are_not_fabrication():
+    """加法模式喂进去的相关片段里的数字，模型引用了不算编造。"""
+    src = '本文讨论 HCP 定量。'
+    out = '本文讨论 HCP 定量。掺入量取 50 pmol。'
+    assert not vf.verify(src, out, [], min_ratio=0.1).ok
+    assert vf.verify(src, out, [], min_ratio=0.1,
+                     extra_src='相关片段：标准品掺入量 50 pmol').ok
+    # 但篇幅比例仍以引子为准，喂片段不能把「正文过短」稀释掉
+    assert not vf.verify('x' * 1000, 'y' * 10, [], extra_src='z' * 100000).ok
+
+
 def test_verify_catches_changed_flowrate():
     r = vf.verify(SRC, SRC.replace('0.5 mL/min', '0.8 mL/min', 1), IMGS)
     assert not r.ok and any('数据' in f for f in r.failures), r.failures

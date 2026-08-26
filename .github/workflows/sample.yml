@@ -60,7 +60,7 @@ jobs:
           rm -rf .vault
           git config user.name  'blog-bot'
           git config user.email 'makejun505@gmail.com'
-          for p in _review public/images pipeline/drive_index.json; do
+          for p in _review public/images pipeline/drive_index.json logs; do
             [ -e "$p" ] && git add -A "$p"
           done
           if git diff --staged --quiet; then

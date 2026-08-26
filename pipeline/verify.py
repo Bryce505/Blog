@@ -103,8 +103,14 @@ class VerifyResult:
     failures: list = field(default_factory=list)
 
 
-def verify(src, out, images, min_ratio=None):
+def verify(src, out, images, min_ratio=None, extra_src=''):
     """四项确定性检查。任一不过则不发布。
+
+    extra_src 是「同样合法的素材」：引子通道会把相关笔记片段一起喂给模型
+    并要求优先从中取材，那些片段里的数字当然不算编造。但它只参与「有没有
+    凭空多出数据」的比对，不参与篇幅比例 —— 篇幅永远以引子笔记为准，
+    否则喂进去几篇片段就能把「正文过短」这条稀释掉。
+    实测漏掉这一层的后果：模型老老实实引用片段里的 50 pmol，被判成幻觉。
 
     先整体 URL 解码再比对：Obsidian 粘贴的图片名带空格，正文里是
     「Pasted%20image%2020240528.png」。不解码有两处会出错 ——
@@ -115,6 +121,7 @@ def verify(src, out, images, min_ratio=None):
         min_ratio = config.MIN_LENGTH_RATIO
     src = urllib.parse.unquote(src)
     out = urllib.parse.unquote(out)
+    pool = src + '\n' + urllib.parse.unquote(extra_src)
     failures = []
 
     missing = [i for i in images if i not in out]
@@ -123,7 +130,7 @@ def verify(src, out, images, min_ratio=None):
 
     # 只查「新增」不查「减少」：重组时删掉重复论述是正常的，
     # 凭空冒出源文没有的数据才是危险信号。
-    new_nums = data_numbers(out) - data_numbers(src)
+    new_nums = data_numbers(out) - data_numbers(pool)
     if new_nums:
         failures.append(f'出现源文没有的数据: {sorted(new_nums)[:10]}')
 

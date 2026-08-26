@@ -154,8 +154,11 @@ def process(note, *, blog_root, notes, published, index, svc, api_key,
                                  {i: render.caption_for(note) for i in note.images})
     body = render.append_related(body, rel)
 
+    # extra_src 传整条 user message：里面有笔记标题与相关片段，模型用它们
+    # 的数字是被鼓励的行为，不该判成编造
     fidelity = verify.verify(note.body, article,
-                             [i for i in note.images if i not in missing])
+                             [i for i in note.images if i not in missing],
+                             extra_src=user_msg)
     pub_check = verify.review(
         body, mode=mode, seed_chars=len(note.body), seed_path=note.path,
         used_seeds=used_seeds, related_slugs=[s for s, _ in rel],
