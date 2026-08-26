@@ -29,7 +29,8 @@ def write_log(blog_root, results, today=None):
     p = log_path(blog_root, d)
     p.parent.mkdir(parents=True, exist_ok=True)
     lines = [] if p.exists() else [f'# 校验日志 {d:%Y-%m}', '',
-                                   '每次发布运行的校验结果。未通过的文章在 `_review/` 里等人工放行。', '']
+                                   '每次发布运行的校验结果。未通过的文章带 `draft: true` 躺在 '
+                                   '`src/content/posts/` 里等人工放行。', '']
     lines.append(f'## {d:%Y-%m-%d} {dt.datetime.now():%H:%M}')
     lines.append('')
     for r in results:
@@ -63,7 +64,8 @@ def _failed(results):
 def format_report(results):
     """通知正文：只讲未通过的那些，以及去哪儿处理。"""
     bad = _failed(results)
-    out = [f'本次运行有 {len(bad)} 篇文章没通过校验，已放在 _review/ 等人工放行。', '']
+    out = [f'本次运行有 {len(bad)} 篇文章没通过校验，已带 draft 标落在 '
+           f'src/content/posts/ 里，不会上线。', '']
     for r in bad:
         if r.get('status') == 'error':
             out += [f'■ 运行出错：{r.get("reason")}', '']
@@ -78,8 +80,9 @@ def format_report(results):
         out.append('  未通过的检查：')
         out += [f'    - {f}' for f in r.get('failures', [])]
         out.append('')
-    out.append('处理方式：打开 _review/ 下对应文件，按上面的问题逐条修改，'
-               '确认没问题后移到 src/content/posts/ 并删掉文件开头的注释即可发布。')
+    out.append('处理方式：打开上面的文件，按问题逐条修改，确认没问题后'
+               '删掉 frontmatter 里 `draft: true` 那一行即可发布。'
+               '不想要就直接删掉整个文件，下次运行会自动销账、那篇笔记重新入列。')
     return '\n'.join(out)
 
 

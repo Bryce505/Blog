@@ -22,7 +22,8 @@ drafts/       ─┤ ② 加减法：笔记够完整→浓缩归纳；不完整�
 Google Drive  ─┤ ③ 取图：本地图 / Drive → WebP(≤1200px) → public/images/
                │ ④ 校验：数据保真 + 可发表性两组检查
                │      过 → 写 src/content/posts/ + 记账 + push
-               │      不过 → 进 _review/，写日志、开 issue、发邮件
+               │      不过 → 同样写 src/content/posts/，但带 `draft: true`
+               │             （站点构建跳过），写日志、开 issue、发邮件
                └─↓
                  ⑤ Astro build → GitHub Pages
 ```
@@ -262,8 +263,9 @@ tags:
 **三、AI 处理并发布**
 
 稿子会走**和自动文章完全一样**的一套：按体量判定加减法 → 整理 → 取图 →
-两组校验 → 全过就直接发布，不过就落 `_review/` 等你放行。处理完原稿会从
-`drafts/` 撤走（已经转成文章了，留着会被重复处理）。
+两组校验 → 全过就直接发布，不过就带 `draft: true` 等你放行（见
+「[校验没过怎么办](#校验没过怎么办)」）。处理完原稿会从 `drafts/` 撤走
+（已经转成文章了，留着会被重复处理）。
 
 > **不想让 AI 动内容、要原样发布**：本地跑 `python pipeline/main.py --drafts`。
 > 这条直通道只做格式转换和取图，不调模型、不做加减法。
@@ -279,7 +281,7 @@ tags:
 | 3 | 外链 | `![](https://...)` | 原样保留，不落地 |
 
 三条都不中，正文里留一行「图片暂缺」占位，**并计入校验失败**（缺图是可
-发表性检查的一项），文章进 `_review/`。补上图再放行即可。
+发表性检查的一项），文章带 `draft: true` 落盘。补上图再放行即可。
 
 ### 怎么建一个系列
 
@@ -325,7 +327,7 @@ Actions → publish → Run workflow，四个开关：
 |---|---|
 | `mode` | `seed` 引子通道（默认）／`manual` 处理 drafts／`auto` 旧的多篇重组 |
 | `count` | 本次发几篇 |
-| `publish` | 勾上=校验全过就直接发布；不勾=一律落 `_review/` 等人工放行 |
+| `publish` | 勾上=校验全过就直接发布；不勾=一律带 `draft: true` 等人工放行 |
 | `refresh_index` | 刚往 Drive 补传了图就勾上，强制重建索引 |
 
 发布成功后 `deploy` 会自动跟着跑（靠 `workflow_run` 触发）。这里有个
@@ -363,17 +365,66 @@ deploy 的 push 事件 —— 文章会一直躺在仓库里不上线。
 
 ### 校验没过怎么办
 
-三件事同时发生：
+**放行 = 删掉一行。** 没过校验的文章和正式文章一样落在
+`src/content/posts/`，只在 frontmatter 里多两项：
 
-1. 文章写进 `_review/seed-<slug>.md`，**开头的注释里逐条列着没过哪些项**
-2. 追加一行到 `logs/verify-YYYY-MM.md`，随产出一起提交进仓库
-3. 开一个 GitHub Issue（标签 `校验未通过`），配了 SMTP 的话同时发邮件
+```markdown
+---
+draft: true
+reviewNotes:
+  - "出现源文没有的数据: ['1.8', '12kda']"
+  - "丢图: ['202201241314544.png']"
+title: "宿主细胞蛋白（HCP）的质谱鉴定与绝对定量"
+date: 2026-08-25
+...
+---
+```
 
-处理：打开 `_review/` 下的文件，按注释里的问题逐条改，确认没问题后移到
-`src/content/posts/`、删掉开头的注释即可发布。
+`draft: true` 让站点构建整篇跳过 —— 文章躺在仓库里，但不出现在首页、
+分类页、标签页、归档、RSS、sitemap 里，也不会生成自己的页面。
 
-> `_review/` 里存在的组会被跳过，否则它会一直霸占队首、后面的文章一篇也
-> 发不出去。人工处理掉文件后自动重新入列。
+| 要做什么 | 怎么做 |
+|---|---|
+| **放行** | 删掉 `draft: true` 那一行，提交 |
+| **退稿** | 删掉整个文件 |
+| **记账** | 不用管，流水线每次运行自动对账 |
+
+`reviewNotes` 是没过哪几项。放行时留着不影响任何东西（frontmatter 不参与
+渲染），想顺手删掉也行。
+
+在 GitHub 网页或手机上：打开文件 → 点铅笔 → 删掉 `draft: true` 那一行 →
+Commit changes。推到 master 会自动触发 deploy，文章随即上线。
+
+> **为什么 `reviewNotes` 用 YAML 而不是 HTML 注释。** 早期版本把问题清单写在
+> 文件开头的 `<!-- -->` 里，实测 GitHub 的 markdown 预览会把注释整段隐藏 ——
+> 人打开文件只看得到正文，根本不知道哪里没过，得点 Code 或 Raw 才看得见。
+> YAML 字段在预览里正常显示。
+
+除了文件本身，另外两处也会记下这次失败：
+
+1. 追加一行到 `logs/verify-YYYY-MM.md`，随产出一起提交进仓库
+2. 开一个 GitHub Issue（标签 `校验未通过`），配了 SMTP 的话同时发邮件
+
+#### 账本自己会对账，不用手动维护
+
+`published.json` 是选材去重的账本（引子通道按 `seed` 字段判定这篇笔记
+用过没有）。它**按 slug 做 key，每次运行开头自动跟 `src/content/posts/`
+对一次账**：
+
+- 有文件、没记录 → 按 frontmatter 回填
+- 有记录、没文件 → 销账，那篇笔记重新入列
+
+所以人工只需要动文件本身，不需要写一行 JSON。
+
+> **这一条是踩过坑才有的。** 早期账本按 `primaryTag` 做 key，而同一个三级
+> 标签下会有多篇文章（ELISA 与 HCP鉴定与定量 的 `primaryTag` 完全相同），
+> 后写的会静默覆盖先写的，被覆盖那篇于是变回「没发过」，下次定时任务重新
+> 生成一遍。另一次是手工把文章搬进 `posts/` 却忘了记账，同样导致重复生成。
+> 改 slug 做 key + 自动对账之后，这两种情况都不会再发生。
+
+> **回填记录没有 `source_hash`**（拿不到 vault 算不出），流水线把这种记录
+> 一律当作已发布、不重发 —— 人工放行过的文章不该因为源笔记改了个错别字
+> 就被悄悄重写一遍。
 
 ### 校验未通过的通知怎么配
 
@@ -467,9 +518,11 @@ pipeline/     Python 流水线（config / vault / select_ / verify / render
               / images / compose / drafts / routinerun / repair / main）
   prompt.md   DeepSeek 的系统提示词，改写力度不对就调这里
 src/          Astro 站点
+  content/posts/  文章。校验未通过的也在这里，靠 frontmatter 的
+                  `draft: true` 区分，站点构建跳过
+  lib/posts.ts    全站唯一的文章入口，草稿过滤只在这一处
 drafts/       手动发布投递口
 public/images/ 文章图片（WebP）
-published.json 已发布状态，按标签组记录
-_review/      校验未通过、等人工复核的文章
+published.json 已发布状态，按 slug 记录，每次运行自动跟 posts/ 对账
 design/       视觉设计源文件
 ```

@@ -1,10 +1,7 @@
-<!-- 引子通道产出。校验未通过，逐条处理后再移入 src/content/posts/。
-来源：Antibody-Characterization/HCP/2012-Comparison and applications of label-free absolute proteome quantification methods on Escherichia coli.md
-模式：加法　7,327 字符 → 7,711 字符
-问题：
-  - 出现源文没有的数据: ['1.8', '10%', '2003', '2012', '2017', '2026', '25%', '500', '50pmol', '56%']
--->
 ---
+draft: true
+reviewNotes:
+  - "出现源文没有的数据: ['1.8', '10%', '2003', '2012', '2017', '2026', '25%', '500', '50pmol', '56%']"
 title: "Label-free 绝对蛋白质组定量：两种定量策略的比较与 HCP 应用衔接"
 date: 2026-08-26
 category: "03质量控制"

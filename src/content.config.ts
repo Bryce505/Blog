@@ -17,6 +17,12 @@ const posts = defineCollection({
     description: z.string().nullable().default('').transform((v) => v ?? ''),
     references: z.array(z.string()).nullable().default([]).transform((v) => v ?? []),
     sourceNotes: z.array(z.string()).nullable().default([]).transform((v) => v ?? []),
+    // 没过校验的文章跟正式文章同住 posts/，只靠这一行区分。放行 = 删掉这一行。
+    // 过滤在 src/lib/posts.ts 的 listPosts() 里一处完成，别处不许裸调 getCollection。
+    draft: z.boolean().nullable().default(false).transform((v) => v ?? false),
+    // 没过哪几项。用 YAML 而不是 HTML 注释：GitHub 的 markdown 预览会把
+    // <!-- --> 整段吃掉，人打开文件根本看不见问题清单（实测踩过）。
+    reviewNotes: z.array(z.string()).nullable().default([]).transform((v) => v ?? []),
   }),
 });
 

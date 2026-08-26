@@ -1,5 +1,5 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
+import { listPosts } from '../lib/posts';
 
 import { BASE } from '../../site.config.mjs';
 
@@ -8,7 +8,7 @@ import { BASE } from '../../site.config.mjs';
 const base = BASE.replace(/\/$/, '');
 
 export async function GET(context) {
-  const posts = (await getCollection('posts')).sort((a, b) => b.data.date - a.data.date);
+  const posts = (await listPosts()).sort((a, b) => b.data.date - a.data.date);
   return rss({
     title: '表征笔记',
     description: '生物医药 CMC 与分析方法的工作笔记',

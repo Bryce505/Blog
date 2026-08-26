@@ -46,33 +46,20 @@ def decide_mode(note):
     return 'shrink' if len(note.body) >= SHRINK_THRESHOLD else 'grow'
 
 
-def candidates(notes, used=(), pending=()):
-    """还没当过引子、不在 _review/ 待复核、且体量落在 SEED_BAND 内的可发布
-    笔记，长的排前面。
+def candidates(notes, used=()):
+    """还没当过引子、且体量落在 SEED_BAND 内的可发布笔记，长的排前面。
 
     区间内取长的：同样是合格的引子，内容多的那篇成文质量更高。
 
-    pending 必须排除：不排除的话，一篇被拒的引子下次自动选材还是原样排回
-    队首（体量没变，排序不变），等于同一个失败重演一遍，还得再烧一次
-    DeepSeek 调用。run_auto() 对标签分组早有对应的 _review 跳过（按 slug
-    判存在），引子通道这条路径当初没补——都在等 _review/ 里人工放行，
-    不是「还没试过」。
+    used 包含没过校验的草稿。不排除草稿的话，一篇被拒的引子下次自动选材
+    还是原样排回队首（体量没变，排序不变），等于同一个失败重演一遍，还得
+    再烧一次 DeepSeek 调用，真正的新材料反而排不上。
     """
-    used, pending = set(used), set(pending)
+    used = set(used)
     lo, hi = SEED_BAND
     return sorted((n for n in sel.publishable(notes)
-                   if n.path not in used and n.path not in pending
-                   and lo <= len(n.body) <= hi),
+                   if n.path not in used and lo <= len(n.body) <= hi),
                   key=lambda n: -len(n.body))
-
-
-def pending_review(blog_root, notes):
-    """还在 `_review/` 里等人工放行的引子笔记路径（按 slug 反查）。"""
-    review_dir = Path(blog_root) / '_review'
-    if not review_dir.is_dir():
-        return set()
-    waiting = {p.stem[len('seed-'):] for p in review_dir.glob('seed-*.md')}
-    return {n.path for n in notes if drafts.slugify_cn(Path(n.path).stem) in waiting}
 
 
 def related_fragments(note, notes, limit=MAX_FRAGMENTS):
@@ -97,12 +84,15 @@ def related_fragments(note, notes, limit=MAX_FRAGMENTS):
 
 
 def related_published(note, published, posts_dir):
-    """同二级标签的已发布文章 → [(slug, 标题)]，用来生成「相关阅读」。"""
+    """同二级标签的已发布文章 → [(slug, 标题)]，用来生成「相关阅读」。
+
+    草稿排除：它们不参与站点构建，链过去就是一条死链。
+    """
     tag = sel._primary_tag(note) or ''
     lvl2 = '/'.join(tag.split('/')[:2])
     out = []
-    for rec_tag, rec in published.items():
-        if not rec_tag.startswith(lvl2):
+    for rec in published.values():
+        if rec.get('draft') or not str(rec.get('tag', '')).startswith(lvl2):
             continue
         title = _post_title(Path(posts_dir) / f"{rec['slug']}.md") or rec['slug']
         out.append((rec['slug'], title))
@@ -145,7 +135,10 @@ def process(note, *, blog_root, notes, published, index, svc, api_key,
     """整理一篇 → 取图 → 校验 → 落盘。引子通道与人工通道共用这一段。"""
     blog_root = Path(blog_root)
     posts_dir = blog_root / 'src' / 'content' / 'posts'
-    used_seeds = [r['seed'] for r in published.values() if r.get('seed')]
+    # 排除这篇自己的记录：「选材重复」拦的是「另一篇文章已经占用了这个引子」，
+    # 不是自己覆盖自己。人工改完笔记想重跑同一篇，不该被这条挡住。
+    used_seeds = [r['seed'] for r in published.values()
+                  if r.get('seed') and r['seed'] != note.path]
 
     mode = decide_mode(note)
     frags = related_fragments(note, notes) if mode == 'grow' else []
@@ -166,7 +159,8 @@ def process(note, *, blog_root, notes, published, index, svc, api_key,
     article = (_chat or compose.compose_seed_message)(user_msg, api_key)
     title, article = mn.split_title(article, g)
 
-    rel = related_published(note, published, posts_dir)
+    rel = [(s, ti) for s, ti in related_published(note, published, posts_dir)
+           if s != g.slug]
     body = render.rewrite_images(article, img_map, missing,
                                  {i: render.caption_for(note) for i in note.images})
     body = render.append_related(body, rel)
@@ -184,31 +178,23 @@ def process(note, *, blog_root, notes, published, index, svc, api_key,
     fails = fidelity.failures + pub_check.failures
     ok = not fails
 
-    doc = mn.assemble_frontmatter(g, title, mn.first_paragraph(article)) + body
-    if ok and publish:
-        out = posts_dir / f'{g.slug}.md'
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(doc, encoding='utf-8')
-        mn.record_published(blog_root, published, g, seed=note.path, title=title)
-    else:
-        out = blog_root / '_review' / f'seed-{g.slug}.md'
-        out.parent.mkdir(parents=True, exist_ok=True)
-        head = ('<!-- 引子通道产出。'
-                + ('校验全过，人工确认后移入 src/content/posts/ 即可发布。\n'
-                   if ok else '校验未通过，逐条处理后再移入 src/content/posts/。\n')
-                + f'来源：{note.path}\n'
-                + f'模式：{"减法" if mode == "shrink" else "加法"}　'
-                + f'{len(note.body):,} 字符 → {len(article):,} 字符\n'
-                + ('' if ok else '问题：\n' + '\n'.join(f'  - {f}' for f in fails) + '\n')
-                + '-->\n')
-        out.write_text(head + doc, encoding='utf-8')
+    # 过与不过都落 posts/，只差 frontmatter 里的 draft 那一行。
+    # 放行 = 删掉那一行；退稿 = 删掉这个文件，reconcile 会自动销账。
+    live = ok and publish
+    doc = mn.assemble_frontmatter(g, title, mn.first_paragraph(article),
+                                  draft_notes=None if live else fails) + body
+    out = posts_dir / f'{g.slug}.md'
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(doc, encoding='utf-8')
+    mn.record_published(blog_root, published, g, seed=note.path, title=title,
+                        draft=not live)
 
     return {'seed': note.path, 'slug': g.slug, 'title': title, 'mode': mode,
             'seedChars': len(note.body), 'articleChars': len(article),
             'fragments': len(frags), 'ok': ok, 'failures': fails,
             'images': len(img_map), 'missingImages': missing,
             'related': [s for s, _ in rel],
-            'status': 'published' if (ok and publish) else 'review',
+            'status': 'published' if live else 'draft',
             'file': str(out.relative_to(blog_root))}
 
 
@@ -226,8 +212,8 @@ def run(vault_root, blog_root, api_key, sa_json, seed_paths=(), count=1,
         publish=False, _index=None, _download=None, _chat=None):
     """引子通道：从知识库里挑笔记当引子。
 
-    publish=False（默认）产出落 _review/ 等人工过目；publish=True 时校验
-    全过的直接写进 posts/ 并记账，不过的仍然落 _review/。
+    产出一律落 src/content/posts/。publish=False（默认）时全部带 draft 标
+    等人工过目；publish=True 时校验全过的不带标、直接上线，不过的仍带标。
     """
     vault_root, blog_root = Path(vault_root), Path(blog_root)
     notes = vault.load_vault(vault_root)
@@ -236,14 +222,14 @@ def run(vault_root, blog_root, api_key, sa_json, seed_paths=(), count=1,
     used_seeds = [r['seed'] for r in published.values() if r.get('seed')]
 
     if seed_paths:
-        # 显式指定的引子照跑不误，哪怕它还在 _review/ 里——人工改完笔记后
-        # 想重跑同一篇，不该被自动去重挡住。
+        # 显式指定的引子照跑不误，哪怕它已经有一篇草稿在等着——人工改完
+        # 笔记后想重跑同一篇，不该被自动去重挡住。产出覆盖同一个 slug。
         picked = [by_path[p] for p in seed_paths if p in by_path]
         gone = [p for p in seed_paths if p not in by_path]
         if gone:
             return [{'status': 'error', 'reason': f'找不到引子笔记: {gone}'}]
     else:
-        picked = candidates(notes, used_seeds, pending_review(blog_root, notes))[:count]
+        picked = candidates(notes, used_seeds)[:count]
     if not picked:
         return [{'status': 'error', 'reason': '没有可用的引子笔记'}]
 

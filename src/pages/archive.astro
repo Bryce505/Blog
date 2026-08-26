@@ -1,9 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
+import { listPosts } from '../lib/posts';
 import Base from '../layouts/Base.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const posts = (await getCollection('posts')).sort((a, b) => b.data.date - a.data.date);
+const posts = (await listPosts()).sort((a, b) => b.data.date - a.data.date);
 
 const years = new Map<number, any[]>();
 for (const p of posts) {
