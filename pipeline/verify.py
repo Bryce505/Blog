@@ -11,7 +11,8 @@
 - `review()`：可发表性。结构、格式、选材重复、关联文章链接、扩展内容的
   来源核验（转交 evidence.py）。引子通道跑这一组。
 
-任一项不过，文章进 _review/ 等人工放行，并记日志、发通知。
+任一项不过，文章照样落 posts/ 但带 `draft: true`（站点构建跳过），
+并记日志、发通知，等人工放行。
 """
 import re
 import urllib.parse

@@ -1,9 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
+import { listPosts } from '../../lib/posts';
 import Base from '../../layouts/Base.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const posts = await getCollection('posts');
+const posts = await listPosts();
 const counts = new Map<string, number>();
 for (const p of posts) for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
 

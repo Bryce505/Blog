@@ -16,7 +16,7 @@ on:
         description: 本次发布的篇数（seed / auto 通道）
         default: '1'
       publish:
-        description: 校验全过就直接发布（不勾则一律落 _review/ 等人工放行）
+        description: 校验全过就直接发布（不勾则一律带 draft 标等人工放行）
         type: boolean
         default: true
       refresh_index:
@@ -38,7 +38,7 @@ jobs:
     env:
       MODE: ${{ github.event.inputs.mode || (github.event_name == 'push' && 'manual' || 'seed') }}
       COUNT: ${{ github.event.inputs.count || 1 }}
-      # 手动触发时不勾「直接发布」就只落 _review/；定时与 drafts 推送默认直接发布
+      # 手动触发时不勾「直接发布」就一律带 draft 标；定时与 drafts 推送默认直接发布
       PUBLISH: ${{ github.event.inputs.publish == 'false' && '' || '--publish' }}
     steps:
       - uses: actions/checkout@v4
@@ -97,7 +97,7 @@ jobs:
           git config user.email 'makejun505@gmail.com'
           # 逐个添加：git add 遇到任一不存在的路径会整条中止、一个文件都不暂存。
           for p in src/content/posts public/images published.json \
-                   pipeline/drive_index.json _review drafts logs; do
+                   pipeline/drive_index.json drafts logs; do
             [ -e "$p" ] && git add -A "$p"
           done
           if git diff --staged --quiet; then

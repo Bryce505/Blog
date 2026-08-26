@@ -1,5 +1,7 @@
 import { getCollection } from 'astro:content';
 
+import { listPosts } from './posts';
+
 export interface SeriesItem {
   /** 已发布的文章条目；待发布条目为 null */
   post: any | null;
@@ -28,7 +30,7 @@ export interface SeriesContext {
 export async function loadSeries(): Promise<ResolvedSeries[]> {
   const [seriesEntries, posts] = await Promise.all([
     getCollection('series'),
-    getCollection('posts'),
+    listPosts(),
   ]);
   const byId = new Map(posts.map((p) => [p.id, p]));
   // 文章 id -> 已归属的系列 id，用于拦「一篇进了两个系列」

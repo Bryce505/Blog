@@ -215,7 +215,8 @@ def test_oversized_group_truncated_to_max():
 def test_pick_next_skips_published_unchanged():
     ns = [_fake(f'n{i}.md', ['02分子表征/PTM/糖基化']) for i in range(5)]
     g = sel.build_groups(ns)[0]
-    assert sel.pick_next([g], {g.tag: {'source_hash': g.source_hash, 'slug': g.slug}}) is None
+    assert sel.pick_next(
+        [g], {g.slug: {'tag': g.tag, 'source_hash': g.source_hash, 'slug': g.slug}}) is None
     assert sel.pick_next([g], {}) is g
 
 
@@ -240,7 +241,8 @@ def test_pick_next_returns_changed_group():
     """笔记更新导致哈希变化时该组可重发。"""
     ns = [_fake(f'n{i}.md', ['02分子表征/PTM/糖基化']) for i in range(5)]
     g = sel.build_groups(ns)[0]
-    assert sel.pick_next([g], {g.tag: {'source_hash': 'sha256:stale', 'slug': g.slug}}) is g
+    assert sel.pick_next(
+        [g], {g.slug: {'tag': g.tag, 'source_hash': 'sha256:stale', 'slug': g.slug}}) is g
 
 
 # ---------- verify（本项目最关键的模块）----------
@@ -868,8 +870,8 @@ def test_run_auto_end_to_end_offline():
         '重跑发布了同一组'
 
 
-def test_run_auto_routes_failed_verification_to_review():
-    """校验不过的文章必须进 _review/，不能进 posts/。"""
+def test_run_auto_marks_failed_verification_as_draft():
+    """校验不过的文章照样落 posts/，但必须带 draft 标，站点构建跳过它。"""
     import shutil
     root = Path('/home/user/obsidian-base')
     if not root.exists():
@@ -895,10 +897,13 @@ def test_run_auto_routes_failed_verification_to_review():
         (mn.compose.compose, mn.images.drive_service,
          mn.images.load_index, mn.images.fetch_images) = orig
 
-    assert rs[0]['status'] == 'review', rs
-    assert (blog / '_review' / f"{rs[0]['slug']}.md").exists()
-    assert not (blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md").exists()
-    assert not (blog / 'published.json').exists(), '校验失败不该写 published.json'
+    assert rs[0]['status'] == 'draft', rs
+    assert not (blog / '_review').exists(), '_review/ 已经取消'
+    text = (blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    assert re.search(r'^draft: true$', text, re.M), text[:300]
+    # 草稿也记账，否则下次运行又挑中同一组
+    pub = json.loads((blog / 'published.json').read_text(encoding='utf-8'))
+    assert pub[rs[0]['slug']]['draft'] is True, pub
 
 
 # ---------- drafts（手动通道）----------
@@ -1099,11 +1104,11 @@ def test_mode_is_decided_by_note_size():
     assert sd.decide_mode(vault.Note('a', 't', [], 'note', body='x' * 3000)) == 'grow'
 
 
-def test_auto_select_skips_notes_already_pending_review():
+def test_auto_select_skips_notes_already_drafted():
     """定时任务不传 --seed，靠自动选材；候选按体量降序排。一篇被拒的引子
-
-    不排除的话体量没变、排序不变，下次自动选材还是原样排回队首——同样的
-    失败重演一遍，还得再烧一次 DeepSeek 调用，真正的新材料反而排不上。
+    已经带 draft 标记了账，不排除的话体量没变、排序不变，下次自动选材还是
+    原样排回队首——同样的失败重演一遍，还得再烧一次 DeepSeek 调用，真正的
+    新材料反而排不上。
     """
     TMP.mkdir(parents=True, exist_ok=True)
     v = TMP / 'v-pending'
@@ -1118,14 +1123,12 @@ def test_auto_select_skips_notes_already_pending_review():
 
     blog = TMP / 'seed-pending'
     shutil.rmtree(blog, ignore_errors=True)
-    (blog / 'src' / 'content' / 'posts').mkdir(parents=True)
-    (blog / '_review').mkdir(parents=True)
-    long_slug = df.slugify_cn(Path('long.md').stem)
-    (blog / '_review' / f'seed-{long_slug}.md').write_text('待复核', encoding='utf-8')
+    # long.md 已经产出过一篇没过校验的草稿，还在 posts/ 里等人放行
+    _post(blog, df.slugify_cn('long'), title='待复核', primaryTag='03质量控制/残留/HCP',
+          sourceNotes=['long.md'], draft=True)
 
     rs = sd.run(v, blog, 'k', None, publish=True, _index={},
                 _chat=lambda m, k: '# 标题\n\n' + _article() + '正' * 2000)
-    # 不去重会选中体量更大的 long.md（它还躺在 _review/ 里）；去重后轮到 short.md
     assert rs[0]['seed'] == 'short.md', rs[0]
 
 
@@ -1159,7 +1162,7 @@ def test_shrink_that_deletes_too_much_is_blocked():
                 _chat=lambda m, k: '# 标题\n\n' + _article())
     assert not rs[0]['ok']
     assert any('减法模式下篇幅' in f for f in rs[0]['failures']), rs[0]['failures']
-    assert rs[0]['status'] == 'review'
+    assert rs[0]['status'] == 'draft'
 
 
 def test_grow_mode_requires_evidence_section():
@@ -1205,6 +1208,176 @@ def test_related_published_articles_get_links():
     assert rs[0]['related'] == ['old-one'], rs[0]
     text = (posts / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
     assert '## 相关阅读' in text and '](/posts/old-one)' in text
+
+
+# ---------- 草稿位（draft）与 published.json 自愈 ----------
+
+def _post(blog, slug, **fm):
+    """在 posts/ 造一篇文章，frontmatter 只写给定字段。"""
+    d = Path(blog) / 'src' / 'content' / 'posts'
+    d.mkdir(parents=True, exist_ok=True)
+    lines = ['---']
+    for k, v in fm.items():
+        if isinstance(v, list):
+            lines.append(f'{k}:')
+            lines += [f'  - "{x}"' for x in v]
+        elif isinstance(v, bool):
+            lines.append(f'{k}: {"true" if v else "false"}')
+        else:
+            lines.append(f'{k}: "{v}"')
+    lines += ['---', '', '正文']
+    (d / f'{slug}.md').write_text('\n'.join(lines), encoding='utf-8')
+
+
+def test_reconcile_backfills_manually_moved_article():
+    """人工把文章搬进 posts/ 却没记账 —— 账本自己补上。
+
+    master 上真出过这事：HCP鉴定与定量 手工搬过去并上线，published.json
+    里没有对应记录，引子通道按 seed 字段去重于是仍算「没用过」，下一次
+    定时任务会重新挑中同一篇笔记、再烧一次 DeepSeek、覆盖已发布的文章。
+    """
+    blog = TMP / 'rec-backfill'
+    shutil.rmtree(blog, ignore_errors=True)
+    _post(blog, '搬过来的', title='手工搬的', primaryTag='03质量控制/残留/HCP',
+          sourceNotes=['A/HCP鉴定与定量.md'])
+    pub = mn.reconcile(blog, {})
+    assert '搬过来的' in pub, pub
+    assert pub['搬过来的']['seed'] == 'A/HCP鉴定与定量.md', pub
+    assert pub['搬过来的']['tag'] == '03质量控制/残留/HCP', pub
+
+
+def test_reconcile_drops_record_when_file_deleted():
+    """删文件 = 退稿。账本跟着销，那篇笔记重新入列。"""
+    blog = TMP / 'rec-drop'
+    shutil.rmtree(blog, ignore_errors=True)
+    (blog / 'src' / 'content' / 'posts').mkdir(parents=True)
+    pub = mn.reconcile(blog, {'没了的': {'slug': '没了的', 'seed': 'x.md'}})
+    assert pub == {}, pub
+
+
+def test_reconcile_rekeys_legacy_tag_keyed_records():
+    """旧账本按 tag 做 key，迁移时改成按 slug，且不丢 source_hash。"""
+    blog = TMP / 'rec-rekey'
+    shutil.rmtree(blog, ignore_errors=True)
+    _post(blog, 'old-slug', title='旧文')
+    pub = mn.reconcile(blog, {'00基础/生物制品/单抗':
+                              {'slug': 'old-slug', 'source_hash': 'sha256:h'}})
+    assert list(pub) == ['old-slug'], pub
+    assert pub['old-slug']['source_hash'] == 'sha256:h', pub
+    assert pub['old-slug']['tag'] == '00基础/生物制品/单抗', pub
+
+
+def test_same_tag_articles_do_not_overwrite_each_other():
+    """两篇文章的 primaryTag 可以完全相同（实测 ELISA 与 HCP鉴定与定量
+    都是 03质量控制/残留/HCP）。按 tag 做 key 时后写的会静默覆盖先写的，
+    被覆盖那篇于是变回「没发过」，下次定时任务重新生成一遍。"""
+    blog = TMP / 'rec-collide'
+    shutil.rmtree(blog, ignore_errors=True)
+    tag = '03质量控制/残留/HCP'
+    for s, n in (('a', 'A.md'), ('b', 'B.md')):
+        _post(blog, s, title=s, primaryTag=tag, sourceNotes=[n])
+    pub = mn.reconcile(blog, {})
+    assert set(pub) == {'a', 'b'}, pub
+    assert {r['seed'] for r in pub.values()} == {'A.md', 'B.md'}, pub
+
+
+def test_backfilled_record_is_not_republished():
+    """回填记录没有 source_hash（拿不到 vault 算不出）。当作已发布，
+    不重发 —— 人工放行过的文章不该因为源笔记改了个错别字就被悄悄重写。"""
+    g = sel.Group(tag='02分子表征/A/B', notes=[], source_hash='sha256:new', slug='x')
+    assert sel.pick_next([g], {'x': {'slug': 'x', 'tag': g.tag}}) is None
+    # 有哈希且对不上才重发
+    assert sel.pick_next([g], {'x': {'slug': 'x', 'tag': g.tag,
+                                     'source_hash': 'sha256:old'}}) is g
+
+
+def test_failed_verification_lands_in_posts_as_draft():
+    """校验没过不再进 _review/：同一个 posts/ 文件，多一行 draft: true。
+
+    放行 = 删掉那一行。不用改名、不用移文件、不用手写 published.json。
+    """
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-draft'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+    v = _mkvault(TMP / 'v-draft', 'n.md', '正' * 20000)
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article())
+    assert not rs[0]['ok'] and rs[0]['status'] == 'draft', rs[0]
+    assert not (blog / '_review').exists(), '_review/ 已经取消'
+    f = blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md"
+    assert f.exists(), '草稿也要落在 posts/ 里'
+    text = f.read_text(encoding='utf-8')
+    assert text.startswith('---\n'), 'frontmatter 必须在文件最开头'
+    assert re.search(r'^draft: true$', text, re.M), text[:300]
+    # 问题清单用 YAML 而不是 HTML 注释：GitHub 预览会把 <!-- --> 整段吃掉，
+    # 人打开文件根本看不见没过哪几项
+    assert '<!--' not in text.split('---')[1], '不许再用 HTML 注释'
+    assert re.search(r'^reviewNotes:$', text, re.M), text[:300]
+    assert any('减法模式下篇幅' in ln for ln in text.splitlines()), text[:400]
+
+
+def test_draft_is_recorded_so_it_is_not_regenerated():
+    """草稿也要记账，否则下次自动选材又挑中同一篇、再烧一次 DeepSeek。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-draftrec'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+    v = _mkvault(TMP / 'v-draftrec', 'n.md', '正' * 20000)
+    sd.run(v, blog, 'k', None, publish=True, _index={},
+           _chat=lambda m, k: '# 标题\n\n' + _article())
+    pub = json.loads((blog / 'published.json').read_text(encoding='utf-8'))
+    rec = list(pub.values())[0]
+    assert rec['draft'] is True and rec['seed'] == 'n.md', rec
+    # 再跑一次自动选材，不该重复挑中
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article())
+    assert rs[0]['status'] == 'error', rs[0]
+
+
+def test_related_reading_skips_drafts():
+    """草稿不参与构建，链过去就是死链 —— 相关阅读只认已放行的文章。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-reldraft'
+    shutil.rmtree(blog, ignore_errors=True)
+    _post(blog, 'live-one', title='已发布', primaryTag='03质量控制/残留/HCP')
+    _post(blog, 'draft-one', title='草稿', primaryTag='03质量控制/残留/HCP', draft=True)
+    v = _mkvault(TMP / 'v-reldraft', 'n.md', '正' * 20000)
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article() + '正' * 12000)
+    assert rs[0]['related'] == ['live-one'], rs[0]['related']
+
+
+def test_explicit_rerun_of_own_draft_is_not_selection_duplicate():
+    """人工改完笔记想重跑同一篇，不该被「选材重复」挡住 —— 那条规则拦的是
+    「另一篇文章已经占用了这个引子」，不是自己覆盖自己。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-rerun'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+    v = _mkvault(TMP / 'v-rerun', 'n.md', '回收率 85.3%。' + '正' * 20000)
+    chat = lambda m, k: '# 标题\n\n' + _article() + '\n\n回收率 85.3%。' + '正' * 12000
+    first = sd.run(v, blog, 'k', None, publish=True, _index={}, _chat=chat)
+    assert first[0]['ok'], first[0]['failures']
+    again = sd.run(v, blog, 'k', None, ['n.md'], publish=True, _index={}, _chat=chat)
+    assert not any('选材重复' in f for f in again[0]['failures']), again[0]['failures']
+
+
+def test_site_never_reads_posts_collection_directly():
+    """草稿与正式文章同住 posts/，全站列表必须走 listPosts() 这一个过滤入口。
+
+    9 处 getCollection('posts') 逐处加过滤迟早漏一处，而漏一处就是未审
+    文章直接上线 —— 这是安全阀，拿自检守住。
+    """
+    src = Path(__file__).parent.parent / 'src'
+    bad = []
+    for p in sorted(src.rglob('*')):
+        if p.suffix not in ('.astro', '.ts', '.js') or p.name == 'posts.ts':
+            continue
+        for i, line in enumerate(p.read_text(encoding='utf-8').splitlines(), 1):
+            if re.search(r"""getCollection\(\s*['"]posts['"]""", line):
+                bad.append(f'{p.relative_to(src)}:{i}')
+    assert not bad, f'这些地方绕过了 listPosts()，草稿会漏上线：{bad}'
 
 
 # ---------- manual（人工投稿通道）----------
@@ -1267,7 +1440,7 @@ def test_notify_writes_log_and_skips_when_unconfigured():
     shutil.rmtree(blog, ignore_errors=True)
     blog.mkdir(parents=True)
     rs = [{'slug': 'a', 'title': '甲', 'ok': False, 'mode': 'grow',
-           'seedChars': 100, 'articleChars': 300, 'file': '_review/a.md',
+           'seedChars': 100, 'articleChars': 300, 'file': 'src/content/posts/a.md',
            'failures': ['空壳章节']}]
     out = nt.notify(blog, rs)
     log = Path(out['log']).read_text(encoding='utf-8')

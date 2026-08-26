@@ -28,6 +28,7 @@ import images             # noqa: E402
 import render             # noqa: E402
 import select_ as sel     # noqa: E402
 import vault              # noqa: E402
+import yaml               # noqa: E402
 import verify             # noqa: E402
 
 H1 = re.compile(r'^#\s+(.+?)\s*$', re.M)
@@ -39,8 +40,14 @@ def _q(s):
     return str(s).replace('\\', '\\\\').replace('"', '\\"')
 
 
-def assemble_frontmatter(group, title, description=''):
-    """frontmatter 由流水线拼装，不让 LLM 生成 —— 否则它会编造日期和标签。"""
+def assemble_frontmatter(group, title, description='', draft_notes=None):
+    """frontmatter 由流水线拼装，不让 LLM 生成 —— 否则它会编造日期和标签。
+
+    draft_notes 不是 None 就打草稿位：文章照样落 posts/，但 `draft: true`
+    让站点构建跳过它。放行 = 删掉那一行，不用改名、不用移文件、不用记账。
+    reviewNotes 用 YAML 列表而不是 HTML 注释 —— GitHub 的 markdown 预览会把
+    `<!-- -->` 整段吃掉，人打开文件根本看不见没过哪几项（实测踩过）。
+    """
     refs, seen_ref = [], set()
     for n in group.notes:
         for v in (n.book, n.paper, n.link):
@@ -48,13 +55,19 @@ def assemble_frontmatter(group, title, description=''):
                 seen_ref.add(v)
                 refs.append(v)
 
-    lines = ['---',
-             f'title: "{_q(title)}"',
-             f'date: {dt.date.today().isoformat()}',
-             f'category: "{_q(group.tag.split("/")[0])}"',
-             f'primaryTag: "{_q(group.tag)}"',
-             f'description: "{_q(description)}"',
-             'tags:']
+    lines = ['---']
+    # 草稿位放最前面：打开文件第一眼就看见「这是草稿」和为什么
+    if draft_notes is not None:
+        lines.append('draft: true')
+        if draft_notes:
+            lines.append('reviewNotes:')
+            lines += [f'  - "{_q(f)}"' for f in draft_notes]
+    lines += [f'title: "{_q(title)}"',
+              f'date: {dt.date.today().isoformat()}',
+              f'category: "{_q(group.tag.split("/")[0])}"',
+              f'primaryTag: "{_q(group.tag)}"',
+              f'description: "{_q(description)}"',
+              'tags:']
     lines += [f'  - "{_q(t)}"' for t in _group_tags(group)]
     # 空列表键不输出：`references:` 后面直接跟下一个键，YAML 解析成 null
     if refs:
@@ -108,14 +121,19 @@ def first_paragraph(md, limit=140):
 
 
 
-def record_published(blog_root, published, group, seed=None, title=None):
-    """把一组记进 published.json 并落盘。
+def record_published(blog_root, published, group, seed=None, title=None, draft=False):
+    """把一篇记进 published.json 并落盘。
 
-    seed 字段是引子通道用的：选材去重按引子笔记路径判定，跟自动通道
-    按标签组判定是两套口径，得分开存。
+    key 用 slug 不用 tag：同一个三级标签下会有多篇文章（实测 ELISA 与
+    HCP鉴定与定量 的 primaryTag 完全相同），用 tag 做 key 时后写的会静默
+    覆盖先写的，被覆盖那篇于是变回「没发过」，下次定时任务重新生成一遍。
+    slug 就是文件名，天然唯一。
+
+    草稿也要记账：不记的话下次自动选材又挑中同一篇，再烧一次 DeepSeek。
     """
     rec = {
         'slug': group.slug,
+        'tag': group.tag,
         'published_at': dt.date.today().isoformat(),
         'source_hash': group.source_hash,
         'notes': [n.path for n in group.notes],
@@ -125,26 +143,94 @@ def record_published(blog_root, published, group, seed=None, title=None):
         rec['title'] = title
     if seed:
         rec['seed'] = seed
-    published[group.tag] = rec
-    (Path(blog_root) / 'published.json').write_text(
-        json.dumps(published, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    if draft:
+        rec['draft'] = True
+    published[group.slug] = rec
+    save_published(blog_root, published)
     return rec
 
 
+def save_published(blog_root, published):
+    (Path(blog_root) / 'published.json').write_text(
+        json.dumps(published, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+
 def load_published(blog_root):
+    """读账本，并先跟 posts/ 对一次账。
+
+    对账是这套「放行 = 删一行、退稿 = 删文件」的前提：人只动文件，
+    账本自己跟上，没有第二处状态要人工同步。
+    """
     p = Path(blog_root) / 'published.json'
-    return json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+    published = json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+    return reconcile(blog_root, published)
+
+
+def _post_meta(path):
+    """读文章 frontmatter。坏 YAML 当空处理，不能让一篇坏文章卡死整条流水线。"""
+    m = vault.FM_RE.match(Path(path).read_text(encoding='utf-8'))
+    if not m:
+        return {}
+    try:
+        return yaml.safe_load(m.group(1)) or {}
+    except yaml.YAMLError:
+        return {}
+
+
+def reconcile(blog_root, published):
+    """让账本跟 src/content/posts/ 对上：缺的回填，文件没了的销账。
+
+    实测过一次漏账的后果：HCP鉴定与定量 手工搬进 posts/ 并上线，
+    published.json 里没有记录，引子通道按 seed 字段去重于是仍算「没用过」,
+    下一次定时任务重新挑中同一篇笔记、再烧一次 DeepSeek、覆盖已发布的文章。
+    """
+    posts = Path(blog_root) / 'src' / 'content' / 'posts'
+    have = {p.stem: p for p in sorted(posts.glob('*.md'))} if posts.is_dir() else {}
+
+    # 旧账本按 tag 做 key，就地改成按 slug。丢 source_hash 会让自动通道
+    # 把已发布的组当成「源笔记变了」重发一遍，所以是搬记录不是重建。
+    for key in [k for k, r in published.items()
+                if isinstance(r, dict) and r.get('slug') and k != r['slug']]:
+        rec = published.pop(key)
+        rec.setdefault('tag', key)
+        published[rec['slug']] = rec
+
+    for slug in [s for s in published if s not in have]:
+        del published[slug]
+
+    for slug, path in have.items():
+        fm = _post_meta(path)
+        if slug in published:
+            # 人删掉 draft 那一行 = 放行，账本跟着改口径
+            if fm.get('draft'):
+                published[slug]['draft'] = True
+            else:
+                published[slug].pop('draft', None)
+            continue
+        notes = [str(n) for n in (fm.get('sourceNotes') or [])]
+        rec = {'slug': slug,
+               'tag': str(fm.get('primaryTag') or fm.get('category') or ''),
+               'published_at': str(fm.get('date') or ''),
+               'notes': notes}
+        if fm.get('title'):
+            rec['title'] = str(fm['title'])
+        # 引子通道产出恰好一篇源笔记，自动通道是一组 —— 据此还原 seed
+        if len(notes) == 1:
+            rec['seed'] = notes[0]
+        if fm.get('draft'):
+            rec['draft'] = True
+        published[slug] = rec
+    return published
 
 
 def title_slug_map(published):
-    """源笔记标题 → 文章 slug，供双链解析用。"""
-    return {t: rec['slug'] for rec in published.values()
+    """源笔记标题 → 文章 slug，供双链解析用。草稿没有页面，链过去是死链。"""
+    return {t: rec['slug'] for rec in published.values() if not rec.get('draft')
             for t in rec.get('noteTitles', [])}
 
 
 def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
     vault_root, blog_root = Path(vault_root), Path(blog_root)
-    pub_path = blog_root / 'published.json'
     published = load_published(blog_root)
 
     groups = sel.build_groups(vault.load_vault(vault_root))
@@ -153,11 +239,9 @@ def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
         Path(__file__).parent / 'drive_index.json',
         lambda: images.build_drive_index(svc, config.DRIVE_FOLDER_ID))
 
-    # 还躺在 _review/ 里的组等着人工复核，跳过，否则它会一直霸占队首。
-    # 人工把文件移走或删掉，该组自动重新入列 —— 用文件系统当状态，不另设账本。
-    skip = {g.tag for g in groups
-            if (blog_root / '_review' / f'{g.slug}.md').exists()}
-
+    # 没过校验的组也记了账（带 draft 标），pick_next 自然不会再挑中它，
+    # 不用另外维护一份跳过名单。人删掉文件 = 退稿，reconcile 销账后重新入列。
+    skip = set()
     results = []
     for _ in range(count):
         g = sel.pick_next(groups, published, skip)
@@ -181,22 +265,17 @@ def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
         caption_of = {i: render.caption_for(n) for n in g.notes for i in n.images}
         body = render.rewrite_images(article, img_map, missing, caption_of)
         body = render.resolve_wikilinks(body, title_slug_map(published))
-        doc = assemble_frontmatter(g, title, first_paragraph(article)) + body
+        doc = assemble_frontmatter(g, title, first_paragraph(article),
+                                   draft_notes=None if res.ok else res.failures) + body
 
-        if res.ok:
-            out = blog_root / 'src' / 'content' / 'posts' / f'{g.slug}.md'
-            out.parent.mkdir(parents=True, exist_ok=True)
-            out.write_text(doc, encoding='utf-8')
-            record_published(blog_root, published, g)
-        else:
-            out = blog_root / '_review' / f'{g.slug}.md'
-            out.parent.mkdir(parents=True, exist_ok=True)
-            out.write_text(
-                '<!-- 校验未通过，人工复核后移入 src/content/posts/ 即可发布：\n'
-                + '\n'.join(res.failures) + '\n-->\n' + doc, encoding='utf-8')
+        out = blog_root / 'src' / 'content' / 'posts' / f'{g.slug}.md'
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(doc, encoding='utf-8')
+        record_published(blog_root, published, g, draft=not res.ok)
 
         results.append({'slug': g.slug, 'tag': g.tag, 'notes': len(g.notes),
-                        'status': 'published' if res.ok else 'review',
+                        'status': 'published' if res.ok else 'draft',
+                        'ok': res.ok, 'file': str(out.relative_to(blog_root)),
                         'failures': res.failures, 'missingImages': missing})
     return results
 
@@ -220,7 +299,7 @@ def main():
     ap.add_argument('--manual', action='store_true',
                     help='人工投稿通道：处理 drafts/ 下的稿子，同样走加减法与校验')
     ap.add_argument('--publish', action='store_true',
-                    help='校验全过就直接发布；不加则一律落 _review/ 等人工放行')
+                    help='校验全过就直接发布；不加则一律带 draft 标等人工放行')
     a = ap.parse_args()
 
     if a.manual:

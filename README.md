@@ -47,22 +47,21 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
                          ▼
                   pipeline/ 五步走：选材 → 取图 → 整理 → 校验 → 落盘
                          │
-              ┌──────────┴──────────┐
-          校验通过                 校验不过
-              │                      │
-              ▼                      ▼
-   src/content/posts/*.md       _review/*.md
-   public/images/<slug>/        + GitHub Issue / 邮件通知
-   published.json 记账
-              │
-              ▼
-     git push → GitHub Actions（deploy.yml）
-              │
-              ▼
-      npm run build（Astro）→ GitHub Pages
-              │
-              ▼
-     https://bryce505.github.io/Blog
+                         ▼
+       src/content/posts/<slug>.md —— 校验过与没过都写这里
+       校验没过 → 额外带 frontmatter `draft: true` + `reviewNotes`
+                （published.json 自动对账、写日志、开 issue / 发邮件）
+                         │
+                         ▼
+              git push → GitHub Actions（deploy.yml）
+                         │
+                         ▼
+   npm run build（Astro，`listPosts()` 排除 draft）→ GitHub Pages
+                         │
+                         ▼
+              https://bryce505.github.io/Blog
+
+   放行：删掉 draft: true 那一行，提交 → 下次构建即上线（见「校验器」）
 ```
 
 **为什么是单仓库**：流水线只读两个私有笔记仓库、只写这一个仓库。拆成
@@ -91,7 +90,7 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
 |---|---|---|
 | [`publish.yml`](.github/workflows/publish.yml) | 定时（每晚 UTC 13:00）/ `workflow_dispatch` / push 到 `drafts/**` | 跑内容流水线，产出通过就 commit + push |
 | [`deploy.yml`](.github/workflows/deploy.yml) | push 到 `master`（忽略 `drafts/` `pipeline/` `docs/` `design/` `README.md` 等不影响构建产物的路径）/ `publish` 运行完 / `workflow_dispatch` | `npm run build` → 部署到 GitHub Pages |
-| [`sample.yml`](.github/workflows/sample.yml) | 仅 `workflow_dispatch` | 引子通道试运行，只写 `_review/`，不接自动发布——试验性质 |
+| [`sample.yml`](.github/workflows/sample.yml) | 仅 `workflow_dispatch` | 引子通道试运行，产出一律带 `draft: true`，不传 `--publish`——不存在自动上线的可能，试验性质 |
 
 > **GitHub 的坑**：workflow 用内置 `GITHUB_TOKEN` 推的提交不会触发其他
 > workflow 的 `push` 事件（防递归安全规则），所以 `deploy.yml` 额外监听
@@ -125,24 +124,26 @@ Blog/
 │  ├─ requirements.txt
 │  └─ drive_index.json           Drive 文件名 → fileId 索引缓存（提交进仓库，非敏感）
 ├─ src/                        Astro 站点
-│  ├─ content/posts/            流水线产出的文章（.md）
+│  ├─ content/posts/            流水线产出的文章（.md）——校验没过的也在这里，
+│  │                            只靠 frontmatter 的 `draft: true` 区分
+│  │                            （见「[校验器](#校验器)」）
 │  ├─ content/series.json       系列栏目的归属与顺序，唯一真相来源
 │  ├─ content.config.ts         posts / series 两个 collection 的 zod schema
 │  ├─ layouts/                  Base（全局骨架）/ Post（文章页）
 │  ├─ components/               Header / Footer / PostCard
 │  ├─ pages/                    路由：index / archive / category / posts / series / tags / tools / about / rss.xml
+│  ├─ lib/posts.ts              `listPosts()`——全站唯一的文章入口，草稿过滤只在这一处
 │  ├─ lib/series.ts             系列解析、上下篇计算
 │  ├─ plugins/                  自定义 remark 插件（callout / 高亮 / mermaid / base path 补全）
 │  └─ styles/global.css
 ├─ public/images/<slug>/      文章配图（WebP），按文章分目录
 ├─ drafts/                     人工投稿投递口：放 md（+ images/ 子目录）push 即发布
-├─ _review/                    校验未通过、等人工复核的文章
 ├─ logs/                       按月归档的校验运行日志（`verify-YYYY-MM.md`）
 ├─ docs/
 │  ├─ devlog/                   开发日志，每次改动必写，见「开发规范」
 │  └─ superpowers/specs·plans/  设计文档与实施计划
 ├─ design/                     视觉设计源文件（Claude Design 画布 `.dc.html`）
-├─ published.json              发布状态账本：标签组/引子笔记 → slug、日期、来源哈希
+├─ published.json              发布状态账本：按 slug 记录，每次运行自动跟 posts/ 对账
 ├─ site.config.mjs             站点地址与 base path 的唯一来源
 ├─ astro.config.mjs            Astro 配置：remark/rehype 插件挂载
 ├─ obsidian-publish-pipeline.html  最早期的架构探索稿，历史参考，非当前实现
@@ -169,7 +170,7 @@ uv venv && uv pip install -r pipeline/requirements.txt
 .venv/bin/python pipeline/test_pipeline.py
 ```
 
-跑完终端会打印 `通过数/总数`（写这份文档时是 118/118；这个数字会随新增
+跑完终端会打印 `通过数/总数`（写这份文档时是 128/128；这个数字会随新增
 自检增长，**以终端实际输出为准**，不要以本文的数字为准）。这套自检不
 引入测试框架，纯 `assert` + 文件底部的 runner，CI 里直接
 `python pipeline/test_pipeline.py` 就能跑。
@@ -199,7 +200,8 @@ drafts/       ─┤ ② 加减法：笔记够完整→浓缩归纳；不完整�
 Google Drive  ─┤ ③ 取图：本地图 / Drive → WebP(≤1200px) → public/images/
                │ ④ 校验：数据保真 + 可发表性两组检查（见「校验器」）
                │      过 → 写 src/content/posts/ + 记账 + push
-               │      不过 → 进 _review/，写日志、开 issue、发邮件
+               │      不过 → 同样写 src/content/posts/，但带 `draft: true`
+               │             （站点构建跳过），写日志、开 issue、发邮件
                └─↓
                  ⑤ Astro build → GitHub Pages
 ```
@@ -246,10 +248,12 @@ AI 把某个流速、某条法规编号改错了是专业性错误而不是排�
 不住篡改，这条流水线就不该上线。**
 
 > **workflow 显示成功 ≠ 文章发布了。** 这条流水线是「失败关闭」设计：
-> 校验不过就转入 `_review/`，不会让 workflow 报错。判断"今晚有没有真的
-> 发新文章"，看 `published.json` 有没有新记录、或 `_review/` 有没有新增
-> 文件——光看 Actions 的绿勾会误判，本仓库真实踩过这个坑，见
-> [实测记录](docs/devlog/2026-08-26-定时发布排查.md)。
+> 校验不过的文章照样写进 `src/content/posts/`，只是带 `draft: true`——
+> 不会让 workflow 报错，也不会自己上线（构建时 `listPosts()` 会排除它，
+> 见「[校验没过怎么办](#校验没过怎么办)」）。判断"今晚有没有真的发新
+> 文章"，看新提交的文章有没有带 `draft: true`，或者 `published.json`
+> 里的记录是否新增——光看 Actions 的绿勾会误判，本仓库真实踩过这个坑，
+> 见 [实测记录](docs/devlog/2026-08-26-定时发布排查.md)。
 
 ### 两组检查
 
@@ -281,17 +285,68 @@ AI 把某个流速、某条法规编号改错了是专业性错误而不是排�
 
 ### 校验没过怎么办
 
-三件事同时发生：
+**放行 = 删掉一行。** 没过校验的文章和正式文章一样落在
+`src/content/posts/`，只在 frontmatter 里多两项（这套机制取代了早期的
+`_review/` 目录方案，完整踩坑经过见
+[`docs/devlog/2026-08-26-草稿位放行.md`](docs/devlog/2026-08-26-草稿位放行.md)）：
 
-1. 文章写进 `_review/seed-<slug>.md`，**开头的注释里逐条列着没过哪些项**
-2. 追加一行到 `logs/verify-YYYY-MM.md`，随产出一起提交进仓库
-3. 开一个 GitHub Issue（标签 `校验未通过`），配了 SMTP 的话同时发邮件
+```markdown
+---
+draft: true
+reviewNotes:
+  - "出现源文没有的数据: ['1.8', '12kda']"
+  - "丢图: ['202201241314544.png']"
+title: "宿主细胞蛋白（HCP）的质谱鉴定与绝对定量"
+date: 2026-08-25
+...
+---
+```
 
-处理：打开 `_review/` 下的文件，按注释里的问题逐条改，确认没问题后移到
-`src/content/posts/`、删掉开头的注释即可发布。
+`draft: true` 让站点构建整篇跳过 —— 文章躺在仓库里，但不出现在首页、
+分类页、标签页、归档、RSS、sitemap 里，也不会生成自己的页面。
 
-> `_review/` 里存在的组会被跳过，否则它会一直霸占队首、后面的文章一篇也
-> 发不出去。人工处理掉文件后自动重新入列。
+| 要做什么 | 怎么做 |
+|---|---|
+| **放行** | 删掉 `draft: true` 那一行，提交 |
+| **退稿** | 删掉整个文件 |
+| **记账** | 不用管，流水线每次运行自动对账 |
+
+`reviewNotes` 是没过哪几项。放行时留着不影响任何东西（frontmatter 不参与
+渲染），想顺手删掉也行。
+
+在 GitHub 网页或手机上：打开文件 → 点铅笔 → 删掉 `draft: true` 那一行 →
+Commit changes。推到 master 会自动触发 deploy，文章随即上线。
+
+> **为什么 `reviewNotes` 用 YAML 而不是 HTML 注释。** 早期版本把问题清单写在
+> 文件开头的 `<!-- -->` 里，实测 GitHub 的 markdown 预览会把注释整段隐藏 ——
+> 人打开文件只看得到正文，根本不知道哪里没过，得点 Code 或 Raw 才看得见。
+> YAML 字段在预览里正常显示。
+
+除了文件本身，另外两处也会记下这次失败：
+
+1. 追加一行到 `logs/verify-YYYY-MM.md`，随产出一起提交进仓库
+2. 开一个 GitHub Issue（标签 `校验未通过`），配了 SMTP 的话同时发邮件
+
+#### 账本自己会对账，不用手动维护
+
+`published.json` 是选材去重的账本（引子通道按 `seed` 字段判定这篇笔记
+用过没有）。它**按 slug 做 key，每次运行开头自动跟 `src/content/posts/`
+对一次账**：
+
+- 有文件、没记录 → 按 frontmatter 回填
+- 有记录、没文件 → 销账，那篇笔记重新入列
+
+所以人工只需要动文件本身，不需要写一行 JSON。
+
+> **这一条是踩过坑才有的。** 早期账本按 `primaryTag` 做 key，而同一个三级
+> 标签下会有多篇文章（ELISA 与 HCP鉴定与定量 的 `primaryTag` 完全相同），
+> 后写的会静默覆盖先写的，被覆盖那篇于是变回「没发过」，下次定时任务重新
+> 生成一遍。另一次是手工把文章搬进 `posts/` 却忘了记账，同样导致重复生成。
+> 改 slug 做 key + 自动对账之后，这两种情况都不会再发生。
+
+> **回填记录没有 `source_hash`**（拿不到 vault 算不出），流水线把这种记录
+> 一律当作已发布、不重发 —— 人工放行过的文章不该因为源笔记改了个错别字
+> 就被悄悄重写一遍。
 
 ### 通知怎么配
 
@@ -346,8 +401,9 @@ tags:
 **三、AI 处理并发布**
 
 稿子会走**和自动文章完全一样**的一套：按体量判定加减法 → 整理 → 取图 →
-两组校验 → 全过就直接发布，不过就落 `_review/` 等你放行。处理完原稿会从
-`drafts/` 撤走（已经转成文章了，留着会被重复处理）。
+两组校验 → 全过就直接发布，不过就带 `draft: true` 等你放行（见
+「[校验没过怎么办](#校验没过怎么办)」）。处理完原稿会从 `drafts/` 撤走
+（已经转成文章了，留着会被重复处理）。
 
 > **不想让 AI 动内容、要原样发布**：本地跑 `python pipeline/main.py --drafts`。
 > 这条直通道只做格式转换和取图，不调模型、不做加减法。
@@ -363,7 +419,7 @@ tags:
 | 3 | 外链 | `![](https://...)` | 原样保留，不落地 |
 
 三条都不中，正文里留一行「图片暂缺」占位，**并计入校验失败**（缺图是可
-发表性检查的一项），文章进 `_review/`。补上图再放行即可。
+发表性检查的一项），文章带 `draft: true` 落盘。补上图再放行即可。
 
 ### 怎么建一个系列
 
@@ -409,7 +465,7 @@ Actions → publish → Run workflow，四个开关：
 |---|---|
 | `mode` | `seed` 引子通道（默认）／`manual` 处理 drafts／`auto` 旧的多篇重组 |
 | `count` | 本次发几篇 |
-| `publish` | 勾上=校验全过就直接发布；不勾=一律落 `_review/` 等人工放行 |
+| `publish` | 勾上=校验全过就直接发布；不勾=一律带 `draft: true` 等人工放行 |
 | `refresh_index` | 刚往 Drive 补传了图就勾上，强制重建索引 |
 
 发布成功后 `deploy` 会自动跟着跑（靠 `workflow_run` 触发，见「[架构总览](#架构总览)」
