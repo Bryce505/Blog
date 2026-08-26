@@ -1099,6 +1099,36 @@ def test_mode_is_decided_by_note_size():
     assert sd.decide_mode(vault.Note('a', 't', [], 'note', body='x' * 3000)) == 'grow'
 
 
+def test_auto_select_skips_notes_already_pending_review():
+    """定时任务不传 --seed，靠自动选材；候选按体量降序排。一篇被拒的引子
+
+    不排除的话体量没变、排序不变，下次自动选材还是原样排回队首——同样的
+    失败重演一遍，还得再烧一次 DeepSeek 调用，真正的新材料反而排不上。
+    """
+    TMP.mkdir(parents=True, exist_ok=True)
+    v = TMP / 'v-pending'
+    shutil.rmtree(v, ignore_errors=True)
+    v.mkdir(parents=True)
+    (v / 'long.md').write_text(
+        '---\ntags:\n  - 03质量控制/残留/HCP\ntype: note\n---\n' + '正' * 9000,
+        encoding='utf-8')
+    (v / 'short.md').write_text(
+        '---\ntags:\n  - 03质量控制/残留/HCP\ntype: note\n---\n' + '正' * 3000,
+        encoding='utf-8')
+
+    blog = TMP / 'seed-pending'
+    shutil.rmtree(blog, ignore_errors=True)
+    (blog / 'src' / 'content' / 'posts').mkdir(parents=True)
+    (blog / '_review').mkdir(parents=True)
+    long_slug = df.slugify_cn(Path('long.md').stem)
+    (blog / '_review' / f'seed-{long_slug}.md').write_text('待复核', encoding='utf-8')
+
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article() + '正' * 2000)
+    # 不去重会选中体量更大的 long.md（它还躺在 _review/ 里）；去重后轮到 short.md
+    assert rs[0]['seed'] == 'short.md', rs[0]
+
+
 def test_shrink_mode_publishes_when_clean():
     TMP.mkdir(parents=True, exist_ok=True)
     blog = TMP / 'seed-shrink'

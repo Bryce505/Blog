@@ -23,5 +23,18 @@
       "Antibody-Characterization总目录",
       "大肠杆菌表达蛋白PTM与IEX电荷变体分析"
     ]
+  },
+  "07注册与法规/ICH/Quality": {
+    "slug": "分项策略-功能学研究策略-20260703",
+    "published_at": "2026-08-26",
+    "source_hash": "sha256:afc2da77ced8f320b16efe0381289987e7edfc14ca1fe3748eab7eac544b29b4",
+    "notes": [
+      "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-功能学研究策略-20260703.md"
+    ],
+    "noteTitles": [
+      "分项策略-功能学研究策略"
+    ],
+    "title": "生物制品功能学研究策略：覆盖早研至BLA全生命周期的效价测定与方法学体系",
+    "seed": "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-功能学研究策略-20260703.md"
   }
 }

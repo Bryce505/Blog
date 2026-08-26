@@ -46,16 +46,33 @@ def decide_mode(note):
     return 'shrink' if len(note.body) >= SHRINK_THRESHOLD else 'grow'
 
 
-def candidates(notes, used=()):
-    """还没当过引子、且体量落在 SEED_BAND 内的可发布笔记，长的排前面。
+def candidates(notes, used=(), pending=()):
+    """还没当过引子、不在 _review/ 待复核、且体量落在 SEED_BAND 内的可发布
+    笔记，长的排前面。
 
     区间内取长的：同样是合格的引子，内容多的那篇成文质量更高。
+
+    pending 必须排除：不排除的话，一篇被拒的引子下次自动选材还是原样排回
+    队首（体量没变，排序不变），等于同一个失败重演一遍，还得再烧一次
+    DeepSeek 调用。run_auto() 对标签分组早有对应的 _review 跳过（按 slug
+    判存在），引子通道这条路径当初没补——都在等 _review/ 里人工放行，
+    不是「还没试过」。
     """
-    used = set(used)
+    used, pending = set(used), set(pending)
     lo, hi = SEED_BAND
     return sorted((n for n in sel.publishable(notes)
-                   if n.path not in used and lo <= len(n.body) <= hi),
+                   if n.path not in used and n.path not in pending
+                   and lo <= len(n.body) <= hi),
                   key=lambda n: -len(n.body))
+
+
+def pending_review(blog_root, notes):
+    """还在 `_review/` 里等人工放行的引子笔记路径（按 slug 反查）。"""
+    review_dir = Path(blog_root) / '_review'
+    if not review_dir.is_dir():
+        return set()
+    waiting = {p.stem[len('seed-'):] for p in review_dir.glob('seed-*.md')}
+    return {n.path for n in notes if drafts.slugify_cn(Path(n.path).stem) in waiting}
 
 
 def related_fragments(note, notes, limit=MAX_FRAGMENTS):
@@ -219,12 +236,14 @@ def run(vault_root, blog_root, api_key, sa_json, seed_paths=(), count=1,
     used_seeds = [r['seed'] for r in published.values() if r.get('seed')]
 
     if seed_paths:
+        # 显式指定的引子照跑不误，哪怕它还在 _review/ 里——人工改完笔记后
+        # 想重跑同一篇，不该被自动去重挡住。
         picked = [by_path[p] for p in seed_paths if p in by_path]
         gone = [p for p in seed_paths if p not in by_path]
         if gone:
             return [{'status': 'error', 'reason': f'找不到引子笔记: {gone}'}]
     else:
-        picked = candidates(notes, used_seeds)[:count]
+        picked = candidates(notes, used_seeds, pending_review(blog_root, notes))[:count]
     if not picked:
         return [{'status': 'error', 'reason': '没有可用的引子笔记'}]
 
