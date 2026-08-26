@@ -15,6 +15,7 @@
 并记日志、发通知，等人工放行。
 """
 import re
+import unicodedata
 import urllib.parse
 from dataclasses import dataclass, field
 
@@ -48,12 +49,38 @@ _UNITS = sorted([
 # 正文里这种写法占多数，后果是校验器对源文视而不见，模型重排时顺手加个
 # 空格，同一个数就成了「源文没有的数据」——实测那篇 HPLC 被拦下的 10 个
 # 数里 9 个原文就有，白拦一次还白烧一次 token。
+# 单位分支排在最前面：同一个量不能因为空格与否得到两个 token。
+# 实测踩坑 —— 源笔记写「分析物＜4000Da」（粘连）提取成 4000da，而
+# 「分子量 148000 Da」（带空格）走小数/整数分支提取成裸 148000，同类量两种
+# 口径。结果模型把 4000Da 复述成「4000 道尔顿」就被判成编造数据（HPLC 那篇
+# 实测复现）。绑定优先反而更严：以前「0.5 mL/min → 0.5 L/min」两边都提取成
+# 裸 0.5，单位调包完全看不见，现在拦得住。
 DATA_NUM = re.compile(
     r'(?<![0-9A-Za-z_.])(?:'
-    r'\d+\.\d+'                                    # 小数
+    r'\d+(?:\.\d+)?\s*(?:' + '|'.join(re.escape(u) for u in _UNITS) + r')(?![A-Za-z])'
+    r'|\d+\.\d+'                                    # 小数
     r'|\d{3,}(?![0-9A-Za-z_])'                       # 三位以上整数
-    r'|\d+(?:\.\d+)?\s*(?:' + '|'.join(re.escape(u) for u in _UNITS) + r')(?![A-Za-z])'
     r')')
+
+# 这些载体里的数字不是实验数据，而且各自有更严的专属检查（图片走「丢图」、
+# DOI 走丢失阈值）。重复计入只会制造误报：实测 209 篇笔记里，515 个不同
+# token 来自链接 URL 与 DOI 串，其中大量是 202208091746201.png 这种截图
+# 时间戳 —— 它们在源文和成稿里的写法必然不同（.png → .webp）。
+# 替换成等长空格而不是删除，保证后面按位置取上下文时偏移不变。
+IMG_EMBED = re.compile(r'!\[[^\]]*\]\([^)]*\)|!\[\[[^\]]*\]\]')
+LINK_URL = re.compile(r'(?<=\])\([^)]*\)|<https?://[^>]*>|https?://\S+')
+
+# 裸年份不是测量值。这条规则原意是拦「编造的流速、限度、回收率」，而实测
+# 语料里 63 个不同裸年份 token 绝大多数来自参考文献串（Nature Protocols,
+# 2007, 1, 2650–2660）；模型写「截至 2026 年」这类过渡句也必然产生年份，
+# 把它当编造等于让校验器天天误杀。
+BARE_YEAR = re.compile(r'^(?:19|20)\d\d$')
+# 唯一例外：版本年份。《中国药典》2020年版 / ChP 2025年版 是规范性依据，
+# 改错了是合规主张变了，必须继续拦。实测语料里 10 处全部带「年版」或「版」。
+VERSION_YEAR = re.compile(r'\s*(?:年版|版|Edition|edition)')
+
+# 纯数值（不带单位）
+BARE_NUM = re.compile(r'^\d+(?:\.\d+)?$')
 
 # DOI 用否定字符类而非 \S+：\S+ 会把 markdown 链接语法、右括号、中文
 # 全角括号一起吞进来，同一个 DOI 因上下文不同提取出不同字符串。
@@ -77,12 +104,30 @@ MIN_DOI_LOSS_ALLOWED = 1
 
 
 def _norm(t):
+    # 先做 NFKC：µ(U+00B5) 与 μ(U+03BC)、℃(U+2103) 与 °C 在语料里并存
+    # （实测 127 vs 588、168 vs 198），那是字符编码差异不是数据差异，
+    # 不归一化的话「37℃ → 37 °C」这种纯转写会被判成编造数据。
+    # 只对提取出来的 token 做，不对全文做 —— 全文 NFKC 会把上标 10⁶ 压成
+    # 106，凭空造出一个三位整数。
+    t = unicodedata.normalize('NFKC', t)
     # DOI 常以句点结尾，归一化时去掉，避免 'x.' 与 'x' 被当成两个引用
     return re.sub(r'\s+', '', t).lower().rstrip('.')
 
 
+def _blank(m):
+    """替换成等长空格，保住后续按位置取上下文的偏移。"""
+    return re.sub(r'\S', ' ', m.group())
+
+
 def data_numbers(text):
-    return {_norm(m.group()) for m in DATA_NUM.finditer(text)}
+    text = DOI.sub(_blank, LINK_URL.sub(_blank, IMG_EMBED.sub(_blank, text)))
+    out = set()
+    for m in DATA_NUM.finditer(text):
+        tok = _norm(m.group())
+        if BARE_YEAR.match(tok) and not VERSION_YEAR.match(text[m.end():m.end() + 8]):
+            continue
+        out.add(tok)
+    return out
 
 
 def regulations(text):
@@ -131,7 +176,20 @@ def verify(src, out, images, min_ratio=None, extra_src=''):
 
     # 只查「新增」不查「减少」：重组时删掉重复论述是正常的，
     # 凭空冒出源文没有的数据才是危险信号。
-    new_nums = data_numbers(out) - data_numbers(pool)
+    #
+    # 源文里带单位的数字，其裸数值也算「源文出现过」：模型把「4000Da」复述成
+    # 「4000 道尔顿」不是编造，HPLC 那篇实测就栽在这上面。
+    # **单向** —— 输出自己带了单位就必须原样对上。否则源文「50 mM」被改成
+    # 「50 pmol」这种单位调包会漏过去，而那是实测真出现过的（label-free 那篇）。
+    pool_nums = data_numbers(pool)
+    out_nums = data_numbers(out)
+    pool_values = set()
+    for tok in pool_nums:
+        head = re.match(r'\d+(?:\.\d+)?', tok)
+        if head:
+            pool_values.add(head.group())
+    new_nums = {t for t in out_nums - pool_nums
+                if not (BARE_NUM.match(t) and t in pool_values)}
     if new_nums:
         failures.append(f'出现源文没有的数据: {sorted(new_nums)[:10]}')
 

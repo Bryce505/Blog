@@ -262,8 +262,9 @@ def test_numbers_adjacent_to_chinese_are_seen():
     """紧挨汉字的数字必须提取得到 —— Python 的 \\w 把汉字算词字符，
     用它当边界会让中文正文里的多数数据对校验器不可见。"""
     nums = vf.data_numbers('准确度在1.5倍至1.8倍范围内，流速0.05 mL/min，回收率95%。')
-    # 小数分支排在带单位分支前面，所以 0.05 提取出来不带单位——本来如此
-    assert {'1.5', '1.8', '0.05', '95%'} <= nums, nums
+    # 带单位的一律连单位一起提取（0.05 mL 而不是裸 0.05）：同一个量不能因为
+    # 空格与否得到两个 token，详见 test_unit_binds_regardless_of_spacing
+    assert {'1.5', '1.8', '0.05ml', '95%'} <= nums, nums
     # 反过来不能把长数字切开：18.5 里不该冒出 8.5
     assert '8.5' not in vf.data_numbers('取 IAM 18.5 mg 溶解')
 
@@ -358,8 +359,9 @@ def test_verify_allows_dropping_redundant_numbers():
 def test_data_numbers_ignores_bare_small_int():
     assert vf.data_numbers('分为 3 类') == set()
     assert '25°c' in vf.data_numbers('柱温 25 °C')
-    assert '0.5' in vf.data_numbers('流速 0.5 mL/min')
-    assert '148000' in vf.data_numbers('分子量 148000 Da')
+    # 单位跟着数值走，不再因为中间有没有空格而分成两种 token
+    assert '0.5ml' in vf.data_numbers('流速 0.5 mL/min')
+    assert '148000da' in vf.data_numbers('分子量 148000 Da')
 
 
 def test_citations_recognises_common_formats():
@@ -373,6 +375,90 @@ def test_doi_regex_stops_at_markdown_syntax():
     a = vf.dois('[10.1021/pr4010019](https://doi.org/10.1021/pr4010019)')
     b = vf.dois('参考 10.1021/pr4010019。')
     assert a == b == {'10.1021/pr4010019'}, (a, b)
+
+
+# ---------- verify：误报治理（每条都有语料实测支撑）----------
+#
+# 语料实测（209 篇可发布笔记，1,503,893 字符）：提取器抓到的 13,624 个
+# 「数据」token 里约 44% 根本不是测量值 —— 1,677 个裸年份、972 个图片文件名
+# 时间戳、643 个 DOI 前缀，其余大量是参考文献的卷号页码。下面每条都是拿这份
+# 实测数据定的，且都只动「什么算数据」，不动「拦不拦」的判定。
+
+def test_unit_binds_regardless_of_spacing():
+    """同一个量不能因为空格与否得到两个 token。
+
+    实测踩坑：源笔记写「分析物＜4000Da」（粘连）提取成 4000da，而
+    「分子量 148000 Da」（带空格）提取成裸 148000 —— 同类量两种口径。
+    结果模型把 4000Da 复述成「4000 道尔顿」就被判成编造数据（HPLC 那篇
+    实测复现）。改成单位分支优先绑定，两种写法都带单位。
+    """
+    assert vf.data_numbers('分析物＜4000Da') == vf.data_numbers('分析物 < 4000 Da')
+    assert '4000da' in vf.data_numbers('分析物＜4000Da')
+    assert '148000da' in vf.data_numbers('分子量 148000 Da')
+
+
+def test_unit_swap_still_caught_after_binding():
+    """单位绑定优先反而更严：小数换单位以前看不见，现在拦得住。"""
+    assert not vf.verify('流速 0.5 mL/min', '流速 0.5 L/min', [], min_ratio=0.1).ok
+
+
+def test_dropped_unit_is_not_fabrication():
+    """模型把单位省掉或改用中文写，是复述不是编造 —— 数值本身源文有。"""
+    assert vf.verify('分析物＜4000Da', '分析物小于 4000 道尔顿', [], min_ratio=0.1).ok
+    # 反过来不成立：源文 50 mM，输出 50 pmol 是单位调包，必须拦。
+    # 实测真出现过（label-free 那篇），所以裸数字匹配只能是单向的。
+    assert not vf.verify('加入 50 mM IAA', '掺入 50 pmol 标准品', [], min_ratio=0.1).ok
+
+
+def test_micro_and_celsius_variants_are_the_same_number():
+    """µ(U+00B5) 与 μ(U+03BC)、℃(U+2103) 与 °C 在语料里并存
+    （实测 127 vs 588、168 vs 198），是字符编码差异不是数据差异。"""
+    assert vf.data_numbers('取 1µg') == vf.data_numbers('取 1μg')
+    assert vf.data_numbers('孵育 25℃') == vf.data_numbers('孵育 25 °C')
+    assert vf.verify('37℃ 水浴，加 20µL', '37 °C 水浴，加 20 μL', [], min_ratio=0.1).ok
+
+
+def test_link_and_doi_digits_are_not_data():
+    """图片文件名与 DOI 里的数字不是实验数据，且各有更严的专属检查
+    （丢图、DOI 丢失阈值）。重复计入只会制造误报。
+
+    实测：语料里 515 个不同 token 来自链接 URL 与 DOI 串，其中大量是
+    202208091746201.png 这种截图时间戳。
+    """
+    assert vf.data_numbers('![](../img/202208091746201.png)') == set()
+    assert vf.data_numbers('见 doi:10.1016/j.chroma.2020.461234') == set()
+    assert vf.data_numbers('[链接](https://x.com/a/12345/b)') == set()
+    # 正文里的数据照抓不误
+    assert '25°c' in vf.data_numbers('![](../img/202208091746201.png) 柱温 25 °C')
+    # 但 DOI 自己的检查不受影响
+    assert vf.dois('见 doi:10.1016/j.chroma.2020.461234') == {'10.1016/j.chroma.2020.461234'}
+
+
+def test_bare_year_is_not_data():
+    """裸年份不是测量值。规则原意是拦「编造的流速、限度、回收率」。
+
+    实测：语料里 63 个不同裸年份 token，绝大多数来自参考文献串
+    （Nature Protocols, 2007, 1, 2650–2660）；label-free 那篇被拦的
+    10 个数里 4 个是年份，其中 2026 就是当天年份 —— 模型写「截至 2026 年」
+    这种过渡句必然产生，把它当编造等于让校验器天天误杀。
+    """
+    assert vf.data_numbers('2012 年的一项研究') == set()
+    assert vf.verify('本文讨论 HCP 定量。', '2017 年以来，截至 2026 年，HCP 定量……',
+                     [], min_ratio=0.1).ok
+    # 非年份的四位整数仍然是数据
+    assert '4500' in vf.data_numbers('转速 4500')
+
+
+def test_pharmacopoeia_edition_year_is_still_data():
+    """药典版本年份是规范性依据，改错了是合规主张变了 —— 必须继续拦。
+
+    这是裸年份豁免的唯一例外。语料里 10 处《中国药典》2020年版 /
+    ChP 2025年版 / 2020年版起，全部带「年版」或「版」。
+    """
+    assert '2020' in vf.data_numbers('《中国药典》2020年版通则3407')
+    assert '2025' in vf.data_numbers('参照 ChP 2025年版三部')
+    r = vf.verify('依据《中国药典》2020年版', '依据《中国药典》2025年版', [], min_ratio=0.1)
+    assert not r.ok and any('数据' in f for f in r.failures), r.failures
 
 
 # ---------- render ----------
