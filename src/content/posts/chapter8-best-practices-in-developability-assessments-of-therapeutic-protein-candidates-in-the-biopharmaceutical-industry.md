@@ -1,9 +1,7 @@
-<!-- 引子通道产出，人工过目后移入 src/content/posts/ 即可发布。
-引子笔记：Analytical technology/成药性分析/Chapter8 Best Practices in Developability Assessments of Therapeutic Protein Candidates in the Biopharmaceutical Industry.md（4,043 字符）
-扩写后：7,724 字符
-校验：全部通过
--->
 ---
+draft: true
+reviewNotes:
+  - "生成时校验全部通过，仅差人工过目"
 title: "治疗蛋白候选物的可开发性评估：从序列分析到工艺适配的完整框架"
 date: 2026-08-25
 category: "04抗体设计与筛选"

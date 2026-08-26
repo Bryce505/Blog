@@ -116,13 +116,18 @@ def build_groups(notes):
 def pick_next(groups, published, skip=()):
     """取第一个未发布、或源笔记已变更的组。
 
-    skip 里的 tag 一律跳过。校验失败的组不写 published.json，若不跳过，
-    每次都会重新挑中它，队列被永久堵死、后面的文章一篇也发不出去。
+    published 按 slug 做 key，这里要按 tag 找，所以先翻一张 tag → 记录的表。
+
+    没有 source_hash 的是回填记录（人工搬进 posts/ 的文章，拿不到 vault
+    算不出哈希）—— 当作已发布，不重发。人工放行过的文章不该因为源笔记改了
+    个错别字就被悄悄重写一遍。
     """
+    by_tag = {r['tag']: r for r in published.values() if r.get('tag')}
     for g in groups:
         if g.tag in skip:
             continue
-        rec = published.get(g.tag)
-        if rec is None or rec.get('source_hash') != g.source_hash:
+        rec = by_tag.get(g.tag)
+        if rec is None or (rec.get('source_hash')
+                           and rec['source_hash'] != g.source_hash):
             return g
     return None

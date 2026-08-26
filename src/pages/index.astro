@@ -1,10 +1,10 @@
 ---
-import { getCollection } from 'astro:content';
+import { listPosts } from '../lib/posts';
 import Base from '../layouts/Base.astro';
 import PostCard from '../components/PostCard.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const posts = (await getCollection('posts')).sort((a, b) => b.data.date - a.data.date);
+const posts = (await listPosts()).sort((a, b) => b.data.date - a.data.date);
 
 // 分类不硬编码：从文章里推导，知识库加了新的一级标签就自动出现
 const counts = new Map<string, number>();

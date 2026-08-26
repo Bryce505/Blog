@@ -1,9 +1,7 @@
-<!-- 引子通道产出，人工过目后移入 src/content/posts/ 即可发布。
-引子笔记：Antibody-Characterization/Biophysical characterization of proteins in developing biopharmaceuticals/Chapter8：Scattering techniques for the characterization of biopharmaceuticals.md（21,089 字符）
-扩写后：20,631 字符
-校验：全部通过
--->
 ---
+draft: true
+reviewNotes:
+  - "生成时校验全部通过，仅差人工过目"
 title: "光散射技术表征生物药：SLS/DLS的原理、应用与实验边界"
 date: 2026-08-25
 category: "02分子表征"
