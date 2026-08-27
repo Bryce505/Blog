@@ -88,7 +88,7 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
 
 | workflow | 触发方式 | 做什么 |
 |---|---|---|
-| [`publish.yml`](.github/workflows/publish.yml) | 定时（每晚 UTC 13:00）/ `workflow_dispatch` / push 到 `drafts/**` | 跑内容流水线，产出通过就 commit + push |
+| [`publish.yml`](.github/workflows/publish.yml) | 定时（每晚 UTC 13:13 + UTC 15:37 备份，故意避开整点排队高峰）/ `workflow_dispatch` / push 到 `drafts/**` | 跑内容流水线，产出通过就 commit + push |
 | [`deploy.yml`](.github/workflows/deploy.yml) | push 到 `master`（忽略 `drafts/` `pipeline/` `docs/` `design/` `README.md` 等不影响构建产物的路径）/ `publish` 运行完 / `workflow_dispatch` | `npm run build` → 部署到 GitHub Pages |
 | [`sample.yml`](.github/workflows/sample.yml) | 仅 `workflow_dispatch` | 引子通道试运行，产出一律带 `draft: true`，不传 `--publish`——不存在自动上线的可能，试验性质 |
 
