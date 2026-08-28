@@ -17,6 +17,7 @@ import yaml
 
 import config
 import images
+import main as mn
 import render
 import vault
 
@@ -70,6 +71,7 @@ def run_drafts(blog_root, sa_json):
     blog_root = Path(blog_root)
     draft_dir = blog_root / 'drafts'
     posts_dir = blog_root / 'src' / 'content' / 'posts'
+    month = dt.date.today().strftime('%Y-%m')
 
     pub_path = blog_root / 'published.json'
     published = json.loads(pub_path.read_text(encoding='utf-8')) if pub_path.exists() else {}
@@ -101,8 +103,7 @@ def run_drafts(blog_root, sa_json):
                             'reason': '缺少 title 字段'})
             continue
 
-        out = posts_dir / f"{fm['slug']}.md"
-        if out.exists():
+        if fm['slug'] in mn._all_posts(posts_dir):
             # 静默覆盖会让人莫名其妙丢文章，报错跳过并保留原件
             results.append({'file': p.name, 'status': 'error',
                             'reason': f"slug 冲突：{fm['slug']} 已存在，未覆盖"})
@@ -114,6 +115,7 @@ def run_drafts(blog_root, sa_json):
         body = render.rewrite_images(note.body, img_map, missing, {})
         body = render.resolve_wikilinks(body, title_to_slug)
 
+        out = mn.post_path(posts_dir, fm['slug'], month)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(_dump(fm) + body, encoding='utf-8')
         p.unlink()   # 已转存，留着会被重复处理

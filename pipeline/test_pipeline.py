@@ -1103,7 +1103,10 @@ def test_run_drafts_end_to_end():
     ok = by['sec-note.md']
     assert ok['status'] == 'published', ok
 
-    out = (blog / 'src' / 'content' / 'posts' / f"{ok['slug']}.md").read_text(encoding='utf-8')
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    out = (blog / 'src' / 'content' / 'posts' / month
+          / f"{ok['slug']}.md").read_text(encoding='utf-8')
     assert '/images/' in out and 'image&attachment' not in out, '图片未重写'
     assert '[[' not in out and '详见某未发布笔记' in out, '双链未解析'
     assert not (blog / 'drafts' / 'sec-note.md').exists(), '发布后原件应删除'
@@ -1134,6 +1137,33 @@ def test_run_drafts_refuses_slug_collision():
     assert rs[0]['status'] == 'error' and 'slug' in rs[0]['reason'], rs
     assert (posts / 'dup.md').read_text(encoding='utf-8') == '已有文章', '已有文章被覆盖了'
     assert (blog / 'drafts' / 'dup.md').exists(), '出错时不该删原件'
+
+
+def test_run_drafts_refuses_slug_collision_across_month_folders():
+    """已有文章在别的月份文件夹里，也要能查出 slug 冲突——原来只查「本次
+    要写的那个月份路径」存不存在，分了月份后这一步会漏判。"""
+    import shutil
+    blog = TMP / 'blog-collide-nested'
+    shutil.rmtree(blog, ignore_errors=True)
+    (blog / 'drafts').mkdir(parents=True)
+    (blog / 'src' / 'content' / 'posts' / '2020-01').mkdir(parents=True)
+    (blog / 'src' / 'content' / 'posts' / '2020-01' / 'dup.md').write_text(
+        '已有文章', encoding='utf-8')
+    (blog / 'drafts' / 'dup.md').write_text(
+        '---\ntitle: 新稿\n---\n正文', encoding='utf-8')
+
+    orig = (df.images.drive_service, df.images.load_index, df.images.fetch_images)
+    df.images.drive_service = lambda _: None
+    df.images.load_index = lambda *a, **k: {}
+    df.images.fetch_images = lambda *a, **k: ({}, [])
+    try:
+        rs = df.run_drafts(blog, '{}')
+    finally:
+        (df.images.drive_service, df.images.load_index, df.images.fetch_images) = orig
+
+    assert rs[0]['status'] == 'error' and 'slug' in rs[0]['reason'], rs
+    assert (blog / 'src' / 'content' / 'posts' / '2020-01' / 'dup.md'
+           ).read_text(encoding='utf-8') == '已有文章', '已有文章被覆盖了'
 
 
 # ---------- routinerun（工具与效率栏目）----------
