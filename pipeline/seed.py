@@ -14,6 +14,7 @@
 素材优先从同一知识库里取（相关片段随提示词一起喂进去），这样来源天然
 可核验；实在没有再退到引子笔记里已出现过的文献。
 """
+import datetime as dt
 import re
 from pathlib import Path
 
@@ -90,11 +91,13 @@ def related_published(note, published, posts_dir):
     """
     tag = sel._primary_tag(note) or ''
     lvl2 = '/'.join(tag.split('/')[:2])
+    all_posts = mn._all_posts(posts_dir)
     out = []
     for rec in published.values():
         if rec.get('draft') or not str(rec.get('tag', '')).startswith(lvl2):
             continue
-        title = _post_title(Path(posts_dir) / f"{rec['slug']}.md") or rec['slug']
+        path = all_posts.get(rec['slug'])
+        title = (_post_title(path) if path else None) or rec['slug']
         out.append((rec['slug'], title))
     return out
 
@@ -183,7 +186,11 @@ def process(note, *, blog_root, notes, published, index, svc, api_key,
     live = ok and publish
     doc = mn.assemble_frontmatter(g, title, mn.first_paragraph(article),
                                   draft_notes=None if live else fails) + body
-    out = posts_dir / f'{g.slug}.md'
+    month = dt.date.today().strftime('%Y-%m')
+    out = mn.post_path(posts_dir, g.slug, month)
+    old = mn._all_posts(posts_dir).get(g.slug)
+    if old and old != out:
+        old.unlink()   # 同一 slug 换月份重发（人工改完笔记重跑），旧文件删掉避免留孤本
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(doc, encoding='utf-8')
     mn.record_published(blog_root, published, g, seed=note.path, title=title,

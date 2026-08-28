@@ -180,6 +180,26 @@ def load_published(blog_root):
     return reconcile(blog_root, published)
 
 
+def _all_posts(posts_dir):
+    """slug -> Path，递归扫全部月份子目录（含可能残留的平铺文件）。
+
+    分月份子目录后 reconcile()/related_published() 都不能再假设 posts/
+    是平铺的，一处递归扫描给它们共用，避免各自实现一遍、之后行为漂移。
+    """
+    posts_dir = Path(posts_dir)
+    return {p.stem: p for p in sorted(posts_dir.glob('**/*.md'))} if posts_dir.is_dir() else {}
+
+
+def post_path(posts_dir, slug, month):
+    """新文章该落在哪：posts_dir/month/slug.md。
+
+    month 由调用方按「这次运行的当天」传入，不在这里读 frontmatter 的
+    date 字段——date 允许回溯（drafts.py 的手动投稿通道），按 date 归档
+    会把刚落地的稿子塞进旧文件夹，找不到刚落地的东西。
+    """
+    return Path(posts_dir) / month / f'{slug}.md'
+
+
 def _post_meta(path):
     """读文章 frontmatter。坏 YAML 当空处理，不能让一篇坏文章卡死整条流水线。"""
     m = vault.FM_RE.match(Path(path).read_text(encoding='utf-8'))
@@ -199,7 +219,7 @@ def reconcile(blog_root, published):
     下一次定时任务重新挑中同一篇笔记、再烧一次 DeepSeek、覆盖已发布的文章。
     """
     posts = Path(blog_root) / 'src' / 'content' / 'posts'
-    have = {p.stem: p for p in sorted(posts.glob('*.md'))} if posts.is_dir() else {}
+    have = _all_posts(posts)
 
     # 旧账本按 tag 做 key，就地改成按 slug。丢 source_hash 会让自动通道
     # 把已发布的组当成「源笔记变了」重发一遍，所以是搬记录不是重建。
@@ -246,6 +266,8 @@ def title_slug_map(published):
 def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
     vault_root, blog_root = Path(vault_root), Path(blog_root)
     published = load_published(blog_root)
+    month = dt.date.today().strftime('%Y-%m')
+    posts_dir = blog_root / 'src' / 'content' / 'posts'
 
     groups = sel.build_groups(vault.load_vault(vault_root))
     svc = images.drive_service(sa_json)
@@ -282,7 +304,14 @@ def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
         doc = assemble_frontmatter(g, title, first_paragraph(article),
                                    draft_notes=None if res.ok else res.failures) + body
 
-        out = blog_root / 'src' / 'content' / 'posts' / f'{g.slug}.md'
+        out = post_path(posts_dir, g.slug, month)
+        # pick_next() 会在源笔记改动（source_hash 对不上）时重新选中已发布
+        # 的组，跟 seed.process() 的重跑场景一样：换月份后旧文件要删，
+        # 否则同一 slug 在两个月份文件夹各留一份，_all_posts() 只认得到
+        # 其中一份，退稿（删文件）删不干净另一份
+        old = _all_posts(posts_dir).get(g.slug)
+        if old and old != out:
+            old.unlink()
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(doc, encoding='utf-8')
         record_published(blog_root, published, g, draft=not res.ok)

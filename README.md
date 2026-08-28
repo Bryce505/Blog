@@ -48,7 +48,7 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
                   pipeline/ 五步走：选材 → 取图 → 整理 → 校验 → 落盘
                          │
                          ▼
-       src/content/posts/<slug>.md —— 校验过与没过都写这里
+       src/content/posts/YYYY-MM/<slug>.md —— 校验过与没过都写这里
        校验没过 → 额外带 frontmatter `draft: true` + `reviewNotes`
                 （published.json 自动对账、写日志、开 issue / 发邮件）
                          │
@@ -124,9 +124,9 @@ Blog/
 │  ├─ requirements.txt
 │  └─ drive_index.json           Drive 文件名 → fileId 索引缓存（提交进仓库，非敏感）
 ├─ src/                        Astro 站点
-│  ├─ content/posts/            流水线产出的文章（.md）——校验没过的也在这里，
-│  │                            只靠 frontmatter 的 `draft: true` 区分
-│  │                            （见「[校验器](#校验器)」）
+│  ├─ content/posts/YYYY-MM/    流水线产出的文章（.md），按年月归档——校验没过
+│  │                            的也在这里，只靠 frontmatter 的 `draft: true`
+│  │                            区分（见「[校验器](#校验器)」）
 │  ├─ content/series.json       系列栏目的归属与顺序，唯一真相来源
 │  ├─ content.config.ts         posts / series 两个 collection 的 zod schema
 │  ├─ layouts/                  Base（全局骨架）/ Post（文章页）
@@ -383,7 +383,7 @@ Commit changes。推到 master 会自动触发 deploy，文章随即上线。
 
 | 字段 | 含义 | 是否每条都有 |
 |---|---|---|
-| `slug` | 文章 slug，等于 `src/content/posts/<slug>.md` 的文件名（不含扩展名），和这条记录的 key 相同 | 是 |
+| `slug` | 文章 slug，等于 `src/content/posts/YYYY-MM/<slug>.md` 的文件名（不含扩展名），和这条记录的 key 相同 | 是 |
 | `published_at` | 发布日期 `YYYY-MM-DD` | 是 |
 | `tag` | 源笔记的三级分类标签，只记账用，不影响站点渲染 | 是 |
 | `notes` | 源笔记在 vault 仓库里的相对路径；引子通道一篇，`auto` 通道多篇合并 | 是 |
@@ -539,9 +539,9 @@ Actions → publish → Run workflow，五个开关：
 就直接报错 `找不到引子笔记`，不会退回去自动选一篇顶替。
 
 **已经生成、还压着 `draft: true` 的候选文章，想选一篇转正**，不用走
-workflow：直接去 `src/content/posts/` 翻到那个文件，编辑器里删掉
-`draft: true` 那一行，Commit changes 就行——见前面「[校验没过怎么办](#校验没过怎么办)」，
-这条路径本来就是给人工放行用的，不需要额外的开关。
+workflow：直接去 `src/content/posts/` 对应月份的子目录翻到那个文件，编辑器
+里删掉 `draft: true` 那一行，Commit changes 就行——见前面「[校验没过怎么办]
+(#校验没过怎么办)」，这条路径本来就是给人工放行用的，不需要额外的开关。
 
 **手机 GitHub App 一样能点。** 进仓库 → **Actions** → 选 **publish** →
 工作流详情页顶部会有一条"此工作流具有 `workflow_dispatch` 事件触发器"的

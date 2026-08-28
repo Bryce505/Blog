@@ -956,8 +956,10 @@ def test_run_auto_end_to_end_offline():
 
     # 产出物必须真的落盘，且 frontmatter 是合法 YAML
     import yaml as _yaml
+    import datetime as _dt
     for r in rs:
-        f = blog / 'src' / 'content' / 'posts' / f"{r['slug']}.md"
+        f = (blog / 'src' / 'content' / 'posts'
+            / _dt.date.today().strftime('%Y-%m') / f"{r['slug']}.md")
         assert f.exists(), f
         text = f.read_text(encoding='utf-8')
         fm = _yaml.safe_load(text.split('---')[1])
@@ -1009,11 +1011,72 @@ def test_run_auto_marks_failed_verification_as_draft():
 
     assert rs[0]['status'] == 'draft', rs
     assert not (blog / '_review').exists(), '_review/ 已经取消'
-    text = (blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    text = (blog / 'src' / 'content' / 'posts' / month
+           / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
     assert re.search(r'^draft: true$', text, re.M), text[:300]
     # 草稿也记账，否则下次运行又挑中同一组
     pub = json.loads((blog / 'published.json').read_text(encoding='utf-8'))
     assert pub[rs[0]['slug']]['draft'] is True, pub
+
+
+def test_run_auto_moves_article_to_new_month_removes_old_copy():
+    """pick_next() 会在源笔记改动（source_hash 对不上）时重新选中已发布的组，
+    run_auto() 跟 seed.process() 一样要在换月份重发时清理旧月份的孤本——
+    不清理的话同一 slug 在两个月份文件夹各留一份，_all_posts() 只认得到
+    其中一份，退稿删文件删不干净另一份。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    v = TMP / 'v-auto-remove'
+    shutil.rmtree(v, ignore_errors=True)
+    v.mkdir(parents=True)
+    tag = '03质量控制/残留/HCP'
+    for i in range(2):
+        (v / f'n{i}.md').write_text(
+            f'---\ntags:\n  - {tag}\ntype: note\n---\n正文{i}' + '正' * 3000,
+            encoding='utf-8')
+
+    blog = TMP / 'blog-auto-remove'
+    shutil.rmtree(blog, ignore_errors=True)
+    slug = '03质量控制-残留-hcp'
+    old_path = blog / 'src' / 'content' / 'posts' / '2020-01' / f'{slug}.md'
+    old_path.parent.mkdir(parents=True)
+    old_path.write_text('---\ntitle: "旧版本"\n---\n\n旧正文', encoding='utf-8')
+    (blog / 'published.json').write_text(
+        json.dumps({slug: {'slug': slug, 'tag': tag, 'source_hash': 'sha256:old'}}),
+        encoding='utf-8')
+
+    def fake_compose(group, api_key, model=None, _post=None):
+        body = '\n\n'.join(n.body for n in group.notes)
+        return f'## {group.tag.split("/")[-1]}\n\n本文分为 3 个部分。\n\n{body}'
+
+    def fake_fetch(names, index, service, out_dir, url_prefix, _download=None):
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        m = {}
+        for n in names:
+            dest = out_dir / (Path(n).stem + '.webp')
+            dest.write_bytes(b'fake')
+            m[n] = f'{url_prefix}/{dest.name}'
+        return m, []
+
+    orig = (mn.compose.compose, mn.images.drive_service,
+            mn.images.load_index, mn.images.fetch_images)
+    mn.compose.compose = fake_compose
+    mn.images.drive_service = lambda _: None
+    mn.images.load_index = lambda *a, **k: {}
+    mn.images.fetch_images = fake_fetch
+    try:
+        rs = mn.run_auto(v, blog, 'fake-key', '{}', count=1)
+    finally:
+        (mn.compose.compose, mn.images.drive_service,
+         mn.images.load_index, mn.images.fetch_images) = orig
+
+    assert rs and rs[0]['slug'] == slug, rs
+    assert not old_path.exists(), '旧月份文件夹的孤本应该被清掉'
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    assert (blog / 'src' / 'content' / 'posts' / month / f'{slug}.md').exists()
 
 
 # ---------- drafts（手动通道）----------
@@ -1098,7 +1161,10 @@ def test_run_drafts_end_to_end():
     ok = by['sec-note.md']
     assert ok['status'] == 'published', ok
 
-    out = (blog / 'src' / 'content' / 'posts' / f"{ok['slug']}.md").read_text(encoding='utf-8')
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    out = (blog / 'src' / 'content' / 'posts' / month
+          / f"{ok['slug']}.md").read_text(encoding='utf-8')
     assert '/images/' in out and 'image&attachment' not in out, '图片未重写'
     assert '[[' not in out and '详见某未发布笔记' in out, '双链未解析'
     assert not (blog / 'drafts' / 'sec-note.md').exists(), '发布后原件应删除'
@@ -1129,6 +1195,33 @@ def test_run_drafts_refuses_slug_collision():
     assert rs[0]['status'] == 'error' and 'slug' in rs[0]['reason'], rs
     assert (posts / 'dup.md').read_text(encoding='utf-8') == '已有文章', '已有文章被覆盖了'
     assert (blog / 'drafts' / 'dup.md').exists(), '出错时不该删原件'
+
+
+def test_run_drafts_refuses_slug_collision_across_month_folders():
+    """已有文章在别的月份文件夹里，也要能查出 slug 冲突——原来只查「本次
+    要写的那个月份路径」存不存在，分了月份后这一步会漏判。"""
+    import shutil
+    blog = TMP / 'blog-collide-nested'
+    shutil.rmtree(blog, ignore_errors=True)
+    (blog / 'drafts').mkdir(parents=True)
+    (blog / 'src' / 'content' / 'posts' / '2020-01').mkdir(parents=True)
+    (blog / 'src' / 'content' / 'posts' / '2020-01' / 'dup.md').write_text(
+        '已有文章', encoding='utf-8')
+    (blog / 'drafts' / 'dup.md').write_text(
+        '---\ntitle: 新稿\n---\n正文', encoding='utf-8')
+
+    orig = (df.images.drive_service, df.images.load_index, df.images.fetch_images)
+    df.images.drive_service = lambda _: None
+    df.images.load_index = lambda *a, **k: {}
+    df.images.fetch_images = lambda *a, **k: ({}, [])
+    try:
+        rs = df.run_drafts(blog, '{}')
+    finally:
+        (df.images.drive_service, df.images.load_index, df.images.fetch_images) = orig
+
+    assert rs[0]['status'] == 'error' and 'slug' in rs[0]['reason'], rs
+    assert (blog / 'src' / 'content' / 'posts' / '2020-01' / 'dup.md'
+           ).read_text(encoding='utf-8') == '已有文章', '已有文章被覆盖了'
 
 
 # ---------- routinerun（工具与效率栏目）----------
@@ -1166,7 +1259,9 @@ def test_routinerun_writes_tools_category_and_strips_h1():
 
     rs = rr.run(repo, blog)
     assert rs[0]['status'] == 'published', rs
-    f = blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md"
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    f = blog / 'src' / 'content' / 'posts' / month / f"{rs[0]['slug']}.md"
     text = f.read_text(encoding='utf-8')
     fm = _yaml.safe_load(text.split('---')[1])
     assert fm['category'] == '工具与效率'
@@ -1177,6 +1272,32 @@ def test_routinerun_writes_tools_category_and_strips_h1():
 
     # 重跑不覆盖，避免抹掉人工修改
     assert rr.run(repo, blog)[0]['status'] == 'skipped'
+
+
+def test_routinerun_skips_when_slug_exists_in_different_month_folder():
+    """同一篇工具笔记已经在别的月份文件夹发过，重跑不该在新月份再写一份
+    重复的——原来的「已存在则跳过」只查当前月份路径，分月后会漏判。"""
+    import routinerun as rr
+    import shutil
+    repo = TMP / 'rr3'
+    blog = TMP / 'rr3-blog'
+    shutil.rmtree(repo, ignore_errors=True)
+    shutil.rmtree(blog, ignore_errors=True)
+    (repo / 'git&github').mkdir(parents=True)
+    (repo / 'git&github' / '笔记.md').write_text(
+        '# Git & GitHub 学习笔记\n\n按时间顺序追加记录每次相关对话的要点。\n\n' + '正文' * 400,
+        encoding='utf-8')
+    old = blog / 'src' / 'content' / 'posts' / '2020-01'
+    old.mkdir(parents=True)
+    # slug 算法：'tools-' + slugify_cn(Path('笔记.md').stem)，'笔记' 全是
+    # \w 范围内的 CJK 字符，slugify_cn 不改动它，结果就是 'tools-笔记'
+    # （跟仓库里已发布的 src/content/posts/2026-08/tools-笔记.md 同名不是
+    # 巧合——那篇就是这条通道产出的）
+    (old / 'tools-笔记.md').write_text('已发布的旧版本', encoding='utf-8')
+
+    rs = rr.run(repo, blog)
+    assert rs[0]['status'] == 'skipped', rs
+    assert (old / 'tools-笔记.md').read_text(encoding='utf-8') == '已发布的旧版本'
 
 
 # ---------- seed（引子通道）----------
@@ -1255,7 +1376,9 @@ def test_shrink_mode_publishes_when_clean():
 
     rs = sd.run(v, blog, 'k', None, publish=True, _index={}, _chat=fake)
     assert rs[0]['ok'] and rs[0]['status'] == 'published', rs[0]['failures']
-    assert (blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md").exists()
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    assert (blog / 'src' / 'content' / 'posts' / month / f"{rs[0]['slug']}.md").exists()
     # 记账里存了引子路径，下次选材才能去重
     import json as _json
     rec = _json.loads((blog / 'published.json').read_text(encoding='utf-8'))
@@ -1316,15 +1439,45 @@ def test_related_published_articles_get_links():
     rs = sd.run(v, blog, 'k', None, publish=True, _index={},
                 _chat=lambda m, k: '# 标题\n\n' + _article() + '正' * 12000)
     assert rs[0]['related'] == ['old-one'], rs[0]
-    text = (posts / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    text = (posts / month / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
     assert '## 相关阅读' in text and '](/posts/old-one)' in text
+
+
+def test_related_published_finds_articles_across_month_folders():
+    """已发布文章挪到月份子目录后，「相关阅读」的标题查找不能跟着失效
+    （原来直接拼平铺路径读标题，找不到就静默退化成显示 slug）。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-rel-nested'
+    shutil.rmtree(blog, ignore_errors=True)
+    _post(blog, 'old-one', month='2026-07', title='旧文')
+    (blog / 'published.json').write_text(
+        '{"03质量控制/残留/HCP": {"slug": "old-one", "source_hash": "h"}}',
+        encoding='utf-8')
+    v = _mkvault(TMP / 'v-rel-nested', 'n.md', '正' * 20000)
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article() + '正' * 12000)
+    assert rs[0]['related'] == ['old-one'], rs[0]
+    # process() 的返回值只留 slug，标题在这一步就丢了——真正能看出标题查找
+    # 有没有跨月份生效的地方是渲染出来的正文：查不到标题会退化成显示 slug
+    # 本身，链接文字变成 [old-one](...) 而不是 [旧文](...)
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    text = (blog / 'src' / 'content' / 'posts' / month
+           / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    assert '[旧文](/posts/old-one)' in text, text
 
 
 # ---------- 草稿位（draft）与 published.json 自愈 ----------
 
-def _post(blog, slug, **fm):
-    """在 posts/ 造一篇文章，frontmatter 只写给定字段。"""
+def _post(blog, slug, month=None, **fm):
+    """在 posts/ 造一篇文章，frontmatter 只写给定字段。month 给定时把文章落在对应
+    月份子目录，用来测「文章在月份文件夹里」的场景；不给就还是平铺（兼容
+    既有调用，也覆盖「迁移前遗留平铺文件」这个场景）。"""
     d = Path(blog) / 'src' / 'content' / 'posts'
+    if month:
+        d = d / month
     d.mkdir(parents=True, exist_ok=True)
     lines = ['---']
     for k, v in fm.items():
@@ -1337,6 +1490,43 @@ def _post(blog, slug, **fm):
             lines.append(f'{k}: "{v}"')
     lines += ['---', '', '正文']
     (d / f'{slug}.md').write_text('\n'.join(lines), encoding='utf-8')
+
+
+def test_all_posts_finds_nested_and_flat_files():
+    """分月份子目录后，_all_posts 既要找到子目录里的文章，也不能漏掉迁移
+    前可能残留的平铺文件——两种布局在迁移过渡期会同时存在。"""
+    blog = TMP / 'all-posts'
+    shutil.rmtree(blog, ignore_errors=True)
+    posts = blog / 'src' / 'content' / 'posts'
+    (posts / '2026-07').mkdir(parents=True)
+    (posts / '2026-08').mkdir(parents=True)
+    (posts / '2026-07' / 'old-post.md').write_text('正文', encoding='utf-8')
+    (posts / '2026-08' / 'new-post.md').write_text('正文', encoding='utf-8')
+    (posts / 'flat-post.md').write_text('正文', encoding='utf-8')
+
+    found = mn._all_posts(posts)
+    assert set(found) == {'old-post', 'new-post', 'flat-post'}, found
+    assert found['old-post'] == posts / '2026-07' / 'old-post.md', found
+
+    assert mn._all_posts(TMP / 'does-not-exist') == {}
+
+
+def test_post_path_builds_month_subfolder_path():
+    posts = Path('/blog/src/content/posts')
+    assert mn.post_path(posts, 'my-slug', '2026-08') == posts / '2026-08' / 'my-slug.md'
+
+
+def test_reconcile_finds_posts_in_month_subfolders():
+    """分月份子目录后 reconcile 必须还能找到文章——找不到就会把账本里的记录
+    全部当「文件没了」销掉（master 上出过同类事故，同一份代码的另一个漏账
+    方向见 test_reconcile_backfills_manually_moved_article）。"""
+    blog = TMP / 'rec-nested'
+    shutil.rmtree(blog, ignore_errors=True)
+    _post(blog, '在月份文件夹里', month='2026-08', title='已归档',
+         primaryTag='03质量控制/残留/HCP', sourceNotes=['a.md'])
+    pub = mn.reconcile(blog, {'在月份文件夹里':
+                              {'slug': '在月份文件夹里', 'seed': 'a.md'}})
+    assert '在月份文件夹里' in pub, pub
 
 
 def test_reconcile_backfills_manually_moved_article():
@@ -1389,6 +1579,27 @@ def test_same_tag_articles_do_not_overwrite_each_other():
     pub = mn.reconcile(blog, {})
     assert set(pub) == {'a', 'b'}, pub
     assert {r['seed'] for r in pub.values()} == {'A.md', 'B.md'}, pub
+
+
+def test_seed_rerun_moves_article_to_new_month_removes_old_copy():
+    """人工改完源笔记重跑同一篇引子：assemble_frontmatter 把 date 刷成
+    当天，归档月份跟着变——旧月份文件夹里不能留一份没人管的孤本。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-rerun-move'
+    shutil.rmtree(blog, ignore_errors=True)
+    old_path = blog / 'src' / 'content' / 'posts' / '2020-01' / 'n.md'
+    old_path.parent.mkdir(parents=True)
+    old_path.write_text('---\ntitle: "旧版本"\n---\n\n旧正文', encoding='utf-8')
+    v = _mkvault(TMP / 'v-rerun-move', 'n.md', '回收率 85.3%。' + '正' * 20000)
+    chat = lambda m, k: '# 标题\n\n' + _article() + '\n\n回收率 85.3%。' + '正' * 12000
+
+    rs = sd.run(v, blog, 'k', None, ['n.md'], publish=True, _index={}, _chat=chat)
+    assert rs[0]['ok'], rs[0]['failures']
+    assert not old_path.exists(), '旧月份文件夹的孤本应该被清掉'
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    assert (blog / 'src' / 'content' / 'posts' / month
+           / f"{rs[0]['slug']}.md").exists()
 
 
 def test_backfilled_record_is_not_republished():
@@ -1466,7 +1677,9 @@ def test_failed_verification_lands_in_posts_as_draft():
                 _chat=lambda m, k: '# 标题\n\n' + _article())
     assert not rs[0]['ok'] and rs[0]['status'] == 'draft', rs[0]
     assert not (blog / '_review').exists(), '_review/ 已经取消'
-    f = blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md"
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    f = blog / 'src' / 'content' / 'posts' / month / f"{rs[0]['slug']}.md"
     assert f.exists(), '草稿也要落在 posts/ 里'
     text = f.read_text(encoding='utf-8')
     assert text.startswith('---\n'), 'frontmatter 必须在文件最开头'
@@ -1639,6 +1852,30 @@ def test_repair_fills_marks_and_reports_still_missing():
     assert (blog / 'public' / 'images' / 'a-post' / 'back.webp').exists()
     # 补不回来的原样留着，下次补传后还能再修
     assert rd.missing_marks(text) == [('still-gone.png', '')]
+
+
+def test_repair_finds_marks_in_month_subfolder():
+    """待补图的文章挪到月份子目录后，repair 的扫描不能跟着漏掉——原来是
+    平铺 glob，只扫 posts/ 根下一层。"""
+    import repair
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'repair-nested'
+    shutil.rmtree(blog, ignore_errors=True)
+    posts = blog / 'src' / 'content' / 'posts' / '2026-08'
+    posts.mkdir(parents=True, exist_ok=True)
+    art = posts / 'a-post.md'
+    art.write_text(
+        '---\ntitle: t\ndate: 2026-08-01\n---\n\n正文\n\n'
+        + rd.MISSING_TPL.format(name='back.png', caption='') + '\n',
+        encoding='utf-8')
+
+    def fake_download(service, fid):
+        return _png(40, 20)
+
+    rs = repair.run(blog, None, _index={'back.png': 'id1'}, _download=fake_download)
+    assert rs == [{'slug': 'a-post', 'status': 'repaired',
+                   'repaired': ['back.png'], 'stillMissing': []}], rs
+    assert '![](/images/a-post/back.webp)' in art.read_text(encoding='utf-8')
 
 
 def test_repair_without_marks_never_touches_drive():
