@@ -1419,6 +1419,39 @@ def test_save_published_orders_newest_first():
     assert list(on_disk) == ['新', '中-后', '中-先', '旧', '没日期'], on_disk
 
 
+def test_resolve_seed_url_extracts_path_from_github_blob_link():
+    """手动指定引子更顺手的方式：直接在 Obsidian-base 里翻到笔记、复制它的
+    GitHub 链接——中文和斜杠会被转成 %E6%8A%97 这类 percent-encoding。"""
+    url = ('https://github.com/Bryce505/Obsidian-base/blob/master/'
+           'Antibody-Engineering%2F%E6%8A%97%E4%BD%93%E7%BB%93%E6%9E%84'
+           '%E4%B8%8E%E5%8A%9F%E8%83%BD.md')
+    assert mn.resolve_seed_url(url) == 'Antibody-Engineering/抗体结构与功能.md'
+
+
+def test_resolve_seed_url_strips_query_string():
+    """GitHub「查看纯文本」视图的链接带 ?plain=1，不属于路径。"""
+    url = 'https://github.com/Bryce505/Obsidian-base/blob/master/A/B.md?plain=1'
+    assert mn.resolve_seed_url(url) == 'A/B.md'
+
+
+def test_resolve_seed_url_accepts_raw_and_blame_views():
+    """手滑复制成 raw/blame 视图的链接（而不是 blob）也认得。"""
+    assert mn.resolve_seed_url('https://github.com/o/r/raw/main/A/B.md') == 'A/B.md'
+    assert mn.resolve_seed_url('https://github.com/o/r/blame/main/A/B.md') == 'A/B.md'
+
+
+def test_resolve_seed_url_passes_through_bare_path():
+    """已经是裸路径（没有 http 前缀）就原样返回，不强求一定得是链接。"""
+    assert mn.resolve_seed_url('A/B.md') == 'A/B.md'
+
+
+def test_resolve_seed_url_unparseable_link_falls_through_to_existing_error():
+    """解析不出路径的怪链接原样返回，不在这里报错——交给 seed.run() 已有的
+    「找不到引子笔记」校验兜底，不重复一套错误处理。"""
+    weird = 'https://example.com/not-a-github-link'
+    assert mn.resolve_seed_url(weird) == weird
+
+
 def test_failed_verification_lands_in_posts_as_draft():
     """校验没过不再进 _review/：同一个 posts/ 文件，多一行 draft: true。
 

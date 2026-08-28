@@ -18,6 +18,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -293,6 +294,25 @@ def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
     return results
 
 
+def resolve_seed_url(s):
+    """把 GitHub 链接或裸路径统一成 vault 内的相对路径。
+
+    手动指定引子时，直接在 Obsidian-base 仓库里翻目录、复制文件的 GitHub
+    链接（形如 .../blob/master/A/B.md，中文和斜杠会被转成 %E6%8A%97...
+    这种 percent-encoding），比记一遍不含扩展名的短路径更顺手——本来就
+    要先在私有仓库里找到这篇笔记，链接就在那顺手复制到。
+
+    找不到对应笔记不在这里报错：解析失败原样把输入当路径返回，交给
+    seed.run() 已有的「找不到引子笔记」校验兜底，不重复一套错误处理。
+    """
+    s = s.strip()
+    if not s.startswith('http'):
+        return s
+    s = s.split('?', 1)[0]                        # 去掉 ?plain=1 这类查询参数
+    m = re.search(r'/(?:blob|raw|blame)/[^/]+/(.+)$', s)
+    return urllib.parse.unquote(m.group(1)) if m else s
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--vault', help='Obsidian 仓库路径（自动通道必填）')
@@ -309,6 +329,10 @@ def main():
     ap.add_argument('--seed', nargs='*', metavar='NOTE',
                     help='引子通道：单篇笔记做引子，按加减法整理成文章。'
                          '可指定一或多个笔记路径，省略则自动挑')
+    ap.add_argument('--seed-url', metavar='URL_OR_PATH',
+                    help='引子通道：GitHub 链接（在 Obsidian-base 里翻到'
+                         '笔记后复制的那种 .../blob/分支/路径.md）或裸的'
+                         'vault 内相对路径，跟 --seed 二选一')
     ap.add_argument('--manual', action='store_true',
                     help='人工投稿通道：处理 drafts/ 下的稿子，同样走加减法与校验')
     ap.add_argument('--publish', action='store_true',
@@ -319,12 +343,16 @@ def main():
         import manual
         rs = manual.run(a.vault, a.blog, os.environ['DEEPSEEK_API_KEY'],
                         os.environ['GDRIVE_SA_JSON'], publish=a.publish)
-    elif a.seed is not None:
+    elif a.seed is not None or a.seed_url:
         import seed as seed_channel
         if not a.vault:
             ap.error('引子通道需要 --vault')
+        # 两种指定方式收拢成同一个 seed_paths：--seed 是原来的裸路径
+        # （可能不指定，交给自动选材），--seed-url 是手动触发时更顺手的
+        # GitHub 链接，解析成路径后走同一条 run()。
+        seed_paths = [resolve_seed_url(a.seed_url)] if a.seed_url else a.seed
         rs = seed_channel.run(a.vault, a.blog, os.environ['DEEPSEEK_API_KEY'],
-                              os.environ['GDRIVE_SA_JSON'], a.seed, a.count,
+                              os.environ['GDRIVE_SA_JSON'], seed_paths, a.count,
                               publish=a.publish)
     elif a.audit_images:
         import repair

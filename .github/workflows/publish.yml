@@ -29,8 +29,13 @@ on:
         type: choice
         options: [seed, manual, auto]
         default: seed
+      seed_url:
+        description: >-
+          seed 通道指定这一篇当引子：在 Obsidian-base 里翻到笔记后复制它的
+          GitHub 链接粘过来即可（裸的 vault 内相对路径也行）；留空则自动挑
+        default: ''
       count:
-        description: 本次发布的篇数（seed / auto 通道）
+        description: 本次发布的篇数（seed / auto 通道，指定了 seed_url 时不生效）
         default: '1'
       publish:
         description: 校验全过就直接发布（不勾则一律带 draft 标等人工放行）
@@ -55,6 +60,7 @@ jobs:
     env:
       MODE: ${{ github.event.inputs.mode || (github.event_name == 'push' && 'manual' || 'seed') }}
       COUNT: ${{ github.event.inputs.count || 1 }}
+      SEED_URL: ${{ github.event.inputs.seed_url }}
       # 手动触发时不勾「直接发布」就一律带 draft 标；定时与 drafts 推送默认直接发布
       PUBLISH: ${{ github.event.inputs.publish == 'false' && '' || '--publish' }}
     steps:
@@ -100,10 +106,19 @@ jobs:
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: |
+          # SEED_URL 不加引号直接展开：GitHub 链接本身是 percent-encoded，
+          # 不会有裸空格，跟其余分支保持同样「无引号展开」的写法，不为了
+          # 防一个不会发生的输入去引入更复杂的引用规则。
           case "$MODE" in
             manual) ARGS="--manual" ;;
             auto)   ARGS="--count $COUNT" ;;
-            *)      ARGS="--seed --count $COUNT" ;;
+            *)
+              if [ -n "$SEED_URL" ]; then
+                ARGS="--seed-url $SEED_URL"
+              else
+                ARGS="--seed --count $COUNT"
+              fi
+              ;;
           esac
           python pipeline/main.py --vault .vault --blog . $ARGS $PUBLISH | tee -a report.json
 
