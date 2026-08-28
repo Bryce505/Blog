@@ -1021,6 +1021,64 @@ def test_run_auto_marks_failed_verification_as_draft():
     assert pub[rs[0]['slug']]['draft'] is True, pub
 
 
+def test_run_auto_moves_article_to_new_month_removes_old_copy():
+    """pick_next() 会在源笔记改动（source_hash 对不上）时重新选中已发布的组，
+    run_auto() 跟 seed.process() 一样要在换月份重发时清理旧月份的孤本——
+    不清理的话同一 slug 在两个月份文件夹各留一份，_all_posts() 只认得到
+    其中一份，退稿删文件删不干净另一份。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    v = TMP / 'v-auto-remove'
+    shutil.rmtree(v, ignore_errors=True)
+    v.mkdir(parents=True)
+    tag = '03质量控制/残留/HCP'
+    for i in range(2):
+        (v / f'n{i}.md').write_text(
+            f'---\ntags:\n  - {tag}\ntype: note\n---\n正文{i}' + '正' * 3000,
+            encoding='utf-8')
+
+    blog = TMP / 'blog-auto-remove'
+    shutil.rmtree(blog, ignore_errors=True)
+    slug = '03质量控制-残留-hcp'
+    old_path = blog / 'src' / 'content' / 'posts' / '2020-01' / f'{slug}.md'
+    old_path.parent.mkdir(parents=True)
+    old_path.write_text('---\ntitle: "旧版本"\n---\n\n旧正文', encoding='utf-8')
+    (blog / 'published.json').write_text(
+        json.dumps({slug: {'slug': slug, 'tag': tag, 'source_hash': 'sha256:old'}}),
+        encoding='utf-8')
+
+    def fake_compose(group, api_key, model=None, _post=None):
+        body = '\n\n'.join(n.body for n in group.notes)
+        return f'## {group.tag.split("/")[-1]}\n\n本文分为 3 个部分。\n\n{body}'
+
+    def fake_fetch(names, index, service, out_dir, url_prefix, _download=None):
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        m = {}
+        for n in names:
+            dest = out_dir / (Path(n).stem + '.webp')
+            dest.write_bytes(b'fake')
+            m[n] = f'{url_prefix}/{dest.name}'
+        return m, []
+
+    orig = (mn.compose.compose, mn.images.drive_service,
+            mn.images.load_index, mn.images.fetch_images)
+    mn.compose.compose = fake_compose
+    mn.images.drive_service = lambda _: None
+    mn.images.load_index = lambda *a, **k: {}
+    mn.images.fetch_images = fake_fetch
+    try:
+        rs = mn.run_auto(v, blog, 'fake-key', '{}', count=1)
+    finally:
+        (mn.compose.compose, mn.images.drive_service,
+         mn.images.load_index, mn.images.fetch_images) = orig
+
+    assert rs and rs[0]['slug'] == slug, rs
+    assert not old_path.exists(), '旧月份文件夹的孤本应该被清掉'
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    assert (blog / 'src' / 'content' / 'posts' / month / f'{slug}.md').exists()
+
+
 # ---------- drafts（手动通道）----------
 
 def test_fill_defaults_requires_title_only():

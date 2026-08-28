@@ -86,11 +86,17 @@ def run(repo_root, blog_root, today=None):
     posts_dir = Path(blog_root) / 'src' / 'content' / 'posts'
     posts_dir.mkdir(parents=True, exist_ok=True)
     date = (today or dt.date.today()).isoformat()
+    # 这里直接切 date 字符串取月份，没有像别的写入点那样单独算一次
+    # ——因为这条通道的 date 现在恒等于运行当天（today 参数只是方便测试
+    # 注入）。哪天这条通道也允许 date 回溯，这里要跟着改回单独计算，
+    # 不能再共用 date 的值
     month = date[:7]
 
     results = []
     for rel, title, body in collect(repo_root):
         slug = 'tools-' + drafts.slugify_cn(Path(rel).stem)
+        # 每次循环重新扫盘（不缓存在循环外）：同一批产出里刚发布的
+        # 也要能被后续判重，理由同 drafts.py 的 run_drafts()
         if slug in mn._all_posts(posts_dir):
             results.append({'file': rel, 'status': 'skipped', 'slug': slug})
             continue

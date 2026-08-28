@@ -103,6 +103,9 @@ def run_drafts(blog_root, sa_json):
                             'reason': '缺少 title 字段'})
             continue
 
+        # 每次循环重新扫盘（不缓存在循环外）：同一批稿子里如果出现重复
+        # slug，前一篇刚写盘，后一篇也要能查到——批量通常只有几篇，
+        # 重新扫盘的开销可以忽略
         if fm['slug'] in mn._all_posts(posts_dir):
             # 静默覆盖会让人莫名其妙丢文章，报错跳过并保留原件
             results.append({'file': p.name, 'status': 'error',
