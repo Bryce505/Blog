@@ -956,8 +956,10 @@ def test_run_auto_end_to_end_offline():
 
     # 产出物必须真的落盘，且 frontmatter 是合法 YAML
     import yaml as _yaml
+    import datetime as _dt
     for r in rs:
-        f = blog / 'src' / 'content' / 'posts' / f"{r['slug']}.md"
+        f = (blog / 'src' / 'content' / 'posts'
+            / _dt.date.today().strftime('%Y-%m') / f"{r['slug']}.md")
         assert f.exists(), f
         text = f.read_text(encoding='utf-8')
         fm = _yaml.safe_load(text.split('---')[1])
@@ -1009,7 +1011,10 @@ def test_run_auto_marks_failed_verification_as_draft():
 
     assert rs[0]['status'] == 'draft', rs
     assert not (blog / '_review').exists(), '_review/ 已经取消'
-    text = (blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    text = (blog / 'src' / 'content' / 'posts' / month
+           / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
     assert re.search(r'^draft: true$', text, re.M), text[:300]
     # 草稿也记账，否则下次运行又挑中同一组
     pub = json.loads((blog / 'published.json').read_text(encoding='utf-8'))
