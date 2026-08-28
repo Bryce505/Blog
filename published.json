@@ -190,5 +190,20 @@
     ],
     "title": "乌司他丁分子结构与 O-糖胺聚糖链表征方法学综述",
     "seed": "Antibody-Characterization/乌司他丁(Ulinastatin)文献综述-BJ044项目.md"
+  },
+  "大肠杆菌蛋白修饰与酸性峰": {
+    "slug": "大肠杆菌蛋白修饰与酸性峰",
+    "tag": "02分子表征/PTM/Carbamylation",
+    "published_at": "2026-08-28",
+    "source_hash": "sha256:06ca470dfc757a853a679e62e6468805458b40f8dcfe86f3c7bb7fa627d32a6f",
+    "notes": [
+      "Antibody-Characterization/IEX酸性峰调查/大肠杆菌蛋白修饰与酸性峰.md"
+    ],
+    "noteTitles": [
+      "大肠杆菌重组表达蛋白翻译后修饰全景及酸性电荷异质性形成机制深度研究报告"
+    ],
+    "title": "大肠杆菌重组表达蛋白的翻译后修饰与酸性电荷异质性形成机制",
+    "seed": "Antibody-Characterization/IEX酸性峰调查/大肠杆菌蛋白修饰与酸性峰.md",
+    "draft": true
   }
 }
