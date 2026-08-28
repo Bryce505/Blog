@@ -1796,6 +1796,30 @@ def test_repair_fills_marks_and_reports_still_missing():
     assert rd.missing_marks(text) == [('still-gone.png', '')]
 
 
+def test_repair_finds_marks_in_month_subfolder():
+    """待补图的文章挪到月份子目录后，repair 的扫描不能跟着漏掉——原来是
+    平铺 glob，只扫 posts/ 根下一层。"""
+    import repair
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'repair-nested'
+    shutil.rmtree(blog, ignore_errors=True)
+    posts = blog / 'src' / 'content' / 'posts' / '2026-08'
+    posts.mkdir(parents=True, exist_ok=True)
+    art = posts / 'a-post.md'
+    art.write_text(
+        '---\ntitle: t\ndate: 2026-08-01\n---\n\n正文\n\n'
+        + rd.MISSING_TPL.format(name='back.png', caption='') + '\n',
+        encoding='utf-8')
+
+    def fake_download(service, fid):
+        return _png(40, 20)
+
+    rs = repair.run(blog, None, _index={'back.png': 'id1'}, _download=fake_download)
+    assert rs == [{'slug': 'a-post', 'status': 'repaired',
+                   'repaired': ['back.png'], 'stillMissing': []}], rs
+    assert '![](/images/a-post/back.webp)' in art.read_text(encoding='utf-8')
+
+
 def test_repair_without_marks_never_touches_drive():
     """没占位就一次 Drive 都不碰 —— 每晚白跑一趟索引重建不可接受。"""
     import repair

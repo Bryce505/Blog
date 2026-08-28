@@ -19,6 +19,7 @@ from pathlib import Path
 
 import config
 import images
+import main as mn
 import render
 import select_ as sel
 import vault
@@ -30,7 +31,7 @@ def run(blog_root, sa_json, refresh_index=False, _index=None, _download=None):
     """返回每篇文章补回了哪些图、还差哪些。"""
     posts_dir = Path(blog_root) / 'src' / 'content' / 'posts'
     pending = {}
-    for p in sorted(posts_dir.glob('*.md')):
+    for p in sorted(mn._all_posts(posts_dir).values()):
         marks = render.missing_marks(p.read_text(encoding='utf-8'))
         if marks:
             pending[p] = dict(marks)      # 同名图在一篇里可能出现多次
