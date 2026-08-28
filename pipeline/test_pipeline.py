@@ -1401,6 +1401,24 @@ def test_backfilled_record_is_not_republished():
                                      'source_hash': 'sha256:old'}}) is g
 
 
+def test_save_published_orders_newest_first():
+    """落盘前重排：日期新的在前，同一天内后写入的排更前——手机/网页直接
+    打开 published.json 确认发表状态，不用再拉到文件末尾找最新一条。"""
+    blog = TMP / 'save-order'
+    shutil.rmtree(blog, ignore_errors=True)
+    blog.mkdir(parents=True)
+    pub = {
+        '旧': {'slug': '旧', 'published_at': '2026-08-25'},
+        '中-先': {'slug': '中-先', 'published_at': '2026-08-26'},
+        '中-后': {'slug': '中-后', 'published_at': '2026-08-26'},
+        '新': {'slug': '新', 'published_at': '2026-08-27'},
+        '没日期': {'slug': '没日期'},   # reconcile 补建时 frontmatter 缺 date 会出现
+    }
+    mn.save_published(blog, pub)
+    on_disk = json.loads((blog / 'published.json').read_text(encoding='utf-8'))
+    assert list(on_disk) == ['新', '中-后', '中-先', '旧', '没日期'], on_disk
+
+
 def test_failed_verification_lands_in_posts_as_draft():
     """校验没过不再进 _review/：同一个 posts/ 文件，多一行 draft: true。
 

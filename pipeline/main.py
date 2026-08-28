@@ -151,8 +151,21 @@ def record_published(blog_root, published, group, seed=None, title=None, draft=F
 
 
 def save_published(blog_root, published):
+    """落盘前按发布日期新→旧重排，同一天内后写入的排更前。
+
+    实测反馈：原来直接按 dict 插入顺序落盘，等于最早发布的排最前——手机
+    或网页里直接打开 published.json 确认发表状态，要拉到文件末尾才能看到
+    最新一条，很不方便。这里把当前顺序整体反转，再按 published_at 做稳定
+    排序（reverse=True）：稳定排序保留「同一天」这些记录参与排序前的相对
+    顺序，也就是反转后的顺序，等价于「同一天内写入更晚的排更前」。只改这
+    一处、不改 record_published/reconcile 的写入逻辑——不管内存里那份
+    dict 顺序被谁怎么增删过，落到磁盘上的顺序始终正确。
+    """
+    items = list(published.items())[::-1]
+    ordered = dict(sorted(items, key=lambda kv: kv[1].get('published_at', ''),
+                          reverse=True))
     (Path(blog_root) / 'published.json').write_text(
-        json.dumps(published, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        json.dumps(ordered, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 
 def load_published(blog_root):
