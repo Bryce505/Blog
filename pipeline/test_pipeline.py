@@ -1260,7 +1260,9 @@ def test_shrink_mode_publishes_when_clean():
 
     rs = sd.run(v, blog, 'k', None, publish=True, _index={}, _chat=fake)
     assert rs[0]['ok'] and rs[0]['status'] == 'published', rs[0]['failures']
-    assert (blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md").exists()
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    assert (blog / 'src' / 'content' / 'posts' / month / f"{rs[0]['slug']}.md").exists()
     # 记账里存了引子路径，下次选材才能去重
     import json as _json
     rec = _json.loads((blog / 'published.json').read_text(encoding='utf-8'))
@@ -1321,8 +1323,34 @@ def test_related_published_articles_get_links():
     rs = sd.run(v, blog, 'k', None, publish=True, _index={},
                 _chat=lambda m, k: '# 标题\n\n' + _article() + '正' * 12000)
     assert rs[0]['related'] == ['old-one'], rs[0]
-    text = (posts / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    text = (posts / month / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
     assert '## 相关阅读' in text and '](/posts/old-one)' in text
+
+
+def test_related_published_finds_articles_across_month_folders():
+    """已发布文章挪到月份子目录后，「相关阅读」的标题查找不能跟着失效
+    （原来直接拼平铺路径读标题，找不到就静默退化成显示 slug）。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-rel-nested'
+    shutil.rmtree(blog, ignore_errors=True)
+    _post(blog, 'old-one', month='2026-07', title='旧文')
+    (blog / 'published.json').write_text(
+        '{"03质量控制/残留/HCP": {"slug": "old-one", "source_hash": "h"}}',
+        encoding='utf-8')
+    v = _mkvault(TMP / 'v-rel-nested', 'n.md', '正' * 20000)
+    rs = sd.run(v, blog, 'k', None, publish=True, _index={},
+                _chat=lambda m, k: '# 标题\n\n' + _article() + '正' * 12000)
+    assert rs[0]['related'] == ['old-one'], rs[0]
+    # process() 的返回值只留 slug，标题在这一步就丢了——真正能看出标题查找
+    # 有没有跨月份生效的地方是渲染出来的正文：查不到标题会退化成显示 slug
+    # 本身，链接文字变成 [old-one](...) 而不是 [旧文](...)
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    text = (blog / 'src' / 'content' / 'posts' / month
+           / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    assert '[旧文](/posts/old-one)' in text, text
 
 
 # ---------- 草稿位（draft）与 published.json 自愈 ----------
@@ -1437,6 +1465,27 @@ def test_same_tag_articles_do_not_overwrite_each_other():
     assert {r['seed'] for r in pub.values()} == {'A.md', 'B.md'}, pub
 
 
+def test_seed_rerun_moves_article_to_new_month_removes_old_copy():
+    """人工改完源笔记重跑同一篇引子：assemble_frontmatter 把 date 刷成
+    当天，归档月份跟着变——旧月份文件夹里不能留一份没人管的孤本。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    blog = TMP / 'seed-rerun-move'
+    shutil.rmtree(blog, ignore_errors=True)
+    old_path = blog / 'src' / 'content' / 'posts' / '2020-01' / 'n.md'
+    old_path.parent.mkdir(parents=True)
+    old_path.write_text('---\ntitle: "旧版本"\n---\n\n旧正文', encoding='utf-8')
+    v = _mkvault(TMP / 'v-rerun-move', 'n.md', '回收率 85.3%。' + '正' * 20000)
+    chat = lambda m, k: '# 标题\n\n' + _article() + '\n\n回收率 85.3%。' + '正' * 12000
+
+    rs = sd.run(v, blog, 'k', None, ['n.md'], publish=True, _index={}, _chat=chat)
+    assert rs[0]['ok'], rs[0]['failures']
+    assert not old_path.exists(), '旧月份文件夹的孤本应该被清掉'
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    assert (blog / 'src' / 'content' / 'posts' / month
+           / f"{rs[0]['slug']}.md").exists()
+
+
 def test_backfilled_record_is_not_republished():
     """回填记录没有 source_hash（拿不到 vault 算不出）。当作已发布，
     不重发 —— 人工放行过的文章不该因为源笔记改了个错别字就被悄悄重写。"""
@@ -1512,7 +1561,9 @@ def test_failed_verification_lands_in_posts_as_draft():
                 _chat=lambda m, k: '# 标题\n\n' + _article())
     assert not rs[0]['ok'] and rs[0]['status'] == 'draft', rs[0]
     assert not (blog / '_review').exists(), '_review/ 已经取消'
-    f = blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md"
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    f = blog / 'src' / 'content' / 'posts' / month / f"{rs[0]['slug']}.md"
     assert f.exists(), '草稿也要落在 posts/ 里'
     text = f.read_text(encoding='utf-8')
     assert text.startswith('---\n'), 'frontmatter 必须在文件最开头'
