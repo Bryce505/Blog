@@ -13,6 +13,7 @@ import yaml
 
 import drafts
 import images
+import main as mn
 import render
 import vault
 
@@ -85,12 +86,12 @@ def run(repo_root, blog_root, today=None):
     posts_dir = Path(blog_root) / 'src' / 'content' / 'posts'
     posts_dir.mkdir(parents=True, exist_ok=True)
     date = (today or dt.date.today()).isoformat()
+    month = date[:7]
 
     results = []
     for rel, title, body in collect(repo_root):
         slug = 'tools-' + drafts.slugify_cn(Path(rel).stem)
-        out = posts_dir / f'{slug}.md'
-        if out.exists():
+        if slug in mn._all_posts(posts_dir):
             results.append({'file': rel, 'status': 'skipped', 'slug': slug})
             continue
         img_map, missing = _copy_images(repo_root, rel, body, blog_root, slug)
@@ -103,6 +104,8 @@ def run(repo_root, blog_root, today=None):
             'description': drafts.fill_defaults(
                 {'title': title}, Path(rel), body)['description'],
         }
+        out = mn.post_path(posts_dir, slug, month)
+        out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(
             '---\n' + yaml.safe_dump(fm, allow_unicode=True, sort_keys=False)
             + '---\n\n' + body, encoding='utf-8')

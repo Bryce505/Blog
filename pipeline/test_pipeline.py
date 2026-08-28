@@ -1201,7 +1201,9 @@ def test_routinerun_writes_tools_category_and_strips_h1():
 
     rs = rr.run(repo, blog)
     assert rs[0]['status'] == 'published', rs
-    f = blog / 'src' / 'content' / 'posts' / f"{rs[0]['slug']}.md"
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    f = blog / 'src' / 'content' / 'posts' / month / f"{rs[0]['slug']}.md"
     text = f.read_text(encoding='utf-8')
     fm = _yaml.safe_load(text.split('---')[1])
     assert fm['category'] == '工具与效率'
@@ -1212,6 +1214,32 @@ def test_routinerun_writes_tools_category_and_strips_h1():
 
     # 重跑不覆盖，避免抹掉人工修改
     assert rr.run(repo, blog)[0]['status'] == 'skipped'
+
+
+def test_routinerun_skips_when_slug_exists_in_different_month_folder():
+    """同一篇工具笔记已经在别的月份文件夹发过，重跑不该在新月份再写一份
+    重复的——原来的「已存在则跳过」只查当前月份路径，分月后会漏判。"""
+    import routinerun as rr
+    import shutil
+    repo = TMP / 'rr3'
+    blog = TMP / 'rr3-blog'
+    shutil.rmtree(repo, ignore_errors=True)
+    shutil.rmtree(blog, ignore_errors=True)
+    (repo / 'git&github').mkdir(parents=True)
+    (repo / 'git&github' / '笔记.md').write_text(
+        '# Git & GitHub 学习笔记\n\n按时间顺序追加记录每次相关对话的要点。\n\n' + '正文' * 400,
+        encoding='utf-8')
+    old = blog / 'src' / 'content' / 'posts' / '2020-01'
+    old.mkdir(parents=True)
+    # slug 算法：'tools-' + slugify_cn(Path('笔记.md').stem)，'笔记' 全是
+    # \w 范围内的 CJK 字符，slugify_cn 不改动它，结果就是 'tools-笔记'
+    # （跟仓库里已发布的 src/content/posts/2026-08/tools-笔记.md 同名不是
+    # 巧合——那篇就是这条通道产出的）
+    (old / 'tools-笔记.md').write_text('已发布的旧版本', encoding='utf-8')
+
+    rs = rr.run(repo, blog)
+    assert rs[0]['status'] == 'skipped', rs
+    assert (old / 'tools-笔记.md').read_text(encoding='utf-8') == '已发布的旧版本'
 
 
 # ---------- seed（引子通道）----------
