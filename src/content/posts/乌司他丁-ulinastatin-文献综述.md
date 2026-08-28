@@ -3,7 +3,7 @@ title: "乌司他丁分子结构与 O-糖胺聚糖链表征方法学综述"
 date: 2026-08-27
 category: "00基础"
 primaryTag: "00基础/文献/综述"
-description: "乌司他丁（Ulinastatin，尿胰蛋白酶抑制剂 Urinary Trypsin Inhibitor / UTI，核心蛋白学名 Bikunin）是 BJ044 项目的研究对象。本文基于 Zotero 文献库 文献/项目文献/BJ044 分类下的 13 篇文献（1999–2023"
+description: "乌司他丁（Ulinastatin，尿胰蛋白酶抑制剂 Urinary Trypsin Inhibitor / UTI，核心蛋白学名 Bikunin）是本项目的研究对象。本文基于 Zotero 文献库 文献/项目文献/乌司他丁 分类下的 13 篇文献（1999–2023）"
 tags:
   - "00基础/文献/综述"
 sourceNotes:
