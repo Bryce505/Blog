@@ -1322,9 +1322,13 @@ def test_related_published_articles_get_links():
 
 # ---------- 草稿位（draft）与 published.json 自愈 ----------
 
-def _post(blog, slug, **fm):
-    """在 posts/ 造一篇文章，frontmatter 只写给定字段。"""
+def _post(blog, slug, month=None, **fm):
+    """在 posts/ 造一篇文章，frontmatter 只写给定字段。month 给定时把文章落在对应
+    月份子目录，用来测「文章在月份文件夹里」的场景；不给就还是平铺（兼容
+    既有调用，也覆盖「迁移前遗留平铺文件」这个场景）。"""
     d = Path(blog) / 'src' / 'content' / 'posts'
+    if month:
+        d = d / month
     d.mkdir(parents=True, exist_ok=True)
     lines = ['---']
     for k, v in fm.items():
@@ -1337,6 +1341,43 @@ def _post(blog, slug, **fm):
             lines.append(f'{k}: "{v}"')
     lines += ['---', '', '正文']
     (d / f'{slug}.md').write_text('\n'.join(lines), encoding='utf-8')
+
+
+def test_all_posts_finds_nested_and_flat_files():
+    """分月份子目录后，_all_posts 既要找到子目录里的文章，也不能漏掉迁移
+    前可能残留的平铺文件——两种布局在迁移过渡期会同时存在。"""
+    blog = TMP / 'all-posts'
+    shutil.rmtree(blog, ignore_errors=True)
+    posts = blog / 'src' / 'content' / 'posts'
+    (posts / '2026-07').mkdir(parents=True)
+    (posts / '2026-08').mkdir(parents=True)
+    (posts / '2026-07' / 'old-post.md').write_text('正文', encoding='utf-8')
+    (posts / '2026-08' / 'new-post.md').write_text('正文', encoding='utf-8')
+    (posts / 'flat-post.md').write_text('正文', encoding='utf-8')
+
+    found = mn._all_posts(posts)
+    assert set(found) == {'old-post', 'new-post', 'flat-post'}, found
+    assert found['old-post'] == posts / '2026-07' / 'old-post.md', found
+
+    assert mn._all_posts(TMP / 'does-not-exist') == {}
+
+
+def test_post_path_builds_month_subfolder_path():
+    posts = Path('/blog/src/content/posts')
+    assert mn.post_path(posts, 'my-slug', '2026-08') == posts / '2026-08' / 'my-slug.md'
+
+
+def test_reconcile_finds_posts_in_month_subfolders():
+    """分月份子目录后 reconcile 必须还能找到文章——找不到就会把账本里的记录
+    全部当「文件没了」销掉（master 上出过同类事故，同一份代码的另一个漏账
+    方向见 test_reconcile_backfills_manually_moved_article）。"""
+    blog = TMP / 'rec-nested'
+    shutil.rmtree(blog, ignore_errors=True)
+    _post(blog, '在月份文件夹里', month='2026-08', title='已归档',
+         primaryTag='03质量控制/残留/HCP', sourceNotes=['a.md'])
+    pub = mn.reconcile(blog, {'在月份文件夹里':
+                              {'slug': '在月份文件夹里', 'seed': 'a.md'}})
+    assert '在月份文件夹里' in pub, pub
 
 
 def test_reconcile_backfills_manually_moved_article():
