@@ -29,14 +29,14 @@ sIgE 检测是过敏诊断的中心环节：The measurement of sIgE levels in th
   - basophil activation test（BAT）；
   - humanized rat basophilic leukemia（RBL）assay。
 
-*[图片暂缺]*<!--missing-image: Pasted Image 20240919101703_895.png|-->
+![](/images/rbl-assay-excalidraw/Pasted%20Image%2020240919101703_895.webp)
 
 ## 传统酶法：脱颗粒释放标志物的检测
 
 传统酶法（biochemical assay）以 RBL 细胞脱颗粒释放的组胺（Histamine）与 β-氨基己糖苷酶（beta-hexosaminidase）为检测对象。β-氨基己糖苷酶通过底物水解产生可定量信号，其他底物：4-MUG；酶解产物4-MU，fluorescence signal at Ex/Em 360/465 nm. 检测用细胞系为改造 RBL-2H3，最小免化剂量（sensitizing dose）：10ng/ml IgE。
 
-*[图片暂缺]*<!--missing-image: Pasted Image 20240919104014_973.png|-->
-*[图片暂缺]*<!--missing-image: Pasted Image 20240919105551_820.png|-->
+![](/images/rbl-assay-excalidraw/Pasted%20Image%2020240919104014_973.webp)
+![](/images/rbl-assay-excalidraw/Pasted%20Image%2020240919105551_820.webp)
 
 ## 传统酶法的灵敏度局限与刺激 buffer 优化
 
@@ -55,11 +55,11 @@ sIgE 检测是过敏诊断的中心环节：The measurement of sIgE levels in th
 - 方法稳健，不受淬灭剂和温度的影响；
 - 可以使用更高稀释比的血清，避免毒性，同时不影响灵敏度。
 
-*[图片暂缺]*<!--missing-image: Pasted Image 20240919112011_924.png|-->
-*[图片暂缺]*<!--missing-image: Pasted Image 20240919171449_268.png|-->
+![](/images/rbl-assay-excalidraw/Pasted%20Image%2020240919112011_924.webp)
+![](/images/rbl-assay-excalidraw/Pasted%20Image%2020240919171449_268.webp)
 
 ## 两条检测路径的取舍与适用边界
 
 传统酶法直接测定脱颗粒释放的组胺与 β-氨基己糖苷酶，贴近天然释放过程，但基线灵敏度不足，D2O 与 NECA 的优化在提高信号的同时抬高背景；报告基因法则以 NFAT 转录激活偶联荧光素酶表达，在灵敏度、稳健性和血清耐受性上更有优势，且无需增敏试剂。选择哪条路径，取决于实验对检测灵敏度、背景控制与血清耐受性的具体需求。
 
-*[图片暂缺]*<!--missing-image: Pasted Image 20240919171849_426.png|-->
+![](/images/rbl-assay-excalidraw/Pasted%20Image%2020240919171849_426.webp)
