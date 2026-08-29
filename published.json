@@ -1,17 +1,17 @@
 {
-  "hcp-elisa稀释线性不通过的判定报告与早期方法开发策略": {
-    "slug": "hcp-elisa稀释线性不通过的判定报告与早期方法开发策略",
-    "tag": "03质量控制/残留/HCP",
+  "cge_injection_optimization_report": {
+    "slug": "cge_injection_optimization_report",
+    "tag": "05仪器与分析技术/Capillary-Electrophoresis",
     "published_at": "2026-08-29",
-    "source_hash": "sha256:c225481a44538a7d79b44c8b32ed09f3dec9b7b2c3cbd6e790b33d1b1017fb3f",
+    "source_hash": "sha256:640d64f9379ce0f95bd6fbea63e9e5c0284d999a958bfc9c094919cf728ea16b",
     "notes": [
-      "Antibody-Characterization/HCP/HCP-ELISA稀释线性不通过的判定报告与早期方法开发策略.md"
+      "Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CGE_Injection_Optimization_Report.md"
     ],
     "noteTitles": [
-      "HCP ELISA 稀释线性不通过的判定、报告与早期方法开发策略"
+      "CGE_Injection_Optimization_Report"
     ],
-    "title": "HCP ELISA 稀释线性不通过的判定、报告与早期方法开发策略",
-    "seed": "Antibody-Characterization/HCP/HCP-ELISA稀释线性不通过的判定报告与早期方法开发策略.md"
+    "title": "CE-SDS 中 IgG 纯度分析的压力进样可行性、电动进样稳定性策略与 PA800 Plus 参数优化",
+    "seed": "Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CGE_Injection_Optimization_Report.md"
   },
   "分项策略-杂质分析策略-20260708": {
     "slug": "分项策略-杂质分析策略-20260708",
@@ -28,48 +28,19 @@
     "seed": "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-杂质分析策略-20260708.md",
     "draft": true
   },
-  "rbl-assay-excalidraw": {
-    "slug": "rbl-assay-excalidraw",
-    "tag": "03质量控制/活性/细胞活性",
-    "published_at": "2026-08-28",
-    "source_hash": "sha256:3d890ad8611d966da619741a32b9a978de9d8dd5683a4d06128cfda48d81483f",
-    "notes": [
-      "Analytical technology/细胞活性分析/RBL assay.excalidraw.md"
-    ],
-    "noteTitles": [
-      "RBL assay.excalidraw"
-    ],
-    "title": "RBL 细胞脱颗粒活性检测：传统酶法与 NFAT 报告基因法",
-    "seed": "Analytical technology/细胞活性分析/RBL assay.excalidraw.md",
-    "draft": true
-  },
-  "hcp定量-ibaq": {
-    "slug": "hcp定量-ibaq",
+  "hcp-elisa稀释线性不通过的判定报告与早期方法开发策略": {
+    "slug": "hcp-elisa稀释线性不通过的判定报告与早期方法开发策略",
     "tag": "03质量控制/残留/HCP",
-    "published_at": "2026-08-28",
-    "source_hash": "sha256:0e27a8b3c493c214486d9e1e46256709b5cc9742c1d2cd28b2a494a56c01f527",
+    "published_at": "2026-08-29",
+    "source_hash": "sha256:c225481a44538a7d79b44c8b32ed09f3dec9b7b2c3cbd6e790b33d1b1017fb3f",
     "notes": [
-      "Antibody-Characterization/HCP/HCP定量：iBAQ.md"
+      "Antibody-Characterization/HCP/HCP-ELISA稀释线性不通过的判定报告与早期方法开发策略.md"
     ],
     "noteTitles": [
-      "HCP定量：iBAQ"
+      "HCP ELISA 稀释线性不通过的判定、报告与早期方法开发策略"
     ],
-    "title": "宿主细胞蛋白定量中的iBAQ无标记蛋白质组学方法：原理、性能比较与工作流程",
-    "seed": "Antibody-Characterization/HCP/HCP定量：iBAQ.md"
-  },
-  "大肠杆菌蛋白修饰与酸性峰": {
-    "slug": "大肠杆菌蛋白修饰与酸性峰",
-    "tag": "02分子表征/PTM/Carbamylation",
-    "published_at": "2026-08-28",
-    "source_hash": "sha256:06ca470dfc757a853a679e62e6468805458b40f8dcfe86f3c7bb7fa627d32a6f",
-    "notes": [
-      "Antibody-Characterization/IEX酸性峰调查/大肠杆菌蛋白修饰与酸性峰.md"
-    ],
-    "noteTitles": [
-      "大肠杆菌重组表达蛋白翻译后修饰全景及酸性电荷异质性形成机制深度研究报告"
-    ],
-    "title": "大肠杆菌重组表达蛋白的翻译后修饰与酸性电荷异质性形成机制",
-    "seed": "Antibody-Characterization/IEX酸性峰调查/大肠杆菌蛋白修饰与酸性峰.md"
+    "title": "HCP ELISA 稀释线性不通过的判定、报告与早期方法开发策略",
+    "seed": "Antibody-Characterization/HCP/HCP-ELISA稀释线性不通过的判定报告与早期方法开发策略.md"
   },
   "糖基化-pert1-基础篇-糖生物学": {
     "slug": "糖基化-pert1-基础篇-糖生物学",
@@ -85,6 +56,49 @@
     "title": "糖基化基础：从单糖立体化学到聚糖结构与生物合成",
     "seed": "Antibody-Characterization/glycosylation/糖基化-Pert1.基础篇：糖生物学.md"
   },
+  "大肠杆菌蛋白修饰与酸性峰": {
+    "slug": "大肠杆菌蛋白修饰与酸性峰",
+    "tag": "02分子表征/PTM/Carbamylation",
+    "published_at": "2026-08-28",
+    "source_hash": "sha256:06ca470dfc757a853a679e62e6468805458b40f8dcfe86f3c7bb7fa627d32a6f",
+    "notes": [
+      "Antibody-Characterization/IEX酸性峰调查/大肠杆菌蛋白修饰与酸性峰.md"
+    ],
+    "noteTitles": [
+      "大肠杆菌重组表达蛋白翻译后修饰全景及酸性电荷异质性形成机制深度研究报告"
+    ],
+    "title": "大肠杆菌重组表达蛋白的翻译后修饰与酸性电荷异质性形成机制",
+    "seed": "Antibody-Characterization/IEX酸性峰调查/大肠杆菌蛋白修饰与酸性峰.md"
+  },
+  "hcp定量-ibaq": {
+    "slug": "hcp定量-ibaq",
+    "tag": "03质量控制/残留/HCP",
+    "published_at": "2026-08-28",
+    "source_hash": "sha256:0e27a8b3c493c214486d9e1e46256709b5cc9742c1d2cd28b2a494a56c01f527",
+    "notes": [
+      "Antibody-Characterization/HCP/HCP定量：iBAQ.md"
+    ],
+    "noteTitles": [
+      "HCP定量：iBAQ"
+    ],
+    "title": "宿主细胞蛋白定量中的iBAQ无标记蛋白质组学方法：原理、性能比较与工作流程",
+    "seed": "Antibody-Characterization/HCP/HCP定量：iBAQ.md"
+  },
+  "rbl-assay-excalidraw": {
+    "slug": "rbl-assay-excalidraw",
+    "tag": "03质量控制/活性/细胞活性",
+    "published_at": "2026-08-28",
+    "source_hash": "sha256:3d890ad8611d966da619741a32b9a978de9d8dd5683a4d06128cfda48d81483f",
+    "notes": [
+      "Analytical technology/细胞活性分析/RBL assay.excalidraw.md"
+    ],
+    "noteTitles": [
+      "RBL assay.excalidraw"
+    ],
+    "title": "RBL 细胞脱颗粒活性检测：传统酶法与 NFAT 报告基因法",
+    "seed": "Analytical technology/细胞活性分析/RBL assay.excalidraw.md",
+    "draft": true
+  },
   "乌司他丁-ulinastatin-文献综述": {
     "slug": "乌司他丁-ulinastatin-文献综述",
     "tag": "00基础/文献/综述",
@@ -99,61 +113,20 @@
     "title": "乌司他丁分子结构与 O-糖胺聚糖链表征方法学综述",
     "seed": "Antibody-Characterization/乌司他丁(Ulinastatin)文献综述-BJ044项目.md"
   },
-  "分项策略-功能学研究策略-20260703": {
-    "slug": "分项策略-功能学研究策略-20260703",
+  "cge_peak_area_instability_literature_review": {
+    "slug": "cge_peak_area_instability_literature_review",
+    "tag": "02分子表征/Size-variant/CE-SDS",
     "published_at": "2026-08-26",
-    "source_hash": "sha256:afc2da77ced8f320b16efe0381289987e7edfc14ca1fe3748eab7eac544b29b4",
+    "source_hash": "sha256:5a2744d3c021a0590c735685086129ca94174174e024971949f4266694206020",
     "notes": [
-      "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-功能学研究策略-20260703.md"
+      "Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CGE_Peak_Area_Instability_Literature_Review.md"
     ],
     "noteTitles": [
-      "分项策略-功能学研究策略"
+      "CGE_Peak_Area_Instability_Literature_Review"
     ],
-    "title": "生物制品功能学研究策略：覆盖早研至BLA全生命周期的效价测定与方法学体系",
-    "seed": "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-功能学研究策略-20260703.md",
-    "tag": "07注册与法规/ICH/Quality"
-  },
-  "2012-comparison-and-applications-of-label-free-absolute-proteome-quantification-methods-on-escherichia-coli": {
-    "slug": "2012-comparison-and-applications-of-label-free-absolute-proteome-quantification-methods-on-escherichia-coli",
-    "tag": "03质量控制/残留/HCP",
-    "published_at": "2026-08-26",
-    "notes": [
-      "Antibody-Characterization/HCP/2012-Comparison and applications of label-free absolute proteome quantification methods on Escherichia coli.md"
-    ],
-    "title": "Label-free 绝对蛋白质组定量：两种定量策略的比较与 HCP 应用衔接",
-    "seed": "Antibody-Characterization/HCP/2012-Comparison and applications of label-free absolute proteome quantification methods on Escherichia coli.md",
+    "title": "CE-SDS 蛋白定量中峰面积逐针下降与迁移时间漂移：文献证据、机制分析与对策",
+    "seed": "Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CGE_Peak_Area_Instability_Literature_Review.md",
     "draft": true
-  },
-  "elisa方法开发-稀释线性和平行性": {
-    "slug": "elisa方法开发-稀释线性和平行性",
-    "tag": "03质量控制/残留/HCP",
-    "published_at": "2026-08-26",
-    "notes": [
-      "Quality_and_Regulation/验证相关/ELISA方法开发-稀释线性和平行性.md"
-    ],
-    "title": "ELISA 方法开发中的稀释线性与平行性：MRD 建立、HCP 专属考量与非线性排查",
-    "seed": "Quality_and_Regulation/验证相关/ELISA方法开发-稀释线性和平行性.md"
-  },
-  "分项策略-结构表征研究策略-20260702": {
-    "slug": "分项策略-结构表征研究策略-20260702",
-    "tag": "07注册与法规/ICH/Quality",
-    "published_at": "2026-08-26",
-    "notes": [
-      "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-结构表征研究策略-20260702.md"
-    ],
-    "title": "结构表征研究策略：覆盖IND至BLA全生命周期的生物制品表征体系",
-    "seed": "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-结构表征研究策略-20260702.md",
-    "draft": true
-  },
-  "切胶覆盖率": {
-    "slug": "切胶覆盖率",
-    "tag": "02分子表征/肽图/切胶覆盖率",
-    "published_at": "2026-08-26",
-    "notes": [
-      "Antibody-Characterization/前处理/切胶覆盖率.md"
-    ],
-    "title": "切胶覆盖率样品前处理：银染凝胶条带胶内酶切与nLC-MS/MS分析的完整SOP",
-    "seed": "Antibody-Characterization/前处理/切胶覆盖率.md"
   },
   "protein-sequencing与离子类型": {
     "slug": "protein-sequencing与离子类型",
@@ -170,19 +143,112 @@
     "seed": "Antibody-Characterization/protein sequencing与离子类型.md",
     "draft": true
   },
-  "cge_peak_area_instability_literature_review": {
-    "slug": "cge_peak_area_instability_literature_review",
-    "tag": "02分子表征/Size-variant/CE-SDS",
+  "切胶覆盖率": {
+    "slug": "切胶覆盖率",
+    "tag": "02分子表征/肽图/切胶覆盖率",
     "published_at": "2026-08-26",
-    "source_hash": "sha256:5a2744d3c021a0590c735685086129ca94174174e024971949f4266694206020",
     "notes": [
-      "Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CGE_Peak_Area_Instability_Literature_Review.md"
+      "Antibody-Characterization/前处理/切胶覆盖率.md"
+    ],
+    "title": "切胶覆盖率样品前处理：银染凝胶条带胶内酶切与nLC-MS/MS分析的完整SOP",
+    "seed": "Antibody-Characterization/前处理/切胶覆盖率.md"
+  },
+  "分项策略-结构表征研究策略-20260702": {
+    "slug": "分项策略-结构表征研究策略-20260702",
+    "tag": "07注册与法规/ICH/Quality",
+    "published_at": "2026-08-26",
+    "notes": [
+      "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-结构表征研究策略-20260702.md"
+    ],
+    "title": "结构表征研究策略：覆盖IND至BLA全生命周期的生物制品表征体系",
+    "seed": "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-结构表征研究策略-20260702.md",
+    "draft": true
+  },
+  "elisa方法开发-稀释线性和平行性": {
+    "slug": "elisa方法开发-稀释线性和平行性",
+    "tag": "03质量控制/残留/HCP",
+    "published_at": "2026-08-26",
+    "notes": [
+      "Quality_and_Regulation/验证相关/ELISA方法开发-稀释线性和平行性.md"
+    ],
+    "title": "ELISA 方法开发中的稀释线性与平行性：MRD 建立、HCP 专属考量与非线性排查",
+    "seed": "Quality_and_Regulation/验证相关/ELISA方法开发-稀释线性和平行性.md"
+  },
+  "2012-comparison-and-applications-of-label-free-absolute-proteome-quantification-methods-on-escherichia-coli": {
+    "slug": "2012-comparison-and-applications-of-label-free-absolute-proteome-quantification-methods-on-escherichia-coli",
+    "tag": "03质量控制/残留/HCP",
+    "published_at": "2026-08-26",
+    "notes": [
+      "Antibody-Characterization/HCP/2012-Comparison and applications of label-free absolute proteome quantification methods on Escherichia coli.md"
+    ],
+    "title": "Label-free 绝对蛋白质组定量：两种定量策略的比较与 HCP 应用衔接",
+    "seed": "Antibody-Characterization/HCP/2012-Comparison and applications of label-free absolute proteome quantification methods on Escherichia coli.md",
+    "draft": true
+  },
+  "分项策略-功能学研究策略-20260703": {
+    "slug": "分项策略-功能学研究策略-20260703",
+    "published_at": "2026-08-26",
+    "source_hash": "sha256:afc2da77ced8f320b16efe0381289987e7edfc14ca1fe3748eab7eac544b29b4",
+    "notes": [
+      "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-功能学研究策略-20260703.md"
     ],
     "noteTitles": [
-      "CGE_Peak_Area_Instability_Literature_Review"
+      "分项策略-功能学研究策略"
     ],
-    "title": "CE-SDS 蛋白定量中峰面积逐针下降与迁移时间漂移：文献证据、机制分析与对策",
-    "seed": "Analytical technology/Capillary electrophoresis methods for pharmaceutical analysis/峰面积不稳定/CGE_Peak_Area_Instability_Literature_Review.md",
+    "title": "生物制品功能学研究策略：覆盖早研至BLA全生命周期的效价测定与方法学体系",
+    "seed": "Quality_and_Regulation/注册申报分析工作的模块化和模板化/分项策略-功能学研究策略-20260703.md",
+    "tag": "07注册与法规/ICH/Quality"
+  },
+  "chapter8-scattering-techniques-for-the-characterization-of-biopharmaceuticals": {
+    "slug": "chapter8-scattering-techniques-for-the-characterization-of-biopharmaceuticals",
+    "tag": "02分子表征/Biophysical-Techniques/SLS",
+    "published_at": "2026-08-25",
+    "notes": [
+      "Antibody-Characterization/Biophysical characterization of proteins in developing biopharmaceuticals/Chapter8：Scattering techniques for the characterization of biopharmaceuticals.md"
+    ],
+    "title": "光散射技术表征生物药：SLS/DLS的原理、应用与实验边界",
+    "seed": "Antibody-Characterization/Biophysical characterization of proteins in developing biopharmaceuticals/Chapter8：Scattering techniques for the characterization of biopharmaceuticals.md",
+    "draft": true
+  },
+  "chapter8-best-practices-in-developability-assessments-of-therapeutic-protein-candidates-in-the-biopharmaceutical-industry": {
+    "slug": "chapter8-best-practices-in-developability-assessments-of-therapeutic-protein-candidates-in-the-biopharmaceutical-industry",
+    "tag": "04抗体设计与筛选/developability",
+    "published_at": "2026-08-25",
+    "notes": [
+      "Analytical technology/成药性分析/Chapter8 Best Practices in Developability Assessments of Therapeutic Protein Candidates in the Biopharmaceutical Industry.md"
+    ],
+    "title": "治疗蛋白候选物的可开发性评估：从序列分析到工艺适配的完整框架",
+    "seed": "Analytical technology/成药性分析/Chapter8 Best Practices in Developability Assessments of Therapeutic Protein Candidates in the Biopharmaceutical Industry.md",
+    "draft": true
+  },
+  "HCP鉴定与定量": {
+    "slug": "HCP鉴定与定量",
+    "tag": "03质量控制/残留/HCP",
+    "published_at": "2026-08-25",
+    "notes": [
+      "Antibody-Characterization/HCP/HCP鉴定与定量.md"
+    ],
+    "title": "宿主细胞蛋白（HCP）的质谱鉴定与绝对定量：从定量标准品、Label-free 算法到样品制备方案",
+    "seed": "Antibody-Characterization/HCP/HCP鉴定与定量.md"
+  },
+  "05仪器与分析技术-色谱分析-hplc": {
+    "slug": "05仪器与分析技术-色谱分析-hplc",
+    "tag": "05仪器与分析技术/色谱分析/HPLC",
+    "published_at": "2026-08-25",
+    "notes": [
+      "Analytical technology/HILIC-HPLC/HILIC色谱柱汇总.md",
+      "Analytical technology/HPLC色谱柱相关知识.md",
+      "Analytical technology/IEX-HPLC/IEX色谱柱信息汇总.md",
+      "Analytical technology/RP反相/New trends in reversed-phase liquid chromatographic separations of therapeutic peptides and proteins Theory and applications.md",
+      "Analytical technology/RP反相/反相色谱柱.md",
+      "Analytical technology/RP反相/梯度洗脱.md",
+      "Analytical technology/RP反相/肽图.md",
+      "Analytical technology/SEC-HPLC/SEC SOP.md",
+      "Analytical technology/SEC-HPLC/SEC-HPLC.md",
+      "Analytical technology/SEC-HPLC/SEC色谱柱信息汇总.md",
+      "Analytical technology/USP Classification of HPLC Columns.md"
+    ],
+    "title": "HPLC 色谱柱选型与分离方法开发：从固定相分类、反相填料参数到梯度洗脱、肽图与 SEC 实践",
     "draft": true
   },
   "00基础-生物制品-单抗": {
@@ -211,57 +277,12 @@
     ],
     "tag": "00基础/生物制品/单抗"
   },
-  "05仪器与分析技术-色谱分析-hplc": {
-    "slug": "05仪器与分析技术-色谱分析-hplc",
-    "tag": "05仪器与分析技术/色谱分析/HPLC",
-    "published_at": "2026-08-25",
-    "notes": [
-      "Analytical technology/HILIC-HPLC/HILIC色谱柱汇总.md",
-      "Analytical technology/HPLC色谱柱相关知识.md",
-      "Analytical technology/IEX-HPLC/IEX色谱柱信息汇总.md",
-      "Analytical technology/RP反相/New trends in reversed-phase liquid chromatographic separations of therapeutic peptides and proteins Theory and applications.md",
-      "Analytical technology/RP反相/反相色谱柱.md",
-      "Analytical technology/RP反相/梯度洗脱.md",
-      "Analytical technology/RP反相/肽图.md",
-      "Analytical technology/SEC-HPLC/SEC SOP.md",
-      "Analytical technology/SEC-HPLC/SEC-HPLC.md",
-      "Analytical technology/SEC-HPLC/SEC色谱柱信息汇总.md",
-      "Analytical technology/USP Classification of HPLC Columns.md"
-    ],
-    "title": "HPLC 色谱柱选型与分离方法开发：从固定相分类、反相填料参数到梯度洗脱、肽图与 SEC 实践",
-    "draft": true
-  },
-  "HCP鉴定与定量": {
-    "slug": "HCP鉴定与定量",
-    "tag": "03质量控制/残留/HCP",
-    "published_at": "2026-08-25",
-    "notes": [
-      "Antibody-Characterization/HCP/HCP鉴定与定量.md"
-    ],
-    "title": "宿主细胞蛋白（HCP）的质谱鉴定与绝对定量：从定量标准品、Label-free 算法到样品制备方案",
-    "seed": "Antibody-Characterization/HCP/HCP鉴定与定量.md"
-  },
-  "chapter8-best-practices-in-developability-assessments-of-therapeutic-protein-candidates-in-the-biopharmaceutical-industry": {
-    "slug": "chapter8-best-practices-in-developability-assessments-of-therapeutic-protein-candidates-in-the-biopharmaceutical-industry",
-    "tag": "04抗体设计与筛选/developability",
-    "published_at": "2026-08-25",
-    "notes": [
-      "Analytical technology/成药性分析/Chapter8 Best Practices in Developability Assessments of Therapeutic Protein Candidates in the Biopharmaceutical Industry.md"
-    ],
-    "title": "治疗蛋白候选物的可开发性评估：从序列分析到工艺适配的完整框架",
-    "seed": "Analytical technology/成药性分析/Chapter8 Best Practices in Developability Assessments of Therapeutic Protein Candidates in the Biopharmaceutical Industry.md",
-    "draft": true
-  },
-  "chapter8-scattering-techniques-for-the-characterization-of-biopharmaceuticals": {
-    "slug": "chapter8-scattering-techniques-for-the-characterization-of-biopharmaceuticals",
-    "tag": "02分子表征/Biophysical-Techniques/SLS",
-    "published_at": "2026-08-25",
-    "notes": [
-      "Antibody-Characterization/Biophysical characterization of proteins in developing biopharmaceuticals/Chapter8：Scattering techniques for the characterization of biopharmaceuticals.md"
-    ],
-    "title": "光散射技术表征生物药：SLS/DLS的原理、应用与实验边界",
-    "seed": "Antibody-Characterization/Biophysical characterization of proteins in developing biopharmaceuticals/Chapter8：Scattering techniques for the characterization of biopharmaceuticals.md",
-    "draft": true
+  "tools-笔记": {
+    "slug": "tools-笔记",
+    "tag": "工具与效率",
+    "published_at": "2026-08-24",
+    "notes": [],
+    "title": "Git & GitHub 学习笔记"
   },
   "tools-claude-code-cloud-notes": {
     "slug": "tools-claude-code-cloud-notes",
@@ -269,12 +290,5 @@
     "published_at": "2026-08-24",
     "notes": [],
     "title": "Claude Code on the Web / Cloud Session 使用笔记"
-  },
-  "tools-笔记": {
-    "slug": "tools-笔记",
-    "tag": "工具与效率",
-    "published_at": "2026-08-24",
-    "notes": [],
-    "title": "Git & GitHub 学习笔记"
   }
 }
