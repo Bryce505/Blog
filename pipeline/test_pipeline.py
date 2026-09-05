@@ -12,6 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import clips as cl
 import compose as cp
 import drafts as df
 import main as mn
@@ -1907,6 +1908,148 @@ def test_audit_lists_images_drive_does_not_have():
     assert [r['missing'] for r in rs] == [[f'gone{i}.png'] for i in range(config.MIN_GROUP)], rs
     assert repair.audit(v, _index={**index, **{f'gone{i}.png': 'x'
                                                for i in range(config.MIN_GROUP)}}) == []
+
+
+
+# ---------- clips（剪藏栏目）----------
+
+def _weixin():
+    return cl.parse_month((FIX / 'clips-weixin.md').read_text(encoding='utf-8'),
+                          'weixin', '2026-08', 'notes/2026-08.md')
+
+
+def _x():
+    return cl.parse_month((FIX / 'clips-x.md').read_text(encoding='utf-8'),
+                          'x', '2026-08', 'notes/x/2026-08.md')
+
+
+def test_clips_parses_every_field():
+    """一条完整记录的十二个字段都要落到位。"""
+    c = _weixin()[0]
+    assert c['source'] == 'weixin' and c['month'] == '2026-08'
+    assert c['title'] == '最新版白皮书：抗体偶联药物（ADC）的生物分析（上）'
+    assert c['clippedAt'] == '2026-08-29 07:25'
+    assert c['publishedAt'] == '2026-07-22'
+    assert c['priority'] == '高'
+    assert c['summary'].startswith('系统介绍了 ADC'), c['summary']
+    assert len(c['insights']) == 2, c['insights']
+    assert c['insights'][0].startswith('杂交免疫捕获'), c['insights']
+    assert c['verdict'].startswith('内容系统详尽'), c['verdict']
+    assert c['url'] == 'https://mp.weixin.qq.com/s/BywLHNiFo_eIdlck8lckPg'
+
+
+def test_clips_keyword_with_slash_stays_one_keyword():
+    """关键词按 ' / ' 切，不按 '/' 切。
+
+    真实语料里有 `LC-MS/MS`、`敲除/敲低` 这类自带斜杠的词，按裸斜杠切会把
+    一个词劈成两个假关键词。
+    """
+    assert _weixin()[0]['keywords'] == ['抗体偶联药物', '生物分析', 'LC-MS/MS', '游离载荷']
+
+
+def test_clips_optional_fields_may_be_absent():
+    """洞见、发布时间、关键词缺失是上游的正常产出，不是错误。
+
+    实测 68 条真实记录里 2 条没有洞见（AI 判定该帖没有实质观点）。
+    """
+    entries = _weixin()
+    assert entries[1]['publishedAt'] == '', entries[1]     # 上游写「未知」
+    assert entries[1]['keywords'] == [], entries[1]        # 上游写「无」
+    assert entries[2]['insights'] == [], entries[2]        # 整行缺席
+
+
+def test_clips_snapshot_relative_path_becomes_repo_url():
+    """公众号退一层、X 退两层，都要还原成 Notes 仓库的 blob 链接。"""
+    assert _weixin()[0]['snapshot'] == (
+        'https://github.com/Bryce505/Notes/blob/master/'
+        'archive/2026-08/%E6%9C%80%E6%96%B0%E7%89%88-BywLHN.md'), _weixin()[0]['snapshot']
+    assert _x()[0]['snapshot'] == (
+        'https://github.com/Bryce505/Notes/blob/master/'
+        'archive/x/2026-08/Agent-651665.md'), _x()[0]['snapshot']
+
+
+def test_clips_snapshot_path_is_not_encoded_twice():
+    """上游已经 percent-encode 过，再编一次链接就打不开了。"""
+    assert '%25' not in _weixin()[0]['snapshot']
+
+
+def test_clips_missing_required_field_raises():
+    """标题 / 剪藏时间 / 原文链接缺任一条，这张卡片就不成立 —— 抛错。"""
+    full = (FIX / 'clips-x.md').read_text(encoding='utf-8')
+    drops = [
+        '- **剪藏**：2026-08-28 18:16 ｜ **发布**：2026-08-28\n',
+        '- **链接**：[原文](https://x.com/shao__meng/status/2093228362965651665)'
+        ' ｜ [全文快照](../../archive/x/2026-08/Agent-651665.md)\n',
+    ]
+    for drop in drops:
+        assert drop in full, f'fixture 里没有这行，测试本身失效了：{drop!r}'
+        try:
+            cl.parse_month(full.replace(drop, ''), 'x', '2026-08', 'notes/x/2026-08.md')
+        except ValueError:
+            continue
+        assert False, f'缺了这行竟然没抛错：{drop!r}'
+
+
+def test_clips_priority_outside_three_buckets_raises():
+    """档外的优先级会让这条被页面上每一个筛选条件都藏起来，等于内容消失。"""
+    bad = (FIX / 'clips-x.md').read_text(encoding='utf-8').replace(
+        '- **优先级**：高 ｜', '- **优先级**：紧急 ｜')
+    try:
+        cl.parse_month(bad, 'x', '2026-08', 'notes/x/2026-08.md')
+    except ValueError as e:
+        assert '紧急' in str(e), e
+    else:
+        assert False, '档外优先级没抛错'
+
+
+def test_clips_zero_entries_raises():
+    """上游把 ## 改成 ###，逐条检查一条都不会触发 —— 靠这条兜底。
+
+    不拦的话站上会静默变成一个空栏目，没有任何人会收到通知。
+    """
+    try:
+        cl.parse_month('# 2026年08月\n\n### 标题层级变了\n- **摘要**：x\n',
+                       'x', '2026-08', 'notes/x/2026-08.md')
+    except ValueError as e:
+        assert '一条' in str(e), e
+    else:
+        assert False, '零条目没抛错'
+
+
+def test_clips_collect_merges_both_sources_newest_first():
+    """两个来源合成一条流，按剪藏时间倒序。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    up = TMP / 'clips-upstream'
+    shutil.rmtree(up, ignore_errors=True)
+    (up / 'notes' / 'x').mkdir(parents=True)
+    (up / 'notes' / '2026-08.md').write_text(
+        (FIX / 'clips-weixin.md').read_text(encoding='utf-8'), encoding='utf-8')
+    (up / 'notes' / 'x' / '2026-08.md').write_text(
+        (FIX / 'clips-x.md').read_text(encoding='utf-8'), encoding='utf-8')
+
+    got = cl.collect(up)
+    assert len(got) == 4, got
+    assert [c['clippedAt'] for c in got] == [
+        '2026-08-29 07:25', '2026-08-28 18:16',
+        '2026-08-28 09:00', '2026-08-27 12:35'], [c['clippedAt'] for c in got]
+    # X 那条夹在两条公众号中间，证明是合并排序而不是先公众号后 X
+    assert got[1]['source'] == 'x', got[1]
+    assert got[1]['snapshot'].startswith(
+        'https://github.com/Bryce505/Notes/blob/master/archive/x/'), got[1]
+
+
+def test_clips_collect_without_any_month_file_raises():
+    """上游把 notes/ 挪走时要红一条，不能产出一个空 JSON 静默上线。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    empty = TMP / 'clips-empty'
+    shutil.rmtree(empty, ignore_errors=True)
+    empty.mkdir(parents=True)
+    try:
+        cl.collect(empty)
+    except ValueError as e:
+        assert 'notes' in str(e), e
+    else:
+        assert False, '上游一个月度文件都没有，竟然没抛错'
 
 
 if __name__ == '__main__':
