@@ -3,6 +3,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const nav = [
   { href: `${base}/series`, label: '系列' },
   { href: `${base}/reports`, label: '文献周报' },
+  { href: `${base}/clips`, label: '剪藏' },
   { href: `${base}/archive`, label: '归档' },
   { href: `${base}/tags`, label: '标签' },
   { href: `${base}/tools`, label: '工具与效率' },
@@ -10,9 +11,16 @@ const nav = [
 ];
 ---
 <header style="border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 10;">
-  <div class="wrap" style="display: flex; align-items: baseline; gap: 32px; height: 68px;">
+  <!-- 换行而不是溢出。nav 原本是不换行的 flex，375px 手机上实测（Chromium，
+       站点 CSS 已加载）：6 条导航内容宽 256px、行内可用 295px，正好还塞得下；
+       加上「剪藏」变成 7 条就是 343px > 295px —— 是这次新增把它顶出边界的，
+       不是原本就坏。flex-wrap 让它折成两行，header 69px → 147px。
+       height 换成 min-height 是配套的：固定 68px 会把折下去的第二行裁掉。
+       刻意不做汉堡菜单：7 条中文导航折两行完全可读，而一个折叠菜单要引入
+       JS 状态、焦点管理与无障碍属性，为这点收益不值得。 -->
+  <div class="wrap" style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 32px; min-height: 68px; padding-top: 12px; padding-bottom: 12px;">
     <a href={base || '/'} style="font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--fg); letter-spacing: -0.01em;">表征笔记</a>
-    <nav style="display: flex; gap: 22px; font-size: 14px; margin-left: auto;" aria-label="主导航">
+    <nav style="display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; margin-left: auto;" aria-label="主导航">
       {nav.map((n) => <a href={n.href} style="color: var(--muted);">{n.label}</a>)}
     </nav>
   </div>
