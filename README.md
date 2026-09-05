@@ -30,10 +30,10 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
 | | |
 |---|---|
 | **站点** | https://bryce505.github.io/Blog |
-| **数据源** | `Bryce505/Obsidian-base`（生物医药 CMC 与分析方法笔记，私有）、`Bryce505/RoutineRun`（工具与效率栏目，私有） |
+| **数据源** | 走流水线的：`Bryce505/Obsidian-base`（CMC 与分析方法笔记，私有）、`Bryce505/RoutineRun`（工具与效率栏目，私有）<br>只镜像不改写的：`Bryce505/zotero-arxiv-daily`（文献周报，公开）、`Bryce505/Notes`（公众号与 X 剪藏，公开） |
 | **图片** | Google Drive `image&attachment` 文件夹，取下来转 WebP 自托管 |
 | **整理模型** | DeepSeek（当前默认见 [`pipeline/config.py`](pipeline/config.py) 的 `DEEPSEEK_MODEL`，写这份文档时是 `deepseek-v4-flash`） |
-| **发布节奏** | 每晚 21:00（北京时间）自动发一篇；`drafts/` 推送即时处理 |
+| **发布节奏** | 文章每晚 21:00（北京时间）自动发一篇，`drafts/` 推送即时处理；文献周报每周五同步；剪藏每天同步 |
 | **托管与调度** | GitHub Pages + GitHub Actions（定时 / 手动 / push 触发） |
 
 ## 架构总览
@@ -206,7 +206,7 @@ uv venv && uv pip install -r pipeline/requirements.txt
 .venv/bin/python pipeline/test_pipeline.py
 ```
 
-跑完终端会打印 `通过数/总数`（写这份文档时是 128/128；这个数字会随新增
+跑完终端会打印 `通过数/总数`（写这份文档时是 162/162；这个数字会随新增
 自检增长，**以终端实际输出为准**，不要以本文的数字为准）。这套自检不
 引入测试框架，纯 `assert` + 文件底部的 runner，CI 里直接
 `python pipeline/test_pipeline.py` 就能跑。
