@@ -1,0 +1,56 @@
+# 把 zotero-arxiv-daily 的 HTML 周报同步进 public/reports/。
+# 周报正文不经过任何转换：Astro 原样输出 public/，站点侧只有一个索引页。
+name: sync-reports
+
+on:
+  schedule:
+    # 上游 weekly.yml 是周五 12:00 UTC 出稿，这里隔 90 分钟再来取
+    - cron: '30 13 * * 5'
+    # 备份触发。本仓库的 schedule 实测会整天不触发（详见
+    # docs/devlog/2026-08-27-定时任务整点排队延迟.md），周报一周才一期，
+    # 漏一次就是站上少一周。同步本身幂等，没更新就什么都不提交。
+    - cron: '40 9 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-reports
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 周报仓库是公开的，内置 GITHUB_TOKEN 就能读，不需要 PAT
+      - uses: actions/checkout@v4
+        with:
+          repository: Bryce505/zotero-arxiv-daily
+          path: .reports
+
+      - name: 同步周报
+        run: |
+          # 先删再拷：public/reports 是上游 reports/ 的镜像。只做增量拷贝的话，
+          # 上游撤下或改名一期，站上就留下一个再没人维护的幽灵页面。
+          # 上游若把 reports/ 挪走，这里 cp 会直接失败——是要的：宁可 Actions
+          # 红一条，也不要静默提交一个空目录把整栏抹掉。
+          rm -rf public/reports
+          cp -r .reports/reports public/reports
+          # md 与月报不进站：md 是同一份内容的另一种格式，列两遍只会让读者困惑
+          find public/reports -type f ! -name '*.html' -delete
+
+      - name: 提交
+        run: |
+          rm -rf .reports
+          git config user.name  'blog-bot'
+          git config user.email 'makejun505@gmail.com'
+          git add -A public/reports
+          if git diff --staged --quiet; then
+            echo '周报没有更新'
+          else
+            git commit -m "同步文献周报：$(date -u +%Y-%m-%d)"
+            git push
+          fi
