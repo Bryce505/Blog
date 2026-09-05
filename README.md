@@ -62,6 +62,18 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
               https://bryce505.github.io/Blog
 
    放行：删掉 draft: true 那一行，提交 → 下次构建即上线（见「校验器」）
+
+
+   另一条通道（文献周报，不经过 pipeline/ 也不经过校验器）：
+
+   Bryce505/zotero-arxiv-daily（公开）的 reports/<年>/<期>.html
+                         │
+                         │  GitHub Actions（sync-reports.yml：每周五 + 周六备份）
+                         ▼
+   public/reports/<年>/<期>.html —— 上游的镜像，一个字节都不改
+                         │
+                         ▼
+   Astro 原样输出 + 一个索引页（src/pages/reports.astro）→ 同一条 deploy 线上线
 ```
 
 **为什么是单仓库**：流水线只读两个私有笔记仓库、只写这一个仓库。拆成
@@ -81,26 +93,28 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
 | 图表 | Mermaid（自定义 remark 插件） | |
 | 代码高亮 | Shiki（`github-light` / `github-dark` 双主题） | |
 | SEO / 订阅 | `@astrojs/sitemap` + 自定义 `src/pages/rss.xml.js` | |
-| CI/CD | GitHub Actions | 三个 workflow，见下表 |
+| CI/CD | GitHub Actions | 四个 workflow，见下表 |
 | 托管 | GitHub Pages | |
 
-### 三个 workflow
+### 四个 workflow
 
 | workflow | 触发方式 | 做什么 |
 |---|---|---|
 | [`publish.yml`](.github/workflows/publish.yml) | 定时（每晚 UTC 13:13 + UTC 15:37 备份，故意避开整点排队高峰）/ `workflow_dispatch` / push 到 `drafts/**` | 跑内容流水线，产出通过就 commit + push |
-| [`deploy.yml`](.github/workflows/deploy.yml) | push 到 `master`（忽略 `drafts/` `pipeline/` `docs/` `design/` `README.md` 等不影响构建产物的路径）/ `publish` 运行完 / `workflow_dispatch` | `npm run build` → 部署到 GitHub Pages |
+| [`deploy.yml`](.github/workflows/deploy.yml) | push 到 `master`（忽略 `drafts/` `pipeline/` `docs/` `design/` `README.md` 等不影响构建产物的路径）/ `publish` 或 `sync-reports` 运行完 / `workflow_dispatch` | `npm run build` → 部署到 GitHub Pages |
 | [`sample.yml`](.github/workflows/sample.yml) | 仅 `workflow_dispatch` | 引子通道试运行，产出一律带 `draft: true`，不传 `--publish`——不存在自动上线的可能，试验性质 |
+| [`sync-reports.yml`](.github/workflows/sync-reports.yml) | 定时（周五 UTC 13:30 + 周六 UTC 09:40 备份）/ `workflow_dispatch` | 把 zotero-arxiv-daily 的 HTML 周报镜像到 `public/reports/`，有变化才提交 |
 
 > **GitHub 的坑**：workflow 用内置 `GITHUB_TOKEN` 推的提交不会触发其他
 > workflow 的 `push` 事件（防递归安全规则），所以 `deploy.yml` 额外监听
-> `publish` 的 `workflow_run` 事件——否则每晚发的文章会一直躺在仓库里不上线。
+> `publish` 与 `sync-reports` 的 `workflow_run` 事件——否则每晚发的文章、
+> 每周同步的周报都会一直躺在仓库里不上线。
 
 ## 仓库目录结构
 
 ```
 Blog/
-├─ .github/workflows/        publish · deploy · sample 三个 workflow
+├─ .github/workflows/        publish · deploy · sample · sync-reports 四个 workflow
 ├─ .claude/                  Claude Code 技能包与项目设置（brainstorming / TDD / 分支管理等）
 ├─ pipeline/                  Python 内容流水线
 │  ├─ main.py                  入口：串起 选材→取图→整理→校验→落盘，见「内容流水线」
@@ -131,12 +145,14 @@ Blog/
 │  ├─ content.config.ts         posts / series 两个 collection 的 zod schema
 │  ├─ layouts/                  Base（全局骨架）/ Post（文章页）
 │  ├─ components/               Header / Footer / PostCard
-│  ├─ pages/                    路由：index / archive / category / posts / series / tags / tools / about / rss.xml
+│  ├─ pages/                    路由：index / archive / category / posts / series / tags / tools / reports / about / rss.xml
+│  ├─ pages/reports.astro       文献周报索引页：读 public/reports/ 列目录，正文不经手
 │  ├─ lib/posts.ts              `listPosts()`——全站唯一的文章入口，草稿过滤只在这一处
 │  ├─ lib/series.ts             系列解析、上下篇计算
 │  ├─ plugins/                  自定义 remark 插件（callout / 高亮 / mermaid / base path 补全）
 │  └─ styles/global.css
 ├─ public/images/<slug>/      文章配图（WebP），按文章分目录
+├─ public/reports/<年>/       文献周报 HTML，sync-reports.yml 从上游镜像而来，不手改
 ├─ drafts/                     人工投稿投递口：放 md（+ images/ 子目录）push 即发布
 ├─ logs/                       按月归档的校验运行日志（`verify-YYYY-MM.md`）
 ├─ docs/
@@ -507,6 +523,55 @@ tags:
 
 序号语义：文章页显示的「第 N / M 篇」中 N 与 M **都含待发布条目** —— M 表达的是
 这个系列计划写多少篇。上一篇 / 下一篇则跳过待发布条目，因为它们没有页面可链。
+
+### 文献周报是怎么上站的
+
+`/Blog/reports` 这一栏收的是 [zotero-arxiv-daily](https://github.com/Bryce505/zotero-arxiv-daily)
+每周自动生成的 CMC 文献周报。**它不经过 `pipeline/`，也不经过校验器** —— 那条
+流水线管的是「把 Obsidian 笔记整理成文章」，周报是另一个仓库已经成稿的产物，
+本站只做镜像与索引。
+
+- **正文一个字节都不改**：`sync-reports.yml` 把上游 `reports/**/*.html` 拷进
+  `public/reports/`，Astro 把 `public/` 原样输出。周报自带整套样式（侧边目录、
+  深色模式），剥掉它的 `<head>` 塞进本站布局的话，它的 `body` / `main` / `h1`
+  选择器会和 `global.css` 打架，而且上游每期结构还会变
+- **镜像而非增量**：同步时先 `rm -rf public/reports` 再拷。只做增量的话，上游
+  撤下或改名一期，站上会留下一个再没人维护的幽灵页面
+- **只收 html**：`.md` 是同一份内容的另一种格式，月报目前也只有 md。列两遍只会
+  让读者以为是两份东西
+- **手动补一次**：Actions → sync-reports → Run workflow。没有更新就什么都不提交
+
+索引页 `src/pages/reports.astro` 从每份 HTML 里抽 `<title>` 和以「覆盖期」开头的
+那行摘要。**抽不到就让 `npm run build` 失败**，理由和系列栏目的三条硬规矩一样：
+静默降级的后果是站上出现一排没有标题的空卡片，而没有任何人会收到通知。上游真改了
+结构，就去看一眼 `reports/` 再改这里的解析，不要把校验删掉。
+
+#### 手机上怎么验这条通道
+
+`sync-reports` 改动过、或者想确认它还活着时，手机 GitHub App 按这个顺序点：
+
+1. **Actions → `sync-reports` → 运行工作流**，分支 `master`。
+   **安卓已知毛病**：一个 workflow 从没被手动跑过时这个按钮不出现（同
+   「[手动触发一次发布](#手动触发一次发布)」那条）。绕法是用手机浏览器开
+   Actions 页切「桌面版网站」，或者等周五的定时自己跑
+2. **看日志该打印「周报没有更新」**。上游没出新一期时这就是正确结果 ——
+   它证明「拷贝 → diff 判定」这条链路是通的，而且幂等
+3. **看 Actions 列表里紧跟着有没有一条 `deploy`**。这条自动出现，才说明
+   `deploy.yml` 的 `workflow_run` 列表里确实有 `sync-reports`；不出现的话
+   同步的周报会永远躺在仓库里不上线
+4. **上站看**：`https://bryce505.github.io/Blog/reports`，卡片数量与顶部那期
+   的覆盖期对得上，随便点开一份确认渲染正常
+
+想连「镜像语义」一起验掉，不用等新周报，两个方向各造一次，全程手机可完成：
+
+| 造的状态 | 手机操作 | 跑完 `sync-reports` 应该看到 |
+|---|---|---|
+| 本地少一份（上游有） | 删掉 `public/reports/<年>/<某期>.html` 并提交 | 文件被拷回来，多一条「同步文献周报：…」提交 |
+| 本地多一份（上游没有） | 新建一个 `public/reports/<年>/<假期号>.html` 提交 | 这份被清掉——上游撤下的旧期不会在站上留幽灵页面 |
+
+第二个测试造的假文件没有 `<title>` 和「覆盖期」行，**在被同步清掉之前那次
+`deploy` 会构建失败**——那是硬校验在干活，不是 bug，跑一次 `sync-reports`
+就恢复。
 
 ### 手动触发一次发布
 

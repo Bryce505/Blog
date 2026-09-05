@@ -7,8 +7,9 @@ on:
   # publish 提交文章后必须接着部署。workflow 用内置 GITHUB_TOKEN 推的提交
   # 不会触发其他 workflow（GitHub 防递归的安全规则），所以光靠上面的 push
   # 触发，每晚发的文章会一直躺在仓库里不上线。
+  # sync-reports 同理：它推的周报也得靠这条才上线。
   workflow_run:
-    workflows: [publish]
+    workflows: [publish, sync-reports]
     types: [completed]
   workflow_dispatch:
 
