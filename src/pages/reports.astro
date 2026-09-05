@@ -1,0 +1,65 @@
+---
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import Base from '../layouts/Base.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// 周报正文一个字节都不经过 Astro：HTML 由 sync-reports workflow 从
+// zotero-arxiv-daily 原样拷进 public/reports/，Astro 把 public/ 直接输出，
+// 于是 public/reports/2026/2026-09-W1.html 就是站上的
+// /Blog/reports/2026/2026-09-W1.html。
+//
+// 不剥 <head> 塞进本站布局，是因为周报自带一整套样式（侧边目录、深色模式），
+// 它的 body/main/h1/.card 选择器和本站 global.css 必然打架，得逐条改写或加
+// 作用域；而上游每期的结构还会变。原样出让它自洽，索引页只负责列目录。
+const dir = 'public/reports';
+
+// 目录不存在只可能是同步还没跑过（或有人删了），这里给空态而不是让
+// readdirSync 抛一串 ENOENT —— 真正的同步故障在 workflow 里就断了，
+// 轮不到构建期发现。
+const files = existsSync(dir)
+  ? readdirSync(dir, { recursive: true }).filter((f) => String(f).endsWith('.html'))
+  : [];
+
+const reports = files
+  .map((f) => {
+    const name = String(f).replaceAll('\\', '/');
+    const html = readFileSync(`${dir}/${name}`, 'utf8');
+    const title = html.match(/<title>([^<]*)<\/title>/)?.[1];
+    // 只认「覆盖期」开头的那一行：页面里 class="meta" 有好几处（每篇文献
+    // 下面也是这个类），按「第一个 meta」取，上游哪天在标题下多加一行，
+    // 索引页就会把某篇文献的作者当成周报的覆盖期显示出来。
+    const meta = html.match(/class="meta">(覆盖期[^<]*)</)?.[1];
+    if (!title || !meta) {
+      throw new Error(
+        `周报 ${name} 抽不到标题或覆盖期 —— 上游 HTML 结构变了。` +
+          '先看一眼 zotero-arxiv-daily 的 reports/ 再改这里的解析，' +
+          '不要把校验删掉：删了就是一排没有标题的空卡片上线。',
+      );
+    }
+    return { href: `${base}/reports/${name}`, title, meta };
+  })
+  // 文件名是 YYYY-MM-Wn，字典序倒排就是时间倒序。不补零是因为一个月最多
+  // 5 周，出不了「W10 排到 W9 前面」那种情况。
+  .sort((a, b) => b.href.localeCompare(a.href));
+---
+<Base title="文献周报" description="每周自动检索的生物药 CMC 方向文献摘要">
+  <div class="wrap" style="padding-top: 48px; padding-bottom: 72px;">
+    <h1 style="font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0 0 6px;">文献周报</h1>
+    <p style="max-width: var(--measure); margin: 0 0 24px; color: var(--muted); font-size: 15px; line-height: 1.8;">
+      每周从 PubMed / Europe PMC / Crossref / OpenAlex 检索新文献，按 Zotero 库的主题筛出生物药
+      CMC 方向的部分，生成中文结构化摘要。由 <a href="https://github.com/Bryce505/zotero-arxiv-daily">zotero-arxiv-daily</a> 自动生成，本站原样收录。
+    </p>
+
+    {reports.length === 0
+      ? <p style="color: var(--muted);">还没有同步到周报。</p>
+      : reports.map((r) => (
+          <article style="padding: 22px 0; border-bottom: 1px solid var(--border);">
+            <h2 style="margin: 0 0 7px; font-family: var(--serif); font-size: 20px; font-weight: 600;">
+              <a href={r.href} target="_blank" rel="noopener" style="color: var(--fg);">{r.title}</a>
+            </h2>
+            <p style="margin: 0; font-size: 13px; color: var(--muted);">{r.meta}</p>
+          </article>
+        ))}
+  </div>
+</Base>
