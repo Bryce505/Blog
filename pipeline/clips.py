@@ -21,7 +21,14 @@ from pathlib import Path
 
 # 快照留在 Notes 仓库，本站只链过去：公众号正文是别人的版权内容，转载到公网
 # 站点有风险；且上游 archive/ 一个月就几百 KB，镜像进来会持续撑大本仓库。
-SNAPSHOT_BASE = 'https://github.com/Bryce505/Notes/blob/master/'
+#
+# 指 raw 而不是 github.com/<repo>/blob/：blob 路由吃不下路径里的 %25。实测一篇
+# 标题带百分号的文章（《…Token消耗降60%、提速50%》），文件名里那个字面的 %
+# 编码出来就是 %25，blob 一律返回 400 —— 连 GitHub 自己 contents API 给出的
+# html_url 都 400，不是编码编错了，是那条路由的限制，绕不过去。raw 对同一批
+# 68 条全部 200。代价是纯文本不渲染 markdown，但一个打得开的链接胜过一个更好
+# 看却会 400 的链接。
+SNAPSHOT_BASE = 'https://raw.githubusercontent.com/Bryce505/Notes/master/'
 
 # 上游 ai.py 已经把优先级兜底成这三个值之一（`if priority not in (...)` → 中），
 # 所以出现第四种值只可能意味着格式变了
@@ -127,7 +134,7 @@ def _take_insights(rest: list[str]) -> list[str]:
 
 
 def _snapshot_url(relative: str, notes_path: str) -> str:
-    """相对索引文件的路径 → Notes 仓库的 blob URL。
+    """相对索引文件的路径 → Notes 仓库的快照 URL。
 
     上游写的是相对路径（公众号 `../archive/…`；X 的索引在 notes/x/ 下，要多退
     一层 `../../archive/x/…`），且中文已经 percent-encode 过。这里只做路径拼接，

@@ -1961,16 +1961,27 @@ def test_clips_optional_fields_may_be_absent():
 def test_clips_snapshot_relative_path_becomes_repo_url():
     """公众号退一层、X 退两层，都要还原成 Notes 仓库的 blob 链接。"""
     assert _weixin()[0]['snapshot'] == (
-        'https://github.com/Bryce505/Notes/blob/master/'
+        'https://raw.githubusercontent.com/Bryce505/Notes/master/'
         'archive/2026-08/%E6%9C%80%E6%96%B0%E7%89%88-BywLHN.md'), _weixin()[0]['snapshot']
     assert _x()[0]['snapshot'] == (
-        'https://github.com/Bryce505/Notes/blob/master/'
+        'https://raw.githubusercontent.com/Bryce505/Notes/master/'
         'archive/x/2026-08/Agent-651665.md'), _x()[0]['snapshot']
 
 
-def test_clips_snapshot_path_is_not_encoded_twice():
-    """上游已经 percent-encode 过，再编一次链接就打不开了。"""
-    assert '%25' not in _weixin()[0]['snapshot']
+def test_clips_snapshot_path_is_passed_through_verbatim():
+    """上游已经 percent-encode 过，这里一个字符都不许再动。
+
+    两个方向都会出事：再编码一次会把 %E4%B8%87 变成 %25E4%25B8%2587；反过来
+    「顺手解一次码」也会出事 —— 实测真有一篇标题带百分号（《…Token消耗降60%、
+    提速50%》），它的快照文件名里就是个字面的 %，编码出来正是 %25，解掉就成了
+    裸 % 同样打不开。所以这里既不编也不解。
+
+    这条 %25 也正是 SNAPSHOT_BASE 必须指 raw 而不是 blob 的原因，见那里的注释。
+    """
+    weixin = _weixin()
+    assert '%25' not in weixin[0]['snapshot'], weixin[0]['snapshot']
+    assert weixin[3]['snapshot'].endswith(
+        'archive/2026-08/247k_Star-%E9%99%8D60%25-o4pgoT.md'), weixin[3]['snapshot']
 
 
 def test_clips_missing_required_field_raises():
@@ -2028,14 +2039,14 @@ def test_clips_collect_merges_both_sources_newest_first():
         (FIX / 'clips-x.md').read_text(encoding='utf-8'), encoding='utf-8')
 
     got = cl.collect(up)
-    assert len(got) == 4, got
+    assert len(got) == 5, got
     assert [c['clippedAt'] for c in got] == [
-        '2026-08-29 07:25', '2026-08-28 18:16',
-        '2026-08-28 09:00', '2026-08-27 12:35'], [c['clippedAt'] for c in got]
+        '2026-08-29 07:25', '2026-08-28 18:16', '2026-08-28 09:00',
+        '2026-08-27 12:35', '2026-08-26 20:10'], [c['clippedAt'] for c in got]
     # X 那条夹在两条公众号中间，证明是合并排序而不是先公众号后 X
     assert got[1]['source'] == 'x', got[1]
     assert got[1]['snapshot'].startswith(
-        'https://github.com/Bryce505/Notes/blob/master/archive/x/'), got[1]
+        'https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/'), got[1]
 
 
 def test_clips_collect_without_any_month_file_raises():

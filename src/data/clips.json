@@ -1,0 +1,1723 @@
+[
+  {
+    "source": "weixin",
+    "month": "2026-09",
+    "title": "PPQ批次数量怎么定？（下篇）",
+    "clippedAt": "2026-09-04 11:53",
+    "publishedAt": "2026-09-03",
+    "priority": "高",
+    "keywords": [
+      "PPQ批次数量",
+      "容差区间",
+      "批次成功概率",
+      "ANOVA",
+      "变异性方法",
+      "工艺验证"
+    ],
+    "summary": "本文基于ISPE补充讨论论文，详解确定PPQ批次数量的四种统计工具：容差区间法、批次成功概率法、ANOVA组合法和变异性方法。每种方法均从底层逻辑、统计原理、操作流程、案例和局限展开。容差区间法通过设定置信度和覆盖率反推批次数，并采用三级判定；批次成功概率法利用二项分布和Wilson Score或Jeffreys区间计算全部成功时的成功率置信下限；ANOVA组合法基于Stage 1数据分解变异，检测实际显著的均值偏移；变异性方法适用于工艺变更或技术转移，通过F检验验证新工艺变异不超过原工艺的R倍。文章最后横向对比了七种方法（含上篇三种），给出不同场景下的方法选择指南，强调PPQ批次数应由科学、风险和统计共同决定。",
+    "insights": [
+      "PPQ批次数量不是固定数字，而是风险、统计和生命周期阶段的函数，企业应在方案中预先论证选择依据。",
+      "容差区间法能给出严格的“置信度覆盖比例”声明，但强正态假设；批次成功概率法虽直觉易懂，却因二分法丢失连续质量信息。",
+      "ANOVA组合法利用批间变异而非总变异计算样本量，可避免高估批次需求，但无法用于合格率声明。",
+      "变异性方法在技术转移或工艺变更时优先检验变异可比性，因为变异性比均值更难调整且直接影响OOS风险。"
+    ],
+    "verdict": "文章系统介绍四种统计方法并给出对比与决策指南，信息密度高且有实操价值，适合质量与验证专业人员精读。",
+    "url": "https://mp.weixin.qq.com/s/DNC_v2x5sbICwgsHIjlqsw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-09/PPQ%E6%89%B9%E6%AC%A1%E6%95%B0%E9%87%8F%E6%80%8E%E4%B9%88%E5%AE%9A%EF%BC%9F%EF%BC%88%E4%B8%8B%E7%AF%87%EF%BC%89-DNC_v2.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-09",
+    "title": "Genentech - 平衡速度与分离度：用于筛选复杂双抗变体的高通量天然质谱平台",
+    "clippedAt": "2026-09-02 07:04",
+    "publishedAt": "2026-09-01",
+    "priority": "高",
+    "keywords": [
+      "双特异性抗体",
+      "轻链错配",
+      "天然质谱",
+      "高通量筛选",
+      "自动化前处理",
+      "SEC-MS"
+    ],
+    "summary": "该研究构建了一个基于96孔板的半自动化天然质谱平台，用于高通量筛选双特异性抗体的轻链错配变体。平台整合了Tecan液体工作站辅助的样品前处理、两种快速色谱策略（HT-SEC-MS和OBE-MS）以及自动化的数据分析流程。验证结果表明，自动化前处理的重复性与手动流程相当或更优，在多步去糖基化流程中优势明显。HT-SEC-MS与基准SEC-MS的定量一致性接近完美，OBE-MS可作为快速初筛工具剔除高错配克隆。该平台将96样品的端到端处理时间缩短约四倍，分析师手工时间减少50%以上。研究认为，该平台能高效、可靠地评估复杂双抗的链错配和相关变体，适用于早期细胞株筛选和工艺开发。",
+    "insights": [
+      "轻链错配是双抗开发中难以检测的关键质量属性，需要质谱方法进行表征。",
+      "HT-SEC-MS在高通量下保持准确定性定量，而OBE-MS适合以5%为阈值的快速初筛。",
+      "自动化前处理在多步去糖基化流程中显著优于手动操作，降低了批间变异。",
+      "平台将96样品处理时间从约50小时压缩至11小时，大幅提升分析效率。"
+    ],
+    "verdict": "文章提供了完整的实验设计、数据对比和效率量化，具有可操作的方法学价值，适合生物制药分析领域研究者精读。",
+    "url": "https://mp.weixin.qq.com/s/Dn6fP6gHVnffENOYXBKRgw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-09/Genentech_-_%E5%B9%B3%E8%A1%A1%E9%80%9F%E5%BA%A6%E4%B8%8E%E5%88%86%E7%A6%BB%E5%BA%A6%EF%BC%9A%E7%94%A8%E4%BA%8E%E7%AD%9B%E9%80%89%E5%A4%8D%E6%9D%82%E5%8F%8C%E6%8A%97%E5%8F%98%E4%BD%93%E7%9A%84%E9%AB%98%E9%80%9A%E9%87%8F%E5%A4%A9%E7%84%B6%E8%B4%A8%E8%B0%B1%E5%B9%B3%E5%8F%B0-Dn6fP6.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "Obsidian 插件 Side-Notes：实现了 Tufte CSS 效果的边注插件之绝杀！",
+    "clippedAt": "2026-08-30 08:53",
+    "publishedAt": "2026-08-29",
+    "priority": "高",
+    "keywords": [
+      "Obsidian",
+      "Side-Notes",
+      "Tufte CSS",
+      "边注",
+      "插件教程"
+    ],
+    "summary": "本文介绍 Obsidian 插件 Side-Notes，该插件受 Tufte CSS 启发，利用横屏两侧空白实现类实体图书的边注效果。插件区分 sidenote 和 margin note，前者自动编号，后者无编号。边注在实时预览模式下可编辑，并支持加粗、斜体、行内代码及链接。插件支持 html 和 Obsidian 原生脚注两种语法，后者可减少文本污染。文章详细说明了添加 sidenote 和 margin note 的方法，包括命令面板插入、手写语法及对侧边注的写法。设置部分涵盖格式、显示、宽度间距、断点、排版、行为及 margin note 显示等选项。插件作者还提到可通过 Digital-Garden 发布实现类似效果。整体为实用教程，适合 Obsidian 用户和排版爱好者。",
+    "insights": [
+      "边注插件通过利用屏幕两侧空白，显著提升阅读和写作体验，接近实体书排版。",
+      "使用 Obsidian 原生脚注语法实现边注，避免 html 污染，兼顾可移植性和可维护性。",
+      "插件提供高度自定义选项，如编号样式、宽度、间距、响应式断点，可适配不同设备和排版需求。",
+      "通过命令面板和语法组合，可灵活添加对侧边注和 margin note，满足复杂批注场景。"
+    ],
+    "verdict": "文章信息密度高，提供详细的操作方法和设置说明，具有直接可用的实践价值，适合希望提升笔记排版效率的 Obsidian 用户精读。",
+    "url": "https://mp.weixin.qq.com/s/rpRzEJ2AQrBq2FXZTO5boQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/Obsidian_%E6%8F%92%E4%BB%B6_Side-Notes%EF%BC%9A%E5%AE%9E%E7%8E%B0%E4%BA%86_Tufte_CSS_%E6%95%88%E6%9E%9C%E7%9A%84%E8%BE%B9%E6%B3%A8%E6%8F%92%E4%BB%B6%E4%B9%8B%E7%BB%9D%E6%9D%80%EF%BC%81-rpRzEJ.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "最新版白皮书：抗体偶联药物（ADC）的生物分析（上）",
+    "clippedAt": "2026-08-29 07:25",
+    "publishedAt": "2026-07-22",
+    "priority": "高",
+    "keywords": [
+      "抗体偶联药物",
+      "生物分析",
+      "DAR分布",
+      "LC-MS/MS",
+      "配体结合测定",
+      "游离载荷"
+    ],
+    "summary": "本文编译了AAPS 2026年最新版ADC生物分析白皮书的上半部分，系统介绍了抗体偶联药物（ADC）生物分析的关键策略和技术平台。文章首先阐明ADC由抗体、连接子和载荷组成，其生物分析面临复杂性挑战。接着详细对比了配体结合测定（LBA）和杂交免疫捕获LC-MS/MS两种主流技术，在总抗体（tAb）、完整ADC及游离载荷定量中的适用性与优缺点。重点讨论了DAR（药物抗体比）分布测定的价值与方法，包括平均DAR和单个DAR物种的高分辨质谱分析。白皮书还新增了对可溶性靶点干扰、分阶段生物分析策略、DXd类药物生命周期管理等议题的探讨，强调方法开发需结合ADC体内DAR动态变化、稳定性及免疫原性考虑。",
+    "insights": [
+      "杂交免疫捕获LC-MS/MS因高特异性、DAR敏感性和无需抗载荷试剂，正逐渐取代传统LBA成为ADC定量分析的主流方法。",
+      "总抗体（tAb）与ADC浓度联合测定可推算平均DAR，是评估连接子稳定性和候选药物排序的有效工具。",
+      "游离载荷分析需严格避免偶联载荷意外脱落，否则会严重干扰定量结果，稳定性考量是方法开发的关键。",
+      "早期临床充分表征DAR特性后，若全身暴露量低且总抗体与ADC浓度高度相关，可考虑不再进行DAR监测。"
+    ],
+    "verdict": "文章源自2026年AAPS最新白皮书，内容系统详尽，涵盖技术对比与方法选择策略，对ADC药物研发和分析人员具有高度参考价值。",
+    "url": "https://mp.weixin.qq.com/s/BywLHNiFo_eIdlck8lckPg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E6%9C%80%E6%96%B0%E7%89%88%E7%99%BD%E7%9A%AE%E4%B9%A6%EF%BC%9A%E6%8A%97%E4%BD%93%E5%81%B6%E8%81%94%E8%8D%AF%E7%89%A9%EF%BC%88ADC%EF%BC%89%E7%9A%84%E7%94%9F%E7%89%A9%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8A%EF%BC%89-BywLHN.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "Agent = Model + Harness：六层实战手册",
+    "clippedAt": "2026-08-28 18:16",
+    "publishedAt": "2026-08-28",
+    "priority": "高",
+    "keywords": [
+      "Harness",
+      "Agent工程",
+      "六层架构",
+      "棘轮原则",
+      "生产级AI",
+      "智能体"
+    ],
+    "summary": "文章提出 Agent = Model + Harness 的核心观点：模型只提供推理能力，决定 Agent 能否走向生产的是围绕模型的工程基础设施。论据包括：同一 Claude 模型仅靠 Harness 优化在 GAIA 基准上提升 43.64 分；LangChain 靠 Harness 优化使 Terminal Bench 排名从第 30 升至第 5；OpenAI 团队用自动化 PR 产出百万行生产代码。文章将 AI 工程分为提示词、上下文、Harness 三个时代，详细介绍了六层架构（引导层、传感层、执行循环、记忆层、权限层、可观测层），并提出棘轮原则和七天落地路径。结论是应把工程重心从模型转向 Harness，否则约 95% 的企业 Agent 会止步于预生产。",
+    "insights": [
+      "只改 Harness 不换模型，收益可超过模型升级，同一模型在 GAIA 基准上提升 43.64 分。",
+      "约 95% 的企业 AI Agent 止步于预生产，核心原因是安全、可观测、治理等 Harness 缺失。",
+      "棘轮原则：每当 Agent 犯错，就工程化一个方案让它永不再犯，修复强度阶梯式上升。",
+      "权限层与可观测层是安全边界，模型无法自我约束，Harness 是唯一可靠护栏。"
+    ],
+    "verdict": "信息密度高，提供完整的六层架构和棘轮方法，对构建生产级 Agent 有直接可操作的指导价值。",
+    "url": "https://x.com/shao__meng/status/2093228362965651665",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/Agent_%3D_Model_%2B_Harness%EF%BC%9A%E5%85%AD%E5%B1%82%E5%AE%9E%E6%88%98%E6%89%8B%E5%86%8C-651665.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "从零开始，用 LangGraph 搭建你的第一个 AI Agent",
+    "clippedAt": "2026-08-28 18:13",
+    "publishedAt": "2026-08-28",
+    "priority": "高",
+    "keywords": [
+      "LangGraph",
+      "AI Agent",
+      "工具调用",
+      "状态管理",
+      "ReAct循环",
+      "教程"
+    ],
+    "summary": "本文是一篇LangGraph入门教程，从概念到实现逐步讲解如何构建一个具备工具调用和记忆能力的AI Agent。文章介绍了LangGraph的State、Node、Edge三个核心概念，然后通过Python代码示例演示了创建工具、模型节点、路由逻辑、组装图、添加记忆的全过程，并展示了运行与测试结果。最后讨论了生产环境需考虑的问题，如权限控制、参数校验、循环限制、人工审批等。教程强调Agent不是黑盒，而是由状态、节点和边组成的可控制、可观察的系统。",
+    "insights": [
+      "LangGraph将Agent执行过程显式建模为图，使决策流程可控可观察，而非神秘黑盒。",
+      "模型只负责生成工具调用请求，实际执行由ToolNode完成，形成‘模型→工具→模型’的循环。",
+      "通过Conditional Edge实现路由逻辑，使Agent能根据当前状态动态选择下一步。",
+      "生产环境必须考虑权限、参数校验、循环限制和人工审批，不能完全信任模型输出。"
+    ],
+    "verdict": "手把手教程，信息密度高，有完整可运行的代码和清晰架构讲解，适合想学习LangGraph的开发者精读。",
+    "url": "https://x.com/Smartpigai/status/2093191865193677285",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%EF%BC%8C%E7%94%A8_LangGraph_%E6%90%AD%E5%BB%BA%E4%BD%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AA_AI_Agent-677285.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "Karpathy课程推广帖",
+    "clippedAt": "2026-08-28 18:12",
+    "publishedAt": "2026-08-28",
+    "priority": "低",
+    "keywords": [
+      "Karpathy",
+      "LLM",
+      "课程推广"
+    ],
+    "summary": "帖子宣称Karpathy重写了LLM使用规则，推出斯坦福图形原生研究课程，可替代耶鲁LLM学位。内容为课程推广，附时间戳和视频链接，缺乏实质观点。",
+    "insights": [],
+    "verdict": "内容为课程广告和情绪化推广，无独到观点或实质信息。",
+    "url": "https://x.com/0xApexAi/status/2093076565563248894",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/Karpathy%E8%AF%BE%E7%A8%8B%E6%8E%A8%E5%B9%BF%E5%B8%96-248894.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "Karpathy免费讲座胜过万元训练营",
+    "clippedAt": "2026-08-28 18:11",
+    "publishedAt": "2026-08-28",
+    "priority": "低",
+    "keywords": [
+      "Andrej Karpathy",
+      "免费讲座",
+      "AI学习",
+      "资源推荐"
+    ],
+    "summary": "帖子推荐Andrej Karpathy的2小时免费讲座，称其凝结了他在OpenAI和特斯拉8年的经验，内容比1.5万美元的编程营更丰富。作者提醒读者保存视频并稍后观看，还建议搭配指南动手实践。帖子本身只是资源推荐，未展开具体内容。",
+    "insights": [
+      "顶级专家的免费分享比高价训练营更有价值",
+      "真正有效的学习来自主动保存和动手实践"
+    ],
+    "verdict": "帖子仅作资源推荐与保存提醒，自身不包含实质知识内容，属于转发链接类。",
+    "url": "https://x.com/LunarResearcher/status/2093074627530764347",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/Karpathy%E5%85%8D%E8%B4%B9%E8%AE%B2%E5%BA%A7%E8%83%9C%E8%BF%87%E4%B8%87%E5%85%83%E8%AE%AD%E7%BB%83%E8%90%A5-764347.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "Andrew Ng构建智能体知识图谱全指南",
+    "clippedAt": "2026-08-28 18:10",
+    "publishedAt": "2026-08-27",
+    "priority": "中",
+    "keywords": [
+      "Andrew Ng",
+      "知识图谱",
+      "智能体",
+      "图工程",
+      "教程"
+    ],
+    "summary": "作者推荐Andrew Ng的一段两小时视频，讲解如何从零构建智能体知识图谱，涵盖工作智能体、循环机制、图谱转换、自我改进代码到完整运行系统，并称该免费资源胜过500美元的课程。",
+    "insights": [
+      "视频覆盖从基础到高级的全流程，是系统性学习图工程的好资源。",
+      "免费资源可能比高价课程更有价值，提醒学习者理性选择。",
+      "提供了可操作的分步指南，可迁移到实际项目开发。"
+    ],
+    "verdict": "内容为优质资源推荐，信息有价值但非原创洞见，适合想深度学习图工程的读者。",
+    "url": "https://x.com/AnatoliKopadze/status/2092967702625157173",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/Andrew_Ng%E6%9E%84%E5%BB%BA%E6%99%BA%E8%83%BD%E4%BD%93%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E5%85%A8%E6%8C%87%E5%8D%97-157173.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "冻融（Freezing/Thawing）对蛋白分子的影响",
+    "clippedAt": "2026-08-27 21:39",
+    "publishedAt": "2026-08-18",
+    "priority": "高",
+    "keywords": [
+      "冻融",
+      "蛋白质稳定性",
+      "低温浓缩",
+      "定向冷冻",
+      "浓度梯度",
+      "生物药原液"
+    ],
+    "summary": "本文探讨生物药原液冻融过程中的工艺风险与控制策略。文章指出，冷冻时溶质随冰晶迁移产生低温浓缩现象，导致蛋白聚集、辅料结晶、pH变化及冰-液界面应力等不稳定因素。慢速冷冻加剧低温浓缩，而快速冷冻虽减小冰晶面积但可能影响溶质迁移。解冻时底部高浓度区域易引发盐析，且解冻后浓度梯度可持续48小时。为优化冻融工艺，作者介绍了一种定向冷冻装置，通过瓶子上部隔热实现自下而上的单向冷冻，减少蛋白聚集。实验表明，该装置可缩短解冻时间，但未能显著消除浓度梯度。研究建议，冻融速率需针对具体分子和配方优化，快速解冻有利于减少蛋白暴露于不利条件的时间。",
+    "insights": [
+      "冷冻过程中的溶质迁移导致低温浓缩，是蛋白聚集的关键触发因素，渗透压是监测该现象的高灵敏度指标。",
+      "通过隔热瓶子上部实现自下而上的定向冷冻，可改变冰晶生长方向，虽不显著降低浓缩倍数，但能有效减少蛋白聚集。",
+      "解冻后溶质扩散极慢，浓度梯度可持续近48小时，快速解冻可缩短蛋白在不利环境中的暴露时间，但无法消除梯度本身。",
+      "冻融工艺参数（如冷冻速率）需依分子特性和配方而定，不存在通用最优条件，但快速解冻普遍更为安全。"
+    ],
+    "verdict": "文章提供了冻融工艺设计的科学机制、实验数据及具体改进装置，对生物药研发和生产有直接参考价值，信息密度高且方法可迁移。",
+    "url": "https://mp.weixin.qq.com/s/FLIkNLi9tDmPxBhtqjvZgA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%86%BB%E8%9E%8D%EF%BC%88FreezingThawing%EF%BC%89%E5%AF%B9%E8%9B%8B%E7%99%BD%E5%88%86%E5%AD%90%E7%9A%84%E5%BD%B1%E5%93%8D-FLIkNL.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "挖到一个GitHub宝藏：一键下载全网电子书，2.4万本！",
+    "clippedAt": "2026-08-27 12:48",
+    "publishedAt": "2026-08-26",
+    "priority": "中",
+    "keywords": [
+      "GitHub",
+      "电子书",
+      "下载",
+      "中文书库",
+      "搜索",
+      "索引"
+    ],
+    "summary": "文章介绍了一个名为 ebook-treasure-chest 的 GitHub 项目，该项目收录了约 2.4 万本中文电子书的索引和下载链接，覆盖帆书、微信读书、京东读书等平台，并提供 epub、mobi、azw3 三种格式。项目配有实时搜索页面，支持多关键词组合搜索和 1000 个细分类目，方便用户快速找到所需书籍。作者分享了自己找电子书的痛点，并给出了适用场景：Kindle 用户找书、通勤阅读、查资料、闲逛书单。同时提醒版权问题，建议将其作为试读工具，正式阅读时支持正版。",
+    "insights": [
+      "电子书资源分散且常被引流套路困扰，集中索引能极大提升找书效率。",
+      "多格式提供（epub/mobi/azw3）解决了不同设备用户的格式转换痛点。",
+      "分类细度达到1000个，远超常规书单，可作为兴趣探索工具。",
+      "项目长期维护且星数高，说明此类需求真实且方案有效。"
+    ],
+    "verdict": "文章是实用的工具推荐，信息清晰但观点平实，无深度分析，适合需要找书资源的读者，但不算高价值精读内容。",
+    "url": "https://mp.weixin.qq.com/s/Z3kZU_TwicqBK_oQclrNsw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E6%8C%96%E5%88%B0%E4%B8%80%E4%B8%AAGitHub%E5%AE%9D%E8%97%8F%EF%BC%9A%E4%B8%80%E9%94%AE%E4%B8%8B%E8%BD%BD%E5%85%A8%E7%BD%91%E7%94%B5%E5%AD%90%E4%B9%A6%EF%BC%8C2.4%E4%B8%87%E6%9C%AC%EF%BC%81-Z3kZU_.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "万字长文｜GitHub 从入门到精通",
+    "clippedAt": "2026-08-27 12:46",
+    "publishedAt": "2026-08-16",
+    "priority": "高",
+    "keywords": [
+      "Git",
+      "GitHub",
+      "版本控制",
+      "开源协作",
+      "AI 编程",
+      "教程"
+    ],
+    "summary": "这是一篇面向零基础读者的 GitHub 完整教程，作者 Miles 从 Git 与 GitHub 的区别讲起，详细介绍了初始化仓库、首次提交、分支操作、合并冲突、推送远程、GitHub 页面解读、协作流程、README 与 LICENSE 的重要性、常见报错排查，以及 AI 时代 Git 的使用原则。文章以实际操作为主线，辅以终端截图和命令解释，强调通过查看 diff、运行测试和检查密钥来建立可靠的提交习惯。最后给出了连续 7 天练习的建议，帮助读者将知识转化为技能。",
+    "insights": [
+      "Git 和 GitHub 是两回事：Git 是本地版本管理工具，GitHub 是远程协作平台，理解四层状态（工作区、暂存区、本地仓库、远程仓库）是避免混乱的关键。",
+      "提交信息比命令更值钱：feat、fix 等前缀只是习惯，真正重要的是说明做了什么、为什么做，让历史可回溯。",
+      "冲突不可怕，它是 Git 不敢替你选择的结果，人工编辑文件、删除标记、测试后提交即可解决，这比 force push 更安全。",
+      "AI 生成代码后，人必须承担验收责任：查看 diff、运行测试、检查密钥，把改动缩到最小范围，才能让 Git 成为可靠的验收系统。"
+    ],
+    "verdict": "内容详实、逻辑清晰，既有基础操作又有排错方法，还结合 AI 时代给出独到见解，适合需要系统掌握 GitHub 的读者精读。",
+    "url": "https://mp.weixin.qq.com/s/1FickGzrNjIc5UE-pOU_IA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E4%B8%87%E5%AD%97%E9%95%BF%E6%96%87%EF%BD%9CGitHub_%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%B2%BE%E9%80%9A-1FickG.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "基于阳离子交换色谱-质谱联用及肽图分析对IgG2二硫键异构体的结构表征",
+    "clippedAt": "2026-08-27 12:45",
+    "publishedAt": "2026-08-27",
+    "priority": "高",
+    "keywords": [
+      "IgG2",
+      "二硫键异构体",
+      "阳离子交换色谱-质谱联用",
+      "肽图分析",
+      "同位素包络置信度"
+    ],
+    "summary": "本文介绍了一项针对IgG2单克隆抗体二硫键异构体的新型表征方法。IgG2铰链区因含有4个半胱氨酸易发生二硫键重排，产生A型、A/B型与B型三种异构体。研究建立了基于挥发性盐的天然态阳离子交换色谱-质谱联用（CEX-MS）方法，结合IdeS酶切产生的F(ab')2片段，实现各异构体的有效分离与高质量质谱鉴定。通过氧化还原处理和定点突变技术，明确了色谱峰对应的异构体洗脱顺序，并成功应用于多种IgG2抗体。在肽图分析方面，开发了优化的非还原酶切流程，并引入同位素包络置信度（IEC）得分作为新判据，克服了铰链区复杂二硫键交联肽段MS/MS解析的困难。该方法为IgG2异构体表征提供了更简便、快速的途径，可应用于工程改造抗体的结构确认。",
+    "insights": [
+      "IgG2铰链区二硫键重排产生A、A/B、B三种异构体，影响抗体活性，需精细表征。",
+      "采用挥发性盐的天然态CEX-MS可有效分离IgG2异构体，且与中间段解析策略兼容。",
+      "引入同位素包络置信度（IEC）得分，即使MS/MS谱图复杂不可解析，也能基于高分辨质谱准确鉴定二硫键连接。",
+      "氧化还原处理与定点突变结合可明确CEX洗脱顺序，为工程改造抗体的结构确认提供依据。"
+    ],
+    "verdict": "文章提供了结构表征领域的新方法论，兼具独到技术方案（IEC得分）与可操作实验流程，对生物制药研发有较高参考价值。",
+    "url": "https://mp.weixin.qq.com/s/tMM4qVNhaZ3LE61s8CRzyQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%9F%BA%E4%BA%8E%E9%98%B3%E7%A6%BB%E5%AD%90%E4%BA%A4%E6%8D%A2%E8%89%B2%E8%B0%B1-%E8%B4%A8%E8%B0%B1%E8%81%94%E7%94%A8%E5%8F%8A%E8%82%BD%E5%9B%BE%E5%88%86%E6%9E%90%E5%AF%B9IgG2%E4%BA%8C%E7%A1%AB%E9%94%AE%E5%BC%82%E6%9E%84%E4%BD%93%E7%9A%84%E7%BB%93%E6%9E%84%E8%A1%A8%E5%BE%81-tMM4qV.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "坚决不用行业标准AGENTS.md，Claude Code惹来“封杀令”：Anthropic终于回应了，但开发者更气了",
+    "clippedAt": "2026-08-27 12:39",
+    "publishedAt": "2026-08-26",
+    "priority": "中",
+    "keywords": [
+      "Claude Code",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "行业标准",
+      "复杂度税",
+      "AI编程工具"
+    ],
+    "summary": "本文报道了Anthropic的Claude Code拒绝支持开源社区广泛采用的AGENTS.md格式，坚持使用自家CLAUDE.md，引发Shopify CEO Tobi Lütke公开威胁在内部禁用Claude Code的事件。开发者社区长期要求兼容AGENTS.md，但相关请求被关闭。Anthropic回应称可提高可定制性，但坚持模型需要专属指令，未承诺默认支持。文章分析了大型代码库中多工具协同时的“复杂度税”问题，指出开发者被迫编写脚本或符号链接来变通，并批评Anthropic的产品文化是拒绝行业标准、转嫁维护成本。最终，社区认为Anthropic正在失去开发者信任，争议仍在持续。",
+    "insights": [
+      "工具不兼容行业标准会让大型团队付出不必要的“复杂度税”，尤其在monorepo协作场景下。",
+      "Anthropic以模型上下文不同为由拒绝通用格式，实际是将适配成本转嫁给所有开发者。",
+      "开发者要求的是默认支持AGENTS.md，而不是通过导入或符号链接等变通方案来弥补。",
+      "拒绝标准背后反映的是产品文化问题，过度自信可能加速失去开发者生态支持。"
+    ],
+    "verdict": "文章是对行业争议的详细报道，信息密度尚可，但对读者而言多为已知观点，可迁移的实操价值有限，属于值得了解但不必精读的资讯。",
+    "url": "https://mp.weixin.qq.com/s/cneOBQwOJs0VMgmbK0OXOg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%9D%9A%E5%86%B3%E4%B8%8D%E7%94%A8%E8%A1%8C%E4%B8%9A%E6%A0%87%E5%87%86AGENTS.md%EF%BC%8CClaude_Code%E6%83%B9%E6%9D%A5%E2%80%9C%E5%B0%81%E6%9D%80%E4%BB%A4%E2%80%9D%EF%BC%9AAnthropic%E7%BB%88%E4%BA%8E%E5%9B%9E%E5%BA%94%E4%BA%86%EF%BC%8C%E4%BD%86%E5%BC%80%E5%8F%91%E8%80%85%E6%9B%B4%E6%B0%94%E4%BA%86-cneOBQ.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "CMC常用的DoE方法",
+    "clippedAt": "2026-08-27 12:35",
+    "publishedAt": "2026-08-27",
+    "priority": "中",
+    "keywords": [
+      "DoE",
+      "CMC",
+      "Plackett-Burman设计",
+      "中心复合设计",
+      "Box-Behnken设计",
+      "计算机最优设计"
+    ],
+    "summary": "本文介绍了CMC（化学、生产和控制）研究中常用的六种试验设计（DoE）方法：Plackett-Burman设计（PBD）、中心复合设计（CCD）、Box-Behnken设计（BBD）、裂区部分析因设计、混料设计和计算机最优设计。PBD用于因子筛选，成本低但仅适用于主效应；CCD和BBD用于工艺优化，可拟合二次模型，其中BBD避免极端水平但预测能力略弱；裂区设计处理难变更因子；混料设计优化组分比例；计算机最优设计灵活应对复杂场景，并介绍了D-最优和I-最优准则。文章强调需根据试验目的和因子特性选择合适设计，必要时咨询统计专家。内容实用，适合工艺开发人员参考。",
+    "insights": [
+      "Plackett-Burman设计以4的倍数构建试验，适合因子筛选，但需假设交互效应不显著。",
+      "BBD不在极端水平试验，适合风险场景，但预测能力弱于CCD。",
+      "裂区设计能解决难变更因子带来的随机化约束，在CMC中常见。",
+      "计算机最优设计灵活支持复杂模型和样本量选择，但依赖预设模型正确。"
+    ],
+    "verdict": "文章系统梳理了多种DoE方法的特点和适用场景，信息密度中等，属常规专业科普，无特别独到的观点，但可为从业者提供实用参考。",
+    "url": "https://mp.weixin.qq.com/s/yro-3usR8TSAL2onN4RnFg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/CMC%E5%B8%B8%E7%94%A8%E7%9A%84DoE%E6%96%B9%E6%B3%95-yro-3u.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "强生 - 抗体工艺中HCP面临的挑战：残留机制与缓解策略",
+    "clippedAt": "2026-08-27 12:34",
+    "publishedAt": "2026-08-27",
+    "priority": "高",
+    "keywords": [
+      "宿主细胞蛋白",
+      "单克隆抗体",
+      "层析纯化",
+      "HCP残留机制",
+      "缓解策略",
+      "聚山梨酯降解酶"
+    ],
+    "summary": "本文是强生研究人员发表于《Biotechnology and Bioengineering》的综述，系统总结了单克隆抗体生产中宿主细胞蛋白（HCP）残留的机制与缓解策略。文章指出，HCP残留主要源于HCP-抗体相互作用、HCP-层析树脂相互作用以及HCP参与形成的异源聚集体。下游缓解策略包括优化澄清步骤、调节Protein A清洗与洗脱条件、筛选精纯树脂及开发新型多模式层析介质；上游策略包括培养条件优化、基因敲除/敲低以及代谢通路调控等。研究强调，传统总HCP控制指标可能掩盖高风险HCP（如聚山梨酯降解酶）的逃逸，未来需转向基于机制的设计和预测性清除，以实现更安全的生物制品。",
+    "insights": [
+      "HCP残留并非单一机制所致，HCP-抗体相互作用是Protein A层析阶段的主要逃逸原因，而HCP-树脂相互作用在精纯阶段更关键。",
+      "HCP并非全部以游离形式存在，相当部分嵌入染色质相关的异源聚集体中，这些聚集体可通过多非特异性作用贯穿整个纯化过程。",
+      "上游基因多重敲除（如11X、39X敲除）可在不损害宿主性能的情况下大幅降低总HCP和PSDE活性，但需警惕功能冗余与脱靶效应。",
+      "下游清洗策略需针对HCP-抗体相互作用的静电力与疏水力进行理性设计，精氨酸类添加剂和辛酸等可有效破坏此类相互作用，但效果因抗体和工艺而异。"
+    ],
+    "verdict": "综述信息密度高，系统梳理了HCP持久机制与最新缓解策略，兼具理论深度和实际指导价值，对生物药工艺开发人员有重要参考意义。",
+    "url": "https://mp.weixin.qq.com/s/xfoSqJlg0v7nRxVXeI5svA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%BC%BA%E7%94%9F_-_%E6%8A%97%E4%BD%93%E5%B7%A5%E8%89%BA%E4%B8%ADHCP%E9%9D%A2%E4%B8%B4%E7%9A%84%E6%8C%91%E6%88%98%EF%BC%9A%E6%AE%8B%E7%95%99%E6%9C%BA%E5%88%B6%E4%B8%8E%E7%BC%93%E8%A7%A3%E7%AD%96%E7%95%A5-xfoSqJ.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "代理工程新趋势：让代理构建代理",
+    "clippedAt": "2026-08-27 12:23",
+    "publishedAt": "2026-08-27",
+    "priority": "低",
+    "keywords": [
+      "代理工程",
+      "Claude Code",
+      "AI自动化",
+      "自我改进系统"
+    ],
+    "summary": "Claude Code负责人表示已不再直接提示AI代理，而是构建图和循环，让代理自行构建代理。视频演示了代理工程的发展方向，并附有构建自我改进系统的指南。帖子旨在引导观看视频和阅读指南，本身信息量有限。",
+    "insights": [
+      "代理工程正从手动提示转向构建自举式代理系统。",
+      "构建自我改进系统的能力将成为下一代AI工程的关键。"
+    ],
+    "verdict": "内容主要为视频和指南引流，缺乏具体细节和独立观点，信息密度低。",
+    "url": "https://x.com/AnatoliKopadze/status/2092673893253226866",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/%E4%BB%A3%E7%90%86%E5%B7%A5%E7%A8%8B%E6%96%B0%E8%B6%8B%E5%8A%BF%EF%BC%9A%E8%AE%A9%E4%BB%A3%E7%90%86%E6%9E%84%E5%BB%BA%E4%BB%A3%E7%90%86-226866.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "万字长文｜Claude code 从入门到实战高手",
+    "clippedAt": "2026-08-27 12:22",
+    "publishedAt": "2026-08-26",
+    "priority": "高",
+    "keywords": [
+      "Claude Code",
+      "AI编程",
+      "工程化",
+      "提示词",
+      "权限管理",
+      "版本控制"
+    ],
+    "summary": "本文总结了一套Claude Code工程化使用方法，共23条实战铁律。作者认为Claude Code不是聊天机器人，而是能读代码、改文件、跑命令的工程师，使用者应像技术负责人一样管理它。文章提出核心闭环R-P-I-V-R-D，强调改前先读、计划先行、小步实现、验证实际执行、双向审查、规范交付。还涵盖权限管理、CLAUDE.md配置、高频命令、Git红线、安全五不及翻车急救包。结论是让AI的改动可解释、可验证、可审查、可回滚，才能从玩具变成工程协作者。",
+    "insights": [
+      "把AI当工程师而非搜索框，明确分工才能避免乱改文件。",
+      "强制AI区分事实与推测，用表格列出依据，能拦住大部分幻觉。",
+      "验证步骤必须要求AI输出实际执行命令和结果，防止假装测试通过。",
+      "权限规则和Hook比提示词更可靠，是防止AI破坏性操作的关键。"
+    ],
+    "verdict": "信息密度高，提供大量可操作的实战方法与反直觉见解，适合开发者精读",
+    "url": "https://x.com/JimmyRevived/status/2092561979693011386",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/%E4%B8%87%E5%AD%97%E9%95%BF%E6%96%87%EF%BD%9CClaude_code_%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E6%88%98%E9%AB%98%E6%89%8B-011386.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "万字长文：Deepseek Harness 一文全看懂！！",
+    "clippedAt": "2026-08-27 12:18",
+    "publishedAt": "2026-08-26",
+    "priority": "高",
+    "keywords": [
+      "DeepSeek Harness",
+      "Agent 架构",
+      "插件系统",
+      "Session Log",
+      "Cordis",
+      "工具安全"
+    ],
+    "summary": "文章系统解析 DeepSeek Harness 的 Agent 架构。作者提出 Agent = Model + Harness，并详细说明 Harness 是模型之外的工具、状态、安全与日志系统。文中介绍插件化设计（Everything is a Plugin）、Cordis 生命周期管理、Session Log 事件溯源、工具审批管线、四种模式（Standard/Code/Minimal/Creator）、子 Agent 抽象及动态创建插件等机制。文章用大量比喻解释技术概念，并强调可组合性与可重建性，最后给出对 Harness 领域创新的评价，认为其将插件边界推进到核心运行结构，且具备生产级实验能力。",
+    "insights": [
+      "Agent 的能力不仅取决于模型，更取决于 Harness——即模型外部的工具、状态管理和安全控制。",
+      "DeepSeek Harness 将一切视为插件，甚至 Agent Loop 本身可替换，大幅提升系统灵活性。",
+      "Session Log 采用事件溯源，使模型所见内容全部可记录、可回放，增强了可审计性。",
+      "动态创建工具（如 release_guard）不再是概念，而是通过插件生命周期管理实现的真实功能。"
+    ],
+    "verdict": "信息密度极高，提供大量独到的架构细节和可操作认知，适合对 Agent 系统感兴趣的读者精读。",
+    "url": "https://x.com/Russell3402/status/2092535898034630816",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/%E4%B8%87%E5%AD%97%E9%95%BF%E6%96%87%EF%BC%9ADeepseek_Harness_%E4%B8%80%E6%96%87%E5%85%A8%E7%9C%8B%E6%87%82%EF%BC%81%EF%BC%81-630816.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "2026 年 8 月 26 日，SCI文献阅读 Skill 排行榜 Top 10",
+    "clippedAt": "2026-08-27 07:06",
+    "publishedAt": "2026-08-26",
+    "priority": "低",
+    "keywords": [
+      "SCI文献阅读",
+      "开源工具",
+      "AI辅助阅读",
+      "论文管理",
+      "GitHub"
+    ],
+    "summary": "文章介绍了 10 个用于 SCI 文献阅读的开源 AI 工具，按 GitHub Star 数排名。每个工具都提供了定位、核心功能和适用场景。排名靠前的有 ChatPaper（综合型，19.8k star）、PaperQA（科学文献问答，9.1k star）、LLM for Zotero（Zotero 深度集成，2.7k star）等。这些工具覆盖论文摘要、翻译、润色、审稿、问答、笔记、引用分析等功能，旨在帮助研究者应对长篇 PDF 阅读的痛点。文章强调不同工具各有侧重，如 Lumi 专注 arXiv 论文理解，Zoro 注重本地化与母语阅读，PaperFlow 侧重个性化推荐与阅读反馈。最后指出，选择工具需结合个人工作流和阅读场景。",
+    "insights": [
+      "AI 文献工具正从单一摘要功能演变为覆盖阅读、翻译、笔记、引用分析的全流程工作流。",
+      "Star 数差异悬殊，但小项目往往有独特场景定位，如本地化或母语支持，不应仅凭 Star 数选择。",
+      "部分工具如 Zoro 将非英语母语者的阅读体验作为核心设计原则，反映 AI 工具对本地化需求的重视。",
+      "工具链整合成为趋势，如 LLM for Zotero 将 AI 能力嵌入已有文献管理流程，提升精读效率。"
+    ],
+    "verdict": "纯工具清单和功能介绍，无深度分析或独到观点，适合快速浏览而非精读。",
+    "url": "https://mp.weixin.qq.com/s/ELjU431XGDWFqtRF97nXjw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/2026_%E5%B9%B4_8_%E6%9C%88_26_%E6%97%A5%EF%BC%8CSCI%E6%96%87%E7%8C%AE%E9%98%85%E8%AF%BB_Skill_%E6%8E%92%E8%A1%8C%E6%A6%9C_Top_10-ELjU43.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "OOS概率应用：从方法验证到放行标准的全生命周期迭代框架",
+    "clippedAt": "2026-08-26 20:43",
+    "publishedAt": "2026-08-26",
+    "priority": "高",
+    "keywords": [
+      "OOS概率",
+      "USP<1033>",
+      "放行标准",
+      "迭代框架",
+      "全生命周期",
+      "生物制药"
+    ],
+    "summary": "本文整合USP <1033>与A-Vax案例，提出OOS概率的双层语义：方法层指测量误差导致的假阳性误判率，产品层指真实质量波动导致的失败率。二者存在循环依赖——s_Assay与放行限互为输入输出，线性思维无法破解。为此提出三轮迭代法：用行业共识值初始化、产品层初算放行限、方法层反推性能靶标、验证闭环，通常1-2次收敛。文章进一步构建五阶段全生命周期框架，从早期发现的临时AC到商业化CPV持续更新，每阶段对应不同的数据基础和迭代状态。最后讨论局限性，强调OOS概率约束需将方法性能与产品质量风险绑定，以数据驱动标准设定。",
+    "insights": [
+      "OOS概率在方法层和产品层含义不同，一个是假阳性误判率，一个是真实失败率，不能混用。",
+      "方法验证与放行标准设定存在循环依赖，必须通过迭代而非线性流程解决。",
+      "三轮迭代法用行业共识值打破循环，通常1-2次即可收敛，具有实用操作性。",
+      "全生命周期管理中，不同阶段需采用不同的OOS概率策略，从临时AC逐步过渡到锁定标准。"
+    ],
+    "verdict": "文章提出双层OOS概率循环依赖的独到见解，给出三轮迭代法和五阶段全生命周期框架，信息密度高且具有可操作的方法论。",
+    "url": "https://mp.weixin.qq.com/s/sBf0PXPYulXPr7_aG9098Q",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/OOS%E6%A6%82%E7%8E%87%E5%BA%94%E7%94%A8%EF%BC%9A%E4%BB%8E%E6%96%B9%E6%B3%95%E9%AA%8C%E8%AF%81%E5%88%B0%E6%94%BE%E8%A1%8C%E6%A0%87%E5%87%86%E7%9A%84%E5%85%A8%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%BF%AD%E4%BB%A3%E6%A1%86%E6%9E%B6-sBf0PX.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "Int Immunol - 双特异性抗体：当前进展与未来展望",
+    "clippedAt": "2026-08-26 17:25",
+    "publishedAt": "2026-08-26",
+    "priority": "高",
+    "keywords": [
+      "双特异性抗体",
+      "T细胞衔接器",
+      "肿瘤免疫治疗",
+      "抗原逃逸",
+      "纳米药物递送"
+    ],
+    "summary": "本文是发表于《International Immunology》的综述，系统梳理了双特异性抗体的研究进展。文章首先阐述了双特异性抗体的基本原理，包括细胞桥接、MHC非依赖性T细胞激活、固有免疫效应细胞招募及多信号通路调控等机制，并分析了片段型和IgG样两大类分子架构在药代动力学、效价和可制造性上的权衡。临床部分按B细胞急性淋巴细胞白血病、淋巴瘤、多发性骨髓瘤和实体瘤四个领域，汇总了blinatumomab、mosunetuzumab、glofitamab、teclistamab、tarlatamab等药物的关键试验数据。前沿策略部分讨论了Fc融合延长半衰期、三特异性设计应对抗原逃逸、肿瘤微环境条件激活降低脱瘤毒性、整合共刺激信号增强T细胞功能，以及脂质体、细胞外囊泡和膜包覆纳米颗粒三类递送平台的最新进展。最后指出实体瘤疗效仍受抗原异质性、T细胞浸润不良和免疫抑制微环境限制，未来方向包括多模式联合及纳米平台整合。",
+    "insights": [
+      "双特异性抗体通过桥接T细胞与肿瘤细胞，实现不依赖MHC的T细胞激活，可克服HLA表达下调导致的免疫逃逸，但慢性抗原刺激易导致T细胞耗竭。",
+      "片段型与IgG样双特异性抗体在疗效与毒性上存在本质权衡：前者半衰期短需持续给药，后者可通过Fc工程延长半衰期并调节效应功能。",
+      "三特异性抗体和纳米颗粒平台（如脂质体、细胞外囊泡、膜包覆纳米颗粒）是应对抗原异质性和强化T细胞信号的新方向，可整合共刺激分子与细胞因子。",
+      "实体瘤中双特异性抗体的疗效受限主要源于抗原异质性、T细胞浸润不良和免疫抑制肿瘤微环境，条件性激活技术（如蛋白酶敏感遮蔽剂、低pH响应）可扩大治疗指数。"
+    ],
+    "verdict": "综述信息密度高，系统覆盖双特异性抗体的机制、临床数据与前沿策略，包含可迁移的分子设计思路和耐药机制洞见，适合肿瘤免疫领域读者精读。",
+    "url": "https://mp.weixin.qq.com/s/Wrfpv1jZ4wZduo7NBOLz8g",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/Int_Immunol_-_%E5%8F%8C%E7%89%B9%E5%BC%82%E6%80%A7%E6%8A%97%E4%BD%93%EF%BC%9A%E5%BD%93%E5%89%8D%E8%BF%9B%E5%B1%95%E4%B8%8E%E6%9C%AA%E6%9D%A5%E5%B1%95%E6%9C%9B-Wrfpv1.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "生物类似药的相似性评价与工艺可比性评估异同",
+    "clippedAt": "2026-08-26 17:01",
+    "publishedAt": "2026-08-25",
+    "priority": "高",
+    "keywords": [
+      "生物类似药",
+      "相似性评价",
+      "Tier分级法",
+      "等效性检验",
+      "工艺可比性",
+      "质量范围法"
+    ],
+    "summary": "本文基于《Statistical Applications for CMC》第九章9.7节，系统阐述了生物类似药相似性评价与工艺变更可比性评估的根本区别。内容包括：两者在比对对象、EAC设定主体与依据、统计方法等维度的三大核心差异；FDA推荐的Tier分级法框架，将质量属性按风险分为三级并匹配不同统计方法；Tier 1等效性检验的法定EAC为1.5倍原研药标准差，并详解了计算流程，以阿达木单抗ABP501为例展示应用；同时深入探讨了原研药批次相关性对σ_RP估计的影响及缓解策略，如扩大批次来源、使用混合模型等。文章还介绍了Tier 2质量范围法和Tier 3描述性比较，并总结了实践中的关键挑战与监管沟通建议，强调分析相似性是整体证据链的起点而非终点。",
+    "insights": [
+      "生物类似药相似性评价与原工艺变更可比性有本质区别：前者是跨产品比对，EAC由法定1.5σ_RP统一规定，后者是企业自行设定的同一产品变更前后比对。",
+      "Tier 1等效性检验的90%置信区间若完全落入±1.5倍原研药标准差内即判相似，即使区间不包含0也不影响结论，核心是差异是否足够小而非是否为零。",
+      "原研药批次间的正相关会导致σ_RP被低估，使EAC偏窄、检验过严，这是生物类似药开发中最常见的统计陷阱，需通过扩大批次来源和混合模型缓解。",
+      "Tier 1未通过不意味着产品失败，而是触发更高层级证据（如动物试验、临床药理学研究），体现监管科学的逐步递进哲学。"
+    ],
+    "verdict": "文章系统拆解了生物类似药相似性评价的Tier分级统计方法，包含EAC法定标准、RP批次相关性陷阱及缓解策略等独到技术细节，信息密度高，对相关从业者具有可操作性和指导价值。",
+    "url": "https://mp.weixin.qq.com/s/vM6sEgZfMZn_S0HiQftm0Q",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E7%94%9F%E7%89%A9%E7%B1%BB%E4%BC%BC%E8%8D%AF%E7%9A%84%E7%9B%B8%E4%BC%BC%E6%80%A7%E8%AF%84%E4%BB%B7%E4%B8%8E%E5%B7%A5%E8%89%BA%E5%8F%AF%E6%AF%94%E6%80%A7%E8%AF%84%E4%BC%B0%E5%BC%82%E5%90%8C-vM6sEg.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "我的开源项目登顶 GitHub 趋势榜 No1 了！",
+    "clippedAt": "2026-08-26 14:19",
+    "publishedAt": "2026-08-26",
+    "priority": "中",
+    "keywords": [
+      "开源项目",
+      "GitHub趋势榜",
+      "AI时代",
+      "坚持",
+      "普通人",
+      "GPT-Image-2"
+    ],
+    "summary": "作者苍何分享自己的开源项目「awesome-gpt-image-2」登上 GitHub 趋势榜第一的经历。项目从今年4月开始，持续更新提示词和模板，并搭建了网站。登顶当天涨了近1700 star，帖子曝光近60万。作者认为这是AI时代普通人的机会，但强调努力不保证成功，需要运气和坚持。他感谢社区贡献者，并表示会继续优化项目，因为真正重要的是帮助到更多人。文章最后鼓励正在坚持但未获回报的人，不要因暂时没有回声而怀疑自己。",
+    "insights": [
+      "AI降低了创造门槛，但未降低坚持门槛，人与人差距在坚持上重新拉开。",
+      "普通人可通过持续做对别人有用的事，绕过学历和资源限制被世界看见。",
+      "努力不保证成功，但运气到来前需先做出值得被看见的东西。",
+      "开源社区的成功来自共同贡献，而非一人之功。"
+    ],
+    "verdict": "文章是个人励志经历分享，有独特视角但信息密度一般，适合对开源和AI个人开发者感兴趣的读者，非硬核干货。",
+    "url": "https://mp.weixin.qq.com/s/w_EANijbpO70HsmEz6nPGg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E6%88%91%E7%9A%84%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E7%99%BB%E9%A1%B6_GitHub_%E8%B6%8B%E5%8A%BF%E6%A6%9C_No1_%E4%BA%86%EF%BC%81-w_EANi.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "Graph Engineering: Stop Chaining Your Agents",
+    "clippedAt": "2026-08-25 18:44",
+    "publishedAt": "2026-08-14",
+    "priority": "高",
+    "keywords": [
+      "Agent工作流",
+      "图结构",
+      "并行化",
+      "数据契约",
+      "Claude Code",
+      "动态工作流"
+    ],
+    "summary": "文章尖锐批评多步 Agent 最常见的实现是串行队列——步骤间实际没有数据依赖却互相等待，浪费资源。作者提出用图结构设计 Agent 工作流：节点是工作单元，边是数据依赖，通过数据契约、并行扇出、汇聚、条件路由和验证器等手段优化。以 Claude Code 动态工作流为例，给出 14 步路线图，包括用 parallel() 并行执行、用 pipeline() 替代 barrier、让模型分层以控制成本、用代码而非对话做编排等。核心观点是 Agent 上限不在模型而在工作拓扑，图形化编排能极大提升速度、可靠性和可扩展性。文末提供六种可直接套用的图模式，如安全扫描、深度研究、差异审计等。",
+    "insights": [
+      "线性脚本是退化的图，砍掉不传数据的箭头即可发现可并行节点，大幅提速。",
+      "并行扇出与汇聚组成的菱形拓扑是复杂 Agent 的基础，可适配多种任务。",
+      "编排层应用代码而非模型对话实现，使多子代理协调的 token 成本趋近于零。",
+      "默认使用 pipeline() 流式处理而非 barrier 全量等待，能显著降低延迟。"
+    ],
+    "verdict": "提供了从思维转变到具体可操作的完整方法，信息密度高，观点反直觉且可迁移性极强。",
+    "url": "https://x.com/seeconvm/status/2088199384580108339",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/Graph_Engineering_Stop_Chaining_Your_Agents-108339.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "Karpathy：提示工程将消失，图才是终点",
+    "clippedAt": "2026-08-25 18:40",
+    "publishedAt": "2026-08-24",
+    "priority": "高",
+    "keywords": [
+      "提示工程",
+      "图结构",
+      "AI代理",
+      "Karpathy",
+      "系统设计"
+    ],
+    "summary": "Andrej Karpathy在斯坦福演讲中提出，提示工程正在消退，系统演进路径为LLM→提示→代理→图，图是最终形态，此前皆是过渡。大多数人仍在优化最先消失的部分。他强调模型和令牌不变，改变运行形状即可带来质变。",
+    "insights": [
+      "提示工程只是过渡阶段，图结构才是AI系统的最终形态。",
+      "系统能力取决于运行形状，而非模型或令牌本身。",
+      "应尽早转向图工程，而非执着于优化提示词。"
+    ],
+    "verdict": "来自Karpathy的独到观点，揭示AI系统演化的关键转折，虽短但有启发性。",
+    "url": "https://x.com/virgilxbt/status/2091910640818417788",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/Karpathy%EF%BC%9A%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%E5%B0%86%E6%B6%88%E5%A4%B1%EF%BC%8C%E5%9B%BE%E6%89%8D%E6%98%AF%E7%BB%88%E7%82%B9-417788.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "简单方法月入6.2万美元？",
+    "clippedAt": "2026-08-25 18:28",
+    "publishedAt": "2026-08-24",
+    "priority": "低",
+    "keywords": [
+      "赚钱方法",
+      "Claude Code",
+      "YouTube",
+      "标题党"
+    ],
+    "summary": "该帖子宣称发现2026年最简单的赚钱方法：结合Claude Code和YouTube，每月可赚62,000美元，仅需13分钟。但帖子只附有视频，未提供具体信息，疑似引流或标题党。",
+    "insights": [
+      "高收益承诺往往缺乏具体细节，需警惕。",
+      "利用AI工具和视频平台赚钱可能成为趋势，但需验证。"
+    ],
+    "verdict": "内容空泛，仅为吸引点击的标题党，无实质信息。",
+    "url": "https://x.com/0xJokker/status/2091895032580112862",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/%E7%AE%80%E5%8D%95%E6%96%B9%E6%B3%95%E6%9C%88%E5%85%A56.2%E4%B8%87%E7%BE%8E%E5%85%83%EF%BC%9F-112862.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "万字长文｜Codex 从入门到精通",
+    "clippedAt": "2026-08-25 18:28",
+    "publishedAt": "2026-08-23",
+    "priority": "高",
+    "keywords": [
+      "Codex",
+      "AI Agent",
+      "教程",
+      "工作区",
+      "权限控制",
+      "MCP"
+    ],
+    "summary": "本文是一篇 Codex 使用教程，面向初学者，从界面布局、工作区选择、Local/Worktree/Cloud 三种模式、Plan 设置、权限控制、CLI 命令、AGENTS.md 规则，到 Skills、Plugins、MCP、Automation 和 /goal 的区别与用法，系统讲解了 Codex 的核心概念和操作要点。文章强调正确选择目录、合理控制权限、重视 Diff 审查，并给出了分阶段的学习路径。结论是：熟练使用 Codex 的关键在于提供正确的材料和边界，及时纠偏，并用 Diff、终端和测试验证结果，而非追求工具数量。",
+    "insights": [
+      "Codex 是能实际操作的 Agent，核心循环是 Prompt→Plan→Execute→Verify，其中 Verify 最重要，不能轻信“完成”结论。",
+      "工作区选择应遵循最小目录原则，边界越小，误操作影响越可控。",
+      "Plan 的价值在于复杂任务提前发现风险，简单任务不必增加仪式感；真正有用的 Plan 必须回答“解决什么、看什么材料、改哪里、怎么证明”。",
+      "Skill 是操作手册，Plugin 是能力包，MCP 是外部接口，Automation 是闹钟，/goal 是长期任务状态；实际工作按需补层，不必全上。"
+    ],
+    "verdict": "信息密度高，系统拆解了 Codex 的界面、工具链和实践路径，提供大量可操作方法和判断标准，适合希望深度使用 Codex 的读者精读。",
+    "url": "https://x.com/miles_mazy/status/2091339513134010554",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/%E4%B8%87%E5%AD%97%E9%95%BF%E6%96%87%EF%BD%9CCodex_%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%B2%BE%E9%80%9A-010554.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "Karpathy免费讲座：AI系统演进",
+    "clippedAt": "2026-08-25 18:21",
+    "publishedAt": "2026-08-24",
+    "priority": "中",
+    "keywords": [
+      "Karpathy",
+      "AI讲座",
+      "自改进系统",
+      "免费学习",
+      "技术进阶"
+    ],
+    "summary": "作者推荐Andrej Karpathy的免费两小时讲座，称其浓缩了他在OpenAI和Tesla八年的经验，涵盖代理、循环、图、自改进系统。认为比多数付费AI课程更有价值，看完的人会比只收藏的人领先六个月。",
+    "insights": [
+      "顶级从业者的免费内容可能比付费课程更干货。",
+      "真正吸收知识需要投入时间，收藏不等于学习。",
+      "AI系统演进路径：代理→循环→图→自改进，是理解前沿的关键框架。"
+    ],
+    "verdict": "内容本身是优质资源推荐，但帖子信息量有限，核心价值在外部链接。",
+    "url": "https://x.com/0xSizer/status/2091916096202785177",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/Karpathy%E5%85%8D%E8%B4%B9%E8%AE%B2%E5%BA%A7%EF%BC%9AAI%E7%B3%BB%E7%BB%9F%E6%BC%94%E8%BF%9B-785177.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "Context Graph Engineering: How K3 Turns 300 Agents Into One Second Brain",
+    "clippedAt": "2026-08-25 18:15",
+    "publishedAt": "2026-08-24",
+    "priority": "高",
+    "keywords": [
+      "Agent Swarm",
+      "上下文图",
+      "强化学习",
+      "任务分解",
+      "多智能体协同",
+      "Kimi K3"
+    ],
+    "summary": "本文介绍 Moonshot AI 的 Kimi K3 Agent Swarm 功能，指出并行运行300个智能体只是容易的一半，真正的难点在于如何将分散的结果连接成有价值的上下文图。Agent Swarm 通过编排器动态创建无预定义角色的子代理，并利用强化学习训练分解行为，而非静态模板。作者以收集200余篇散落文章为例，说明宽任务适合并行，但判断类步骤仍需串行。文章强调该功能适用于宽而重复的任务，且消耗的积分是常规任务的数倍，因此需权衡是否值得。结论是，巨额智能体数量并非卖点，无需手动设计团队且输出统一才是核心价值。",
+    "insights": [
+      "并行运行数百个代理并不难，真正的价值在于如何将分散的结果整合成有联系的上下文图。",
+      "Agent Swarm 的编排器通过强化学习学会了何时拆解任务，而非依赖固定的静态规则。",
+      "该功能适合‘宽而重复’的任务，对于需要深度思考的单一任务反而增加无谓成本。",
+      "在使用 swarm 前应判断任务是否真正需要并行，否则只是用更多积分得到相同答案。"
+    ],
+    "verdict": "文章提出‘上下文图’这一独到概念，深入剖析了多智能体系统的核心瓶颈与成本权衡，具有参考价值。",
+    "url": "https://x.com/0xMortyx/status/2091868687493951598",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/Context_Graph_Engineering_How_K3_Turns_300_Agents_Into_One_S-951598.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-08",
+    "title": "我的 AI 开发流程",
+    "clippedAt": "2026-08-25 18:08",
+    "publishedAt": "2026-08-25",
+    "priority": "高",
+    "keywords": [
+      "AI开发流程",
+      "可行性分析",
+      "设计文档",
+      "原型设计",
+      "黑盒测试"
+    ],
+    "summary": "作者分享为字幕转录App添加远程转录功能的AI开发流程。首先进行可行性分析，避免盲目动手；然后写设计文档，梳理需求和技术方案；接着用baoyu-design skill做高保真原型设计，并反复调整；之后让Claude Code根据文档实施代码；最后人工黑盒测试反馈问题。作者强调先验证后编码，不Review代码，信任AI能力。案例完整，步骤可复现。",
+    "insights": [
+      "动手编码前先做可行性分析，从产品和技术角度评估，避免白费功夫。",
+      "用设计文档和原型设计把方向确定清楚，再让AI写代码，能大幅降低返工。",
+      "即使有AI辅助，也需人工做黑盒测试，把发现的问题反馈给Agent迭代。",
+      "信任AI能力，可跳过代码Review，但需要充分测试。"
+    ],
+    "verdict": "分享了一套完整、可复用的AI辅助开发流程，案例具体，方法可迁移，信息密度高。",
+    "url": "https://x.com/dotey/status/2092014354946257338",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-08/%E6%88%91%E7%9A%84_AI_%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B-257338.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "Kabat, Chothia, IMGT, AbM: 各类抗体序列编号规则有什么区别？（附：高通量注释抗体序列解决办法）",
+    "clippedAt": "2026-08-25 06:25",
+    "publishedAt": "2026-08-18",
+    "priority": "高",
+    "keywords": [
+      "抗体编号规则",
+      "Kabat",
+      "IMGT",
+      "Chothia",
+      "AbM",
+      "CDR区"
+    ],
+    "summary": "文章系统介绍了抗体序列编号规则的作用和分类，重点对比了Kabat、IMGT、Chothia和AbM四种方案。Kabat基于序列多样性，但结构对应不佳；IMGT基于种系基因，标准化强但CDR定义偏窄；Chothia基于三维结构，更准确但存在应用差异；AbM整合前两者并修正HCDR1/HCDR2。文章指出CDR不完全等于抗原结合位点，FR区也可能参与结合，并推荐了自研的高通量抗体注释工具。",
+    "insights": [
+      "CDR区并不完全等同于抗体真正的抗原结合位点（paratope），FR区残基也可能直接参与抗原结合。",
+      "不同编号方案各有优缺点：Kabat基于序列多样性但结构不准确，IMGT标准化强但可能遗漏关键残基，Chothia基于结构但应用有限，AbM整合前两者更全面。",
+      "选择哪种编号方案取决于具体任务，不能简单说哪种最好，需要根据研究目标灵活使用。"
+    ],
+    "verdict": "文章深入对比了主流抗体编号规则的原理与局限，并提出了CDR≠paratope的独到见解，信息密度高，对从事抗体工程和结构分析的读者有实质参考价值。",
+    "url": "https://mp.weixin.qq.com/s/1NhJP_iDWCNIi6oUpq_Ydg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/Kabat%2C_Chothia%2C_IMGT%2C_AbM_%E5%90%84%E7%B1%BB%E6%8A%97%E4%BD%93%E5%BA%8F%E5%88%97%E7%BC%96%E5%8F%B7%E8%A7%84%E5%88%99%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F%EF%BC%88%E9%99%84%EF%BC%9A%E9%AB%98%E9%80%9A%E9%87%8F%E6%B3%A8%E9%87%8A%E6%8A%97%E4%BD%93%E5%BA%8F%E5%88%97%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%EF%BC%89-1NhJP_.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "FDA 发布2026 版（IOM）检查员操作手册",
+    "clippedAt": "2026-08-24 15:58",
+    "publishedAt": "2026-07-30",
+    "priority": "高",
+    "keywords": [
+      "FDA",
+      "IOM",
+      "QMSR",
+      "医疗器械检查",
+      "风险导向",
+      "合规"
+    ],
+    "summary": "文章介绍了FDA于2026年7月发布的2026版调查操作手册（IOM），核心变化是与2026年2月生效的QMSR（21 CFR Part 820）全面对接，标志着FDA对医疗器械企业的质量体系检查从QSIT模式转向以ISO 13485:2016为基准的风险导向新模式。新版IOM定位从内部工作手册升级为公开的合规蓝图，体现了监管透明度提升，企业可主动对标。文章建议企业将IOM作为核心合规参考，关注新增章节（如3.2.3.3、5.12.1、5.12.1.5.1），将其作为内部培训教材和预检工具，并提醒具体法规以FDA官网为准。",
+    "insights": [
+      "IOM 2026版全面对接QMSR，标志着FDA检查从QSIT模式转向ISO 13485风险导向模式，企业需将风险管理融入QMS日常决策。",
+      "IOM从内部手册变为公开合规蓝图，企业可将合规从被动响应升级为主动对标，减少检查不确定性。",
+      "企业应把IOM与QMSR同等对待，作为培训教材和预检工具，重点研究新增章节以提前发现差距。"
+    ],
+    "verdict": "文章提供FDA检查手册更新的核心变化与具体合规行动建议，对医疗器械企业具有直接指导价值，信息密度高且具可操作性。",
+    "url": "https://mp.weixin.qq.com/s/Mm99OncG3I0dbbHm0xxa6w",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/FDA_%E5%8F%91%E5%B8%832026_%E7%89%88%EF%BC%88IOM%EF%BC%89%E6%A3%80%E6%9F%A5%E5%91%98%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C-Mm99On.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "247k Star的编程Skills被Fable 5重构了！Token消耗降60%、提速50%",
+    "clippedAt": "2026-08-24 12:02",
+    "publishedAt": "2026-07-06",
+    "priority": "高",
+    "keywords": [
+      "Superpowers 6",
+      "AI编程",
+      "Token优化",
+      "子智能体",
+      "代码审查",
+      "Claude Fable 5"
+    ],
+    "summary": "本文介绍了开源项目Superpowers 6的重大升级。该项目是为AI编程智能体（如Claude Code、Codex、Cursor）提供工程化开发流程的Skills集合，此前已获247k Star。Superpowers 6针对用户反馈的Token消耗高、构建速度慢的问题，利用Claude Fable 5对子智能体驱动开发链路进行了重构：将原先分离的需求符合性审查和代码质量审查合并为一个reviewer任务，减少重复上下文读取；通过脚本将任务说明和审查diff整理成文件而非直接粘贴进上下文，降低昂贵上下文占用；在计划阶段增加预检以提前发现内部冲突；同时将技能描述改为通用表述并映射到多种开发环境。官方基准测试显示，在保持代码质量的前提下，构建速度提升50%，Token消耗降低60%。文章还提供了安装教程，并指出AI编程工具竞争正从模型能力转向工程化流程能力。",
+    "insights": [
+      "通过合并审查角色而非堆叠更多模型，能同时降低Token消耗并保持质量，效率提升来自流程重构而非模型能力。",
+      "将大段diff移出上下文、改为文件读取，是减少Token占用的有效手段，可推广到其他Agent设计。",
+      "在任务执行前增加计划预检，能避免长任务因需求冲突导致的高昂返工成本。",
+      "AI编程工具的下一个竞争焦点是工程化流程能力，而非单纯的模型参数或上下文长度。"
+    ],
+    "verdict": "文章提供了具体的性能优化方法和流程重构策略，对AI编程重度用户有直接参考价值，且数据支撑明确，属于高密度信息。",
+    "url": "https://mp.weixin.qq.com/s/o4pgoT43L-zi3CDwi9sUng",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/247k_Star%E7%9A%84%E7%BC%96%E7%A8%8BSkills%E8%A2%ABFable_5%E9%87%8D%E6%9E%84%E4%BA%86%EF%BC%81Token%E6%B6%88%E8%80%97%E9%99%8D60%25%E3%80%81%E6%8F%90%E9%80%9F50%25-o4pgoT.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "拆解 claude 文件夹CLAUDE.md、Hooks、Skills 与 Agents 应该怎么放",
+    "clippedAt": "2026-08-24 11:58",
+    "publishedAt": "2026-07-16",
+    "priority": "高",
+    "keywords": [
+      "Claude Code",
+      ".claude目录",
+      "CLAUDE.md",
+      "Hooks",
+      "Skills",
+      "Agents"
+    ],
+    "summary": "本文系统讲解了 Claude Code 中 .claude/ 文件夹的结构与配置方法。首先区分项目级目录（团队共享）和用户级目录（个人偏好），然后分别介绍了 CLAUDE.md 的写作要点与长度控制、rules/ 模块化拆分规则、Hooks 自动执行关键动作（重点说明退出码含义与安全注意事项）、Skills 封装复用流程、Agents 隔离复杂任务，以及 settings.json 的权限边界配置。最后给出了从零开始的落地顺序，建议先写清楚 CLAUDE.md，再根据真实需求逐步增加其他模块。",
+    "insights": [
+      "配置优先级：组织策略 > 全局偏好 > 项目规则 > 个人覆盖，冲突时更具体、更高优先级生效。",
+      "Hooks 中阻止命令必须用 exit code 2，exit 1 只记录错误无法真正拦截。",
+      "Skills 用于封装稳定可复用流程，Agents 用于隔离复杂任务以保护主上下文。",
+      "落地顺序应渐进：先写好 CLAUDE.md 和 settings.json，再按需增加 rules、Skills 与 Agents。"
+    ],
+    "verdict": "信息密度高，提供了具体配置示例和可操作的落地步骤，对 Claude Code 用户有直接实用价值。",
+    "url": "https://mp.weixin.qq.com/s/WnPwdWSHrFmAtfEfI1ymJw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E6%8B%86%E8%A7%A3_claude_%E6%96%87%E4%BB%B6%E5%A4%B9CLAUDE.md%E3%80%81Hooks%E3%80%81Skills_%E4%B8%8E_Agents_%E5%BA%94%E8%AF%A5%E6%80%8E%E4%B9%88%E6%94%BE-WnPwdW.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "以分析相似性为核心的单抗高效监管框架",
+    "clippedAt": "2026-08-24 08:52",
+    "publishedAt": "2026-08-23",
+    "priority": "高",
+    "keywords": [
+      "单抗生物类似药",
+      "分析相似性",
+      "监管科学",
+      "动物试验替代",
+      "临床有效性试验"
+    ],
+    "summary": "本文提出对表征充分的单抗生物类似药，应弱化或取消常规动物毒理和强制对比临床有效性试验，转向以分析相似性为核心、证据驱动的简化监管框架。作者从单抗保守的Ig骨架和可预测的药代特征出发，论证了平台化产品在结构、功能和临床行为上的可预判性，指出现代分析手段（质谱、高级结构表征、功能学检测）比临床终点更灵敏地识别产品差异。文章梳理了EMA、WHO、FDA等监管趋势，并强调FDA 2025年草案尚未生效。同时明确适用边界：免疫原性高风险、新靶点分子、缺乏验证PD标志物、复杂分子机制（双抗、ADC）等场景仍需保守评价。最后指出改革目标是提高研发效率与药物可及性，但需完善方法学与上市后监测，确保安全底线。",
+    "insights": [
+      "单抗的毒性多来自靶点药理作用而非脱靶效应，传统小分子毒理范式并不适配，可用机制知识和人源模型预判。",
+      "分析功能检测的灵敏度通常高于临床终点，临床终点易受疾病异质性、背景治疗等混杂因素干扰，因此分析相似性可作为核心判定依据。",
+      "豁免临床有效性试验需满足严格边界条件：低免疫原性风险、有可靠PD标志物、成熟类别经验等，不可无条件推广。",
+      "全球监管正从强制动物试验转向基于证据权重和NAMs的灵活框架，但FDA草案未定稿，不能作为现行法规执行。"
+    ],
+    "verdict": "文章提出变革性的监管思路，以分析相似性替代传统强制试验，系统论证科学依据与边界，信息密度高，对生物药研发策略有直接参考价值。",
+    "url": "https://mp.weixin.qq.com/s/AXK9Uqi8WDjjioazQlMtdg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E4%BB%A5%E5%88%86%E6%9E%90%E7%9B%B8%E4%BC%BC%E6%80%A7%E4%B8%BA%E6%A0%B8%E5%BF%83%E7%9A%84%E5%8D%95%E6%8A%97%E9%AB%98%E6%95%88%E7%9B%91%E7%AE%A1%E6%A1%86%E6%9E%B6-AXK9Uq.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "ADC偶联位点鉴定及偶联率分析有什么好方法？：Papain酶切辅助",
+    "clippedAt": "2026-08-24 08:50",
+    "publishedAt": "2026-08-24",
+    "priority": "高",
+    "keywords": [
+      "ADC",
+      "偶联位点鉴定",
+      "木瓜蛋白酶",
+      "LC-MS/MS",
+      "肽图分析",
+      "偶联率定量"
+    ],
+    "summary": "本文介绍了一种基于木瓜蛋白酶酶切辅助的LC-MS/MS肽图分析方法，用于鉴定和定量抗体药物偶联物（ADC）的偶联位点及位点占有率。该方法针对具有蛋白酶可裂解连接子（如Val-Cit和Val-Ala）的ADC，通过木瓜蛋白酶去除高度疏水的药物部分，显著改善了偶联肽段的质谱碎裂质量和色谱行为，提高了偶联水平定量的准确性。作者详细优化了酶切条件（酶/蛋白比、pH、温度），并验证了方法的精密度和线性。该方法还可同时监测热应激ADC样品的多种质量属性，包括位点特异性偶联水平、DAR值、琥珀酰亚胺水解及常见PTMs（氧化、脱酰胺、环化等）。文章还对比了药明生物与再生元的类似研究，讨论了不同偶联位点的稳定性差异。",
+    "insights": [
+      "木瓜蛋白酶去偶联可去除疏水药物部分，显著改善偶联肽段的质谱鉴定和定量准确性。",
+      "偶联位点稳定性存在差异：HC Cys225偶联稳定性低于其他位点，且铰链区Cys232较Cys229更不易暴露于溶剂。",
+      "硫代琥珀酰亚胺环水解可稳定偶联，而逆迈克尔反应导致偶联丢失，pH影响显著。",
+      "该方法可同时监测多种质量属性（偶联水平、DAR、水解、PTMs），适用于ADC工艺开发和可比性研究。"
+    ],
+    "verdict": "提供了新颖且实用的ADC偶联位点分析方法，包含详细优化过程和实际应用案例，对生物药分析领域具有较高参考价值。",
+    "url": "https://mp.weixin.qq.com/s/z5jmr-H4ReXGKWT40mLYKw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/ADC%E5%81%B6%E8%81%94%E4%BD%8D%E7%82%B9%E9%89%B4%E5%AE%9A%E5%8F%8A%E5%81%B6%E8%81%94%E7%8E%87%E5%88%86%E6%9E%90%E6%9C%89%E4%BB%80%E4%B9%88%E5%A5%BD%E6%96%B9%E6%B3%95%EF%BC%9F%EF%BC%9APapain%E9%85%B6%E5%88%87%E8%BE%85%E5%8A%A9-z5jmr-.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "新版ICH Q1下的光强制降解与光确认稳定性研究(Steven W. Baertschi博士PPT）",
+    "clippedAt": "2026-08-23 17:34",
+    "publishedAt": "2026-07-27",
+    "priority": "高",
+    "keywords": [
+      "ICH Q1",
+      "光稳定性",
+      "强制降解",
+      "光确认",
+      "辅料光敏性",
+      "使用中稳定性"
+    ],
+    "summary": "本文转载了Steven W. Baertschi博士关于新版ICH Q1稳定性指导原则下光强制降解与光确认稳定性研究的演讲PPT。文章介绍了ICH Q1的更新背景，详细阐述了光稳定性试验的光源要求、照度依据，以及新版草案新增的光源选项3和使用中光稳定性考察。通过多个案例说明辅料可能引发光降解，如柠檬酸与Fe3+络合物的光敏作用、葡萄糖降解产物5-HT作为单线态氧光敏剂等。文章还讨论了影响光降解的因素、本生-罗斯科互易定律的例外，并提出了针对强制降解和光确认稳定性研究的建议，强调需将API与处方整体考虑。最后总结新版Q1赋予更大灵活性但指导性细则弱化。",
+    "insights": [
+      "新版ICH Q1草案新增光源选项3，采用LED等环境光模拟实际使用场景，并纳入使用中光稳定性考察。",
+      "即使API本身不吸收光，处方中辅料也可能引发光降解，如柠檬酸-Fe3+络合物和葡萄糖降解产物均可作为光敏剂。",
+      "光降解常不符合本生-罗斯科互易定律：光照强度、温度、时长均会影响降解速率和杂质谱，高光强易产生初级光解产物，低光强易产生热降解和次级产物。",
+      "光稳定性研究需将制剂体系视为整体，同时评估API和所有辅料的影响。"
+    ],
+    "verdict": "文章专业性强，信息密度高，提供了新版ICH Q1光稳定性试验的详细技术解读、实际案例和可操作建议，对制药研发人员有重要参考价值。",
+    "url": "https://mp.weixin.qq.com/s/FvBquwTZXS40-DbfVX4kFA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E6%96%B0%E7%89%88ICH_Q1%E4%B8%8B%E7%9A%84%E5%85%89%E5%BC%BA%E5%88%B6%E9%99%8D%E8%A7%A3%E4%B8%8E%E5%85%89%E7%A1%AE%E8%AE%A4%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%A0%94%E7%A9%B6%28Steven_W._Baertschi%E5%8D%9A%E5%A3%ABPPT%EF%BC%89-FvBquw.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "建议所有人都去安装这个网页爬取的cli ！",
+    "clippedAt": "2026-08-23 17:18",
+    "publishedAt": "2026-08-21",
+    "priority": "低",
+    "keywords": [
+      "Dokobot",
+      "网页爬取",
+      "CLI",
+      "反爬",
+      "AI 工具",
+      "开箱即用"
+    ],
+    "summary": "文章介绍了作者安装使用网页爬取工具 Dokobot 的体验，声称该工具解决了网页检索和爬取中的三大痛点：绕过反爬、无需登录、无需 API Key。作者通过三个案例展示其效果：小红书选题灵感扫描、电商商品图爬取、多平台科技简报生成，均能高效完成。文章还对比了不使用 Dokobot 的情况，强调其开箱即用、安装 CLI 后全局共享等优势。最后作者推荐读者尝试，并附上点赞、在看、转发请求。",
+    "insights": [
+      "无需登录和 API Key 即可绕过反爬，是 Dokobot 的核心卖点",
+      "CLI 一次安装、全局共享，比 Skill 更适合接口较多的场景",
+      "Agent 结合 Dokobot 可自动完成网页数据抓取和整理，提升效率"
+    ],
+    "verdict": "文章整体为营销软文，以案例推广工具为主，缺乏技术细节和客观对比，判断价值较低。",
+    "url": "https://mp.weixin.qq.com/s/z41a0-5vYi7Fw9LqU2POCw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%BB%BA%E8%AE%AE%E6%89%80%E6%9C%89%E4%BA%BA%E9%83%BD%E5%8E%BB%E5%AE%89%E8%A3%85%E8%BF%99%E4%B8%AA%E7%BD%91%E9%A1%B5%E7%88%AC%E5%8F%96%E7%9A%84cli_%EF%BC%81-z41a0-.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "Claude Code 创始人亲自示范：他一个人怎么干出一个团队的活",
+    "clippedAt": "2026-08-23 17:15",
+    "publishedAt": "2026-07-23",
+    "priority": "高",
+    "keywords": [
+      "Claude Code",
+      "AI编程",
+      "工作流",
+      "复合工程",
+      "自动化",
+      "tokenmaxxing"
+    ],
+    "summary": "本文介绍了 Claude Code 创始人 Boris Cherny 的 AI 编程工作流。他同时运行 10-15 个 Claude 会话，用独立代码副本避免冲突，以 10%-20% 的废弃率换取并行效率。他摒弃复杂 prompt，依赖团队共享的 CLAUDE.md 文件记录错误教训，实现知识复利。关键方法包括：先使用 Plan 模式对齐方案再自动执行；通过斜杠命令、子智能体、钩子和 MCP 将重复操作自动化；为 AI 建立自我验证循环（测试、构建、浏览器测试）以提升结果质量。他主张 tokenmaxxing 策略，给予工程师充足 token 而非限制成本，但需精简配置避免浪费。文章也指出该方法的局限：AI 废弃率、审查瓶颈以及代码理解力缺失的风险。核心洞见是从打字者转变为判断者。",
+    "insights": [
+      "AI 编程的瓶颈不再是写代码，而是如何在多个 AI 会话之间切换注意力；同时运行多个会话并接受一定比例的失败，是提升整体产出效率的关键。",
+      "用 CLAUDE.md 文件记录每次 AI 的错误和纠正规则，让代码库随每次合并变得更智能，实现团队知识的自动积累和复利。",
+      "先通过 Plan 模式与 AI 充分对齐方案，再切换到自动执行，能显著提高一次成功率——所谓神奇的一次完成，其实只是计划上的充分投入。",
+      "将重复操作编码为命令、子智能体和钩子，让 AI 自我验证循环，可以解放人类，使人专注于审查和把控方向，而不是逐行检查代码。"
+    ],
+    "verdict": "文章提供了大量具体、可操作的方法论和独特视角，信息密度高，不同于常规科普，值得精读。",
+    "url": "https://mp.weixin.qq.com/s/u-q36ZHHSaDL7U1POEwwww",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/Claude_Code_%E5%88%9B%E5%A7%8B%E4%BA%BA%E4%BA%B2%E8%87%AA%E7%A4%BA%E8%8C%83%EF%BC%9A%E4%BB%96%E4%B8%80%E4%B8%AA%E4%BA%BA%E6%80%8E%E4%B9%88%E5%B9%B2%E5%87%BA%E4%B8%80%E4%B8%AA%E5%9B%A2%E9%98%9F%E7%9A%84%E6%B4%BB-u-q36Z.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "用 Claude Code 搭一套 7×24 工作环境",
+    "clippedAt": "2026-08-23 17:12",
+    "publishedAt": "2026-06-29",
+    "priority": "高",
+    "keywords": [
+      "Claude Code",
+      "7×24自动化",
+      "cron定时任务",
+      "Hooks",
+      "tmux远程操控",
+      "Git通信管道"
+    ],
+    "summary": "本文介绍如何通过五层配置（定时触发、事件响应、持久记忆、远程操控、隔离执行）让 Claude Code 在无人值守时自主运行，全程基于 CLI 和 API key，无需 claude.ai 认证。定时触发通过 cron 和 claude -p 非交互模式实现；事件响应利用 Hooks 将 AI 内部事件推送到外部通知；持久记忆结合 CLAUDE.md、auto memory、--resume 和 loop.md；远程操控使用 tmux + SSH 或 Git 仓库作为异步通信管道；隔离执行通过 Worktrees 避免多任务冲突。文章最后给出了一个完整场景示例，并对比了有官方订阅时的替代方案。",
+    "insights": [
+      "通过 cron + claude -p 可以让 AI 在固定时间自主启动任务，而 /loop 适合会话内轻量定时。",
+      "Notification/Stop Hook 能将 AI 的等待或完成状态推送到手机，实现远程介入。",
+      "Git 仓库本身可以作为异步通信管道：AI 写报告、人类编辑文件回复，无需额外终端工具。",
+      "使用 --worktree 隔离不同任务的运行目录，避免并行执行时冲突。"
+    ],
+    "verdict": "信息密度高，提供了具体配置示例和可迁移的架构方案，读者可立即实践。",
+    "url": "https://mp.weixin.qq.com/s/8e15DME8RMYMWzj0YvsG_g",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E7%94%A8_Claude_Code_%E6%90%AD%E4%B8%80%E5%A5%97_7%C3%9724_%E5%B7%A5%E4%BD%9C%E7%8E%AF%E5%A2%83-8e15DM.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "双抗错配、半抗体与同源二聚体：杂质究竟从哪里来？",
+    "clippedAt": "2026-08-23 17:10",
+    "publishedAt": "2026-08-23",
+    "priority": "高",
+    "keywords": [
+      "双特异抗体",
+      "纯化工艺",
+      "杂质分析",
+      "层析方法",
+      "链错配",
+      "同源二聚体"
+    ],
+    "summary": "文章系统阐述双特异性抗体（双抗）纯化中各类装配相关杂质的来源、形成机制与分离策略。核心观点是：双抗杂质并非纯化过程中突然产生，而是源于序列设计、链配对、细胞表达及分子应激阶段；下游纯化的本质是识别并放大目标与杂质之间的微小物理化学差异。文章将双抗分为六类结构格式，分别对应典型杂质画像与推荐纯化路线；详细分析了重链同源二聚、轻链错配、半抗与片段等杂质的质量特性及检测难点；提出Protein A、CEX/AEX、MMC、HIC、CHT等层析方法的选择逻辑，并给出六周开发框架、分析方法最低组合和四条案例路线。强调真正的双抗平台是从结构读出工艺的能力，并给出专利视角与产业化判断原则。",
+    "insights": [
+      "双抗杂质多由分子设计和表达阶段决定，纯化只是放大已有差异，而非从无到有分离。",
+      "SEC主峰不能证明正确装配，必须用LC-MS、分析HIC、特异肽图等正交方法确认链组合。",
+      "分子工程（如KiH、静电导向、pI改造）可制造可分离性，比增加一根色谱柱更经济。",
+      "纯化路线应基于杂质身份选择最短正交组合，并用回收、池体积、稳健性等指标综合评分。"
+    ],
+    "verdict": "信息密度极高，系统整合了双抗杂质机制与纯化策略，含大量技术案例与可操作的开发框架，适合从事抗体纯化或工艺开发的专业读者精读。",
+    "url": "https://mp.weixin.qq.com/s/d1Uu6RjBO1U2LQR5VdFjRg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%8F%8C%E6%8A%97%E9%94%99%E9%85%8D%E3%80%81%E5%8D%8A%E6%8A%97%E4%BD%93%E4%B8%8E%E5%90%8C%E6%BA%90%E4%BA%8C%E8%81%9A%E4%BD%93%EF%BC%9A%E6%9D%82%E8%B4%A8%E7%A9%B6%E7%AB%9F%E4%BB%8E%E5%93%AA%E9%87%8C%E6%9D%A5%EF%BC%9F-d1Uu6R.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "推荐10个反复在看的AI博主，从入门到实战",
+    "clippedAt": "2026-08-23 17:08",
+    "publishedAt": "2026-07-10",
+    "priority": "中",
+    "keywords": [
+      "AI博主",
+      "学习路径",
+      "入门到实战",
+      "资源推荐",
+      "AI工具",
+      "工作流"
+    ],
+    "summary": "本文针对AI学习资料过多、筛选耗时的问题，推荐了10个值得反复看的AI博主，并按学习阶段分为四层：入门期（Tina Huang、PAPAYA电脑教室、秋芝2046）、进阶期（Jeff Su、技术爬爬虾）、实战期（软核狼哥、AI产品黄叔、阿杜与猫）、心态层（李继刚、葬AI）。每个博主都标注了特点与适用人群，例如PAPAYA电脑教室适合视频跟练，技术爬爬虾提供全流程实操教学，阿杜与猫面向科研人群搭建AI科研工作区。最后建议读者根据当前阶段挑选2-3位博主，边看边实操，并强调保持学习能力、执行力和好心态。",
+    "insights": [
+      "学习AI应先建立整体认知，避免被工具淹没，否则会浪费大量时间。",
+      "分层筛选学习资源（入门、进阶、实战、心态）能显著降低信息筛选成本。",
+      "实战中“先做出来”比追求完美更重要，行动是连接知道与做到的关键。",
+      "在AI焦虑泛滥的时代，保持冷静和底层思考本身就是一种竞争力。"
+    ],
+    "verdict": "文章提供了一份实用的博主清单和分阶段学习建议，但内容本质是资源罗列，观点多为常见认知，缺乏深度洞见，适合需要筛选指导的初级读者，不值得精读。",
+    "url": "https://mp.weixin.qq.com/s/TOCkF-6e2tIPvUZ-ahCeMA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E6%8E%A8%E8%8D%9010%E4%B8%AA%E5%8F%8D%E5%A4%8D%E5%9C%A8%E7%9C%8B%E7%9A%84AI%E5%8D%9A%E4%B8%BB%EF%BC%8C%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%AE%9E%E6%88%98-TOCkF-.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "分享5个小众但非常实用的Claude Code斜杠命令",
+    "clippedAt": "2026-08-23 17:07",
+    "publishedAt": "2026-08-19",
+    "priority": "中",
+    "keywords": [
+      "Claude Code",
+      "斜杠命令",
+      "subtask",
+      "insights",
+      "数据可视化",
+      "设计"
+    ],
+    "summary": "本文由作者鲁工分享五个小众但实用的Claude Code官方斜杠命令。首先，/insights可分析近期会话生成HTML体检报告，帮助用户改进使用方式；/subtask能带着完整上下文派出子代理，仅返回结果，避免主会话上下文混淆；/artifact-design用于工件设计与交付，提供AI设计俗套清单以避免模板化；/dataviz专注于数据可视化，支持多种图表和仪表盘设计；/design则调用Claude Design的专业设计能力。作者通过实例（如科比投篮数据可视化）展示效果，并建议/subtask高频使用，/insights每月运行一次。文章强调这些命令能提升工作效率，尤其适合深度Claude用户。",
+    "insights": [
+      "/subtask能继承主会话全部上下文并只返回结果，是避免上下文混淆的最佳实践。",
+      "/insights可对本地会话进行体检，生成可执行的改进建议，每月运行一次有助于优化使用习惯。",
+      "Claude Code内置的设计类斜杠命令（如/artifact-design）内置了'反AI味'设计清单，避免产出千篇一律的模板化设计。",
+      "/dataviz可灵活支持从HTML到SVG等多种可视化形式，适合快速生成专业数据报告。"
+    ],
+    "verdict": "文章实用性强，对Claude Code用户有直接操作价值，但内容属于功能介绍与案例分享，未提供更深层方法论，适合需要了解这些命令的读者，但信息密度中等。",
+    "url": "https://mp.weixin.qq.com/s/bx0Z7egWCvnjEkRn0UdtQQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%88%86%E4%BA%AB5%E4%B8%AA%E5%B0%8F%E4%BC%97%E4%BD%86%E9%9D%9E%E5%B8%B8%E5%AE%9E%E7%94%A8%E7%9A%84Claude_Code%E6%96%9C%E6%9D%A0%E5%91%BD%E4%BB%A4-bx0Z7e.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "Claude 官方：将 Session 用到极致。",
+    "clippedAt": "2026-08-23 17:02",
+    "publishedAt": "2026-08-20",
+    "priority": "高",
+    "keywords": [
+      "Claude Code",
+      "Session管理",
+      "Token优化",
+      "Prompt cache",
+      "上下文管理",
+      "Subagent"
+    ],
+    "summary": "本文基于Claude Code官方文章，系统讲解了如何提升Session使用效率、最大化token价值。文章从token定价机制入手，分析了模型选择、输入/输出token差异及Prompt cache原理，并通过一个修复测试的具体例子展示了单次任务背后的多次模型请求。核心建议包括：不同任务间使用/clear、任务前确认/model和/effort、用@-mention引用文件、命令加quiet参数、善用/compact、将高噪声任务交给Subagent等。最后指出，一个Session只做一件事，只保留必要上下文，是控制成本的关键。",
+    "insights": [
+      "Token成本主要取决于模型、输入输出类型及缓存命中，输出token约为输入的5倍，缓存读取仅需0.1倍。",
+      "中途切换模型、effort或Fast mode会破坏Prompt cache，导致整个会话重新prefill，应在Session开始或/clear后切换。",
+      "使用@-mention引用文件可省去Read调用，但同一文件不要重复引用；命令输出会一直占用上下文，应尽量使用quiet参数。",
+      "Subagent有独立上下文，适合处理日志分析等高噪声任务，但小任务交给Subagent反而增加开销。"
+    ],
+    "verdict": "文章提供了大量关于Claude Code token优化的具体可操作技巧，信息密度高，且基于官方文档，对开发者有直接参考价值。",
+    "url": "https://mp.weixin.qq.com/s/6uIvqA-osZJC7ED33UjG_g",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/Claude_%E5%AE%98%E6%96%B9%EF%BC%9A%E5%B0%86_Session_%E7%94%A8%E5%88%B0%E6%9E%81%E8%87%B4%E3%80%82-6uIvqA.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "折腾了一圈，我现在这样在 Obsidian 里管理任务",
+    "clippedAt": "2026-08-23 16:50",
+    "publishedAt": "2026-08-22",
+    "priority": "高",
+    "keywords": [
+      "Obsidian",
+      "任务管理",
+      "XDB数据库",
+      "日期页",
+      "工作流"
+    ],
+    "summary": "本文介绍了一套在 Obsidian 中管理任务的极简方法：每天一个以日期命名的文件，任务直接写在对应日期里，通过双链关联人物和资料，按需添加标签。为解决记录和查看的痛点，作者使用 Components 插件的 XDB 数据库搭建了完整流程，包括日期页快速记录、任务数据库集中管理未完成任务、日历视图预览日程安排，以及指标视图统计完成率等。文章给出了具体配置步骤和代码片段，并推荐了美化方案与 AI 结合的可能性。核心结论是：保持简单，先养成记录习惯，再逐步优化。",
+    "insights": [
+      "用日期文件代表一天，将任务直接写在对应日期，无需复杂分类，最大化降低记录成本。",
+      "通过数据库视图将散落在各日期文件中的任务集中管理，避免遗漏，同时支持直接在表格中编辑。",
+      "利用文件名作为日历字段，省去额外日期字段维护，是 XDB 日历视图配置的巧思。",
+      "建议先形成记录习惯，再引入 AI 或指标优化，避免一开始追求完美系统而陷入折腾。"
+    ],
+    "verdict": "文章提供了可复现的 Obsidian 任务管理方案，包含具体配置步骤、截图和代码，操作性强，信息密度高。",
+    "url": "https://mp.weixin.qq.com/s/6H1NawbIsKPoVZpeSKAznw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E6%8A%98%E8%85%BE%E4%BA%86%E4%B8%80%E5%9C%88%EF%BC%8C%E6%88%91%E7%8E%B0%E5%9C%A8%E8%BF%99%E6%A0%B7%E5%9C%A8_Obsidian_%E9%87%8C%E7%AE%A1%E7%90%86%E4%BB%BB%E5%8A%A1-6H1Naw.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "FDA重磅 | 抗体药物糖型检测——仅需两小时",
+    "clippedAt": "2026-08-22 17:08",
+    "publishedAt": "2026-08-05",
+    "priority": "高",
+    "keywords": [
+      "抗体药物",
+      "Fc糖型检测",
+      "生物层干涉技术",
+      "IgG1",
+      "过程控制",
+      "糖基化分析"
+    ],
+    "summary": "本文介绍美国 FDA Tongzhong Ju 团队联合日本东北医科药科大学 Yoshiki Yamaguchi 等人发表于 Trends in Biotechnology 的研究。他们开发了一种基于特异性抗体 mAb-G 和生物层干涉技术（BLI）的 IgG1 抗体药物 Fc N-糖型高通量检测方法，可在约 2 小时内定量岩藻糖化、非岩藻糖化和高甘露糖三类主要糖型，且适用于药物制剂和未纯化细胞收获液。该方法利用内切糖苷酶 Endo S、Endo F3、Endo H 将复杂糖链转化为不同的 Fc 糖肽表位，再由 mAb-G 通过 BLI 读取结合信号。研究在 adalimumab、trastuzumab、cetuximab 及生物类似药中验证了与 MALDI-TOF/MS 的一致性，并证明可用于细胞株筛选、工艺监控和生物类似药可比性研究。作者认为该技术是快速 CQA/PAT 工具，但无法替代质谱进行精细糖结构解析。",
+    "insights": [
+      "将复杂糖链结构识别转化为抗体-表位结合信号，使糖型检测从质谱依赖走向快速结合实验。",
+      "利用内切糖苷酶选择性处理不同糖型，配合特异性抗体 mAb-G，实现了在粗样品中 2 小时定量三类关键糖型。",
+      "该方法可直接分析未纯化收获液，为细胞株筛选和生物类似药开发提供低成本高通量筛选手段。",
+      "虽然无法解析精细糖结构，但作为快速 CQA/PAT 工具可显著加快工艺决策，与 LC-MS 形成互补。"
+    ],
+    "verdict": "方法创新性强，从质谱转向快速结合检测，具有实际工业应用价值，信息密度高且可操作性强。",
+    "url": "https://mp.weixin.qq.com/s/_JZG2K8qyZ2QuP5IA7DSPw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/FDA%E9%87%8D%E7%A3%85__%E6%8A%97%E4%BD%93%E8%8D%AF%E7%89%A9%E7%B3%96%E5%9E%8B%E6%A3%80%E6%B5%8B%E2%80%94%E2%80%94%E4%BB%85%E9%9C%80%E4%B8%A4%E5%B0%8F%E6%97%B6-_JZG2K.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "治疗药物创新与监管的交汇：近期 CMC 相关考量",
+    "clippedAt": "2026-08-22 14:09",
+    "publishedAt": "2026-08-22",
+    "priority": "高",
+    "keywords": [
+      "CMC",
+      "新型治疗模式",
+      "监管科学",
+      "细胞与基因治疗",
+      "给药技术",
+      "个性化医疗"
+    ],
+    "summary": "本文综述了新型治疗模式与给药技术的最新进展及其CMC（化学、制造和控制）监管挑战。内容涵盖双特异性/多特异性抗体、纳米抗体、掩蔽抗体、DARPins、CAR-T细胞治疗、基因编辑、疫苗及多功能分子（如ADC、PROTAC）等新型疗法，以及脂质体、纳米粒、皮下给药、肺部给药、3D打印等递送技术。文章分析了当前监管框架的不足，如指导原则滞后、个体化疗法可比性评估困难、CMC资料缺陷导致申报失败等。最后提出未来监管优化方向，包括模块化柔性生产、实时学习型监管模式、结构化数据管理（SCDM）和云端监管审评，以加速创新药惠及患者。",
+    "insights": [
+      "新型疗法的CMC难点在于质量属性模糊、检测手段不足，传统监管范式难以适应活生物制品和个体化生产。",
+      "双抗等复杂蛋白的纯化与表征难度极高，需精密工程设计保障质量一致性，无法沿用传统单抗经验。",
+      "未来监管应转向实时学习型模式，利用生产大数据和结构化数据管理减轻审评负担，实现全球协同审评。",
+      "模块化柔性生产将成为个性化医疗时代的主流，小批量多品种产品需快速切换产线，打破传统大规模生产模式。"
+    ],
+    "verdict": "文章系统梳理了新型疗法CMC前沿挑战与监管趋势，信息密度高，对制药从业者具有实践参考价值。",
+    "url": "https://mp.weixin.qq.com/s/P2I12UQyLBS_KkMEIyLTxw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E6%B2%BB%E7%96%97%E8%8D%AF%E7%89%A9%E5%88%9B%E6%96%B0%E4%B8%8E%E7%9B%91%E7%AE%A1%E7%9A%84%E4%BA%A4%E6%B1%87%EF%BC%9A%E8%BF%91%E6%9C%9F_CMC_%E7%9B%B8%E5%85%B3%E8%80%83%E9%87%8F-P2I12U.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "给 Claude Code 装上这 17 个插件，效率直接翻几倍",
+    "clippedAt": "2026-08-22 10:16",
+    "publishedAt": "2026-07-04",
+    "priority": "高",
+    "keywords": [
+      "Claude Code",
+      "插件推荐",
+      "效率工具",
+      "AI设计",
+      "自动化",
+      "工具清单"
+    ],
+    "summary": "文章推荐了17个作者亲测值得安装的Claude Code插件，分为设计、效率、数据三类。设计类如Taste Skill和Impeccable，用于消除AI生成的廉价感，提升前端设计审美；效率类如Ponytail、Playwright CLI和Codex插件，可减少代码量、省token、实现浏览器自动化和对抗式代码审查；数据类如Last 30 Days、Firecrawl和Obsidian，用于深度研究、网页抓取和为AI添加记忆。文章详细介绍了每个插件的核心功能和使用场景，并强调不必一次全装，应从当前最痛的场景入手，选一两款先用起来。结论是合理选择插件能显著提升Claude Code的实用性和效率。",
+    "insights": [
+      "插件是拉开Claude Code使用差距的关键，但应针对性选择而非堆砌。",
+      "设计类插件通过注入审美规则，能有效消除AI生成内容的廉价感。",
+      "效率类插件能从减少代码量、省token、自动测试等维度显著降低成本。",
+      "数据类插件让Claude Code具备研究、抓取、记忆和支付能力，扩展应用边界。"
+    ],
+    "verdict": "信息密度高，提供了17个具体插件及其功能和使用方法，有很强的实操性，可直接指导读者按需选用。",
+    "url": "https://mp.weixin.qq.com/s/1MgpVBHn1OLAjfCKM83ImA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E7%BB%99_Claude_Code_%E8%A3%85%E4%B8%8A%E8%BF%99_17_%E4%B8%AA%E6%8F%92%E4%BB%B6%EF%BC%8C%E6%95%88%E7%8E%87%E7%9B%B4%E6%8E%A5%E7%BF%BB%E5%87%A0%E5%80%8D-1MgpVB.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "2026 年 8 月 17 文献综述Skill排行榜 Top 10",
+    "clippedAt": "2026-08-22 10:04",
+    "publishedAt": "2026-08-17",
+    "priority": "中",
+    "keywords": [
+      "文献综述",
+      "Skill",
+      "GitHub",
+      "学术研究",
+      "AI Agent",
+      "论文写作"
+    ],
+    "summary": "文章指出文献综述的真正挑战在于对检索到的文献进行二次加工，如明确检索范围、理清研究脉络、提炼观点和研究空白。随后，文章基于 GitHub 公开仓库，按 Star 数筛选出 10 个与文献综述、学术研究相关的 Skill 项目，包括 agentic-awesome-skills、academic-research-skills、nature-skills 等，并简要介绍了每个项目的核心功能、使用场景和地址。最后，文章总结出当前科研 Skill 的趋势：多数项目不再局限于文献综述单一场景，而是覆盖从文献调研到论文写作的全流程，文献综述仅是其中一环。",
+    "insights": [
+      "文献综述的难点在于信息加工与综合，而非简单的检索操作。",
+      "GitHub 上高 Star 的科研 Skill 项目多为综合型，覆盖研究全流程。",
+      "未来科研工具趋向自动化，文献综述被整合进更大的 Agent 工作流中。",
+      "选择 Skill 时应关注其对引用核验和证据链的支持，而非仅看 Star 数。"
+    ],
+    "verdict": "文章是排行榜类资讯，提供项目列表和简介，但分析较浅，缺乏深度见解，适合快速了解趋势，不值得精读。",
+    "url": "https://mp.weixin.qq.com/s/pajw4o9yNiiaoygdAznl0Q",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/2026_%E5%B9%B4_8_%E6%9C%88_17_%E6%96%87%E7%8C%AE%E7%BB%BC%E8%BF%B0Skill%E6%8E%92%E8%A1%8C%E6%A6%9C_Top_10-pajw4o.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "Academic-Research-Skills 全流程地图：写论文的每一步，该切到哪个 skill",
+    "clippedAt": "2026-08-22 10:01",
+    "publishedAt": "2026-07-19",
+    "priority": "高",
+    "keywords": [
+      "Academic-Research-Skills",
+      "论文写作流程",
+      "AI辅助科研",
+      "文献综述",
+      "诚信核查",
+      "模拟审稿"
+    ],
+    "summary": "本文是《Academic-Research-Skills》系列文章的进阶篇，核心是梳理论文写作从模糊想法到投稿的完整流程中，如何选择和使用不同的 skill。文章先介绍 ARS 项目的 4 个核心 skill（deep-research、academic-paper、academic-paper-reviewer、academic-pipeline），并说明它们对应的生命周期阶段。随后按 10 个阶段拆解：选题与文献调研用 deep-research 的 8 种模式，写作用 academic-paper 的 11 种模式，诚信核查在 Stage 2.5 和 4.5 进行，但强调其仅为启发式筛查而非专业查重。模拟审稿用 academic-paper-reviewer 的 full 模式，修改循环中需区分 revision、revision-coach、rebuttal-audit 三个模式。最后提供 27 个模式和 16 个命令的速查表，并指出多数模式需用自然语言触发，而非命令。文章结论是流程再细，最终把关仍是人。",
+    "insights": [
+      "ARS 的核心是 4 个 skill 串起 10 阶段流程，但多数功能靠自然语言触发，而非斜杠命令，记住命令不如学会描述当前困境。",
+      "诚信核查是启发式筛查，无法替代 Turnitin 等专业查重工具，投稿前仍需额外检测。",
+      "在修改循环中，应根据手头材料的形状选择模式：只有意见用 revision-coach，需要修改用 revision，已有回复草稿用 rebuttal-audit。",
+      "ARS 提供 AI 自我反思报告，从四个维度评估用户是否真正参与思考，这比论文质量更能反映工具使用的价值。"
+    ],
+    "verdict": "文章信息密度高，详细拆解了 ARS 的流程、模式和触发方式，提供了可直接使用的速查表和避坑指南，对需要用它辅助论文写作的读者有很强的实操指导价值。",
+    "url": "https://mp.weixin.qq.com/s/sMSDqVir_DOnVPunm17wNw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/Academic-Research-Skills_%E5%85%A8%E6%B5%81%E7%A8%8B%E5%9C%B0%E5%9B%BE%EF%BC%9A%E5%86%99%E8%AE%BA%E6%96%87%E7%9A%84%E6%AF%8F%E4%B8%80%E6%AD%A5%EF%BC%8C%E8%AF%A5%E5%88%87%E5%88%B0%E5%93%AA%E4%B8%AA_skill-sMSDqV.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "文献阅读：鉴定IgG1单克隆抗体中酸性电荷变体的多个来源",
+    "clippedAt": "2026-08-21 17:55",
+    "publishedAt": "2024-05-07",
+    "priority": "高",
+    "keywords": [
+      "IgG1单克隆抗体",
+      "酸性电荷变体",
+      "二硫键还原",
+      "脱酰胺",
+      "半乳糖基化",
+      "电荷异质性"
+    ],
+    "summary": "本文是华东理工大学和海正药业合作发表的研究性文献阅读笔记，旨在系统鉴定IgG1单克隆抗体中酸性电荷变体的来源及其对生物活性的影响。研究者通过CEX分离单抗的主峰、酸性峰和碱性峰，并综合运用LC-MS、CE-SDS、SEC、CD、硼酸亲和色谱及肽图谱等技术进行表征。结果显示，二硫键还原导致的半抗体片段、HC-T8 Asn84和HC-T35 Asn388位点的脱酰胺作用以及聚集体形成是酸性电荷变体的主要来源；而半乳糖基化虽与酸性变体水平相关，但酶切实验证明其并非直接原因。此外，竞争性ELISA和SPR分析表明，电荷变体与IgE的结合亲和力略有降低，但与FcRn的结合能力不受显著影响。该研究为理解和控制单抗电荷异质性提供了实验依据。",
+    "insights": [
+      "酸性电荷变体主要由二硫键还原导致的半抗体、特定位点脱酰胺及聚集体引起，而非半乳糖基化直接导致。",
+      "通过β1-4半乳糖苷酶消化实验排除了半乳糖基化作为酸性变体直接原因的可能性，尽管其与酸性变体水平存在统计相关性。",
+      "电荷变体对FcRn结合亲和力无明显影响，但会降低IgE结合活性，提示电荷异质性可能影响抗体效应功能。",
+      "多技术联用（CEX、LC-MS、CE-SDS、SEC等）是全面鉴定蛋白电荷变体来源的有效策略。"
+    ],
+    "verdict": "文章针对单抗电荷变体这一关键质量属性提供了系统的鉴定方法和明确的实验结论，对生物制药研发与质控具有直接参考价值，信息密度高且方法可迁移。",
+    "url": "https://mp.weixin.qq.com/s?__biz=MzUxMjg2MTA5MQ==&mid=2247497256&idx=1&sn=7a58e9140be525733f42cb1dd15f4e12&chksm=f95f40e4ce28c9f25e2926925529c9ede2ea4e2589df376e1a422b55cb95a30a3d1ebe749ddc&mpshare=1&scene=1&srcid=0507nkr8LUIeJU9WRYUzyt2j&sharer_shareinfo=3861b43a23595e830bde90b4eb86a2ae&sharer_shareinfo_first=3861b43a23595e830bde90b4eb86a2ae#rd",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E6%96%87%E7%8C%AE%E9%98%85%E8%AF%BB%EF%BC%9A%E9%89%B4%E5%AE%9AIgG1%E5%8D%95%E5%85%8B%E9%9A%86%E6%8A%97%E4%BD%93%E4%B8%AD%E9%85%B8%E6%80%A7%E7%94%B5%E8%8D%B7%E5%8F%98%E4%BD%93%E7%9A%84%E5%A4%9A%E4%B8%AA%E6%9D%A5%E6%BA%90-7a58e9.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "分析方法验证可接受标准深度剖析—线性篇",
+    "clippedAt": "2026-08-21 17:34",
+    "publishedAt": "2024-04-26",
+    "priority": "高",
+    "keywords": [
+      "分析方法验证",
+      "线性",
+      "可接受标准",
+      "相关系数",
+      "截距",
+      "剩余标准偏差"
+    ],
+    "summary": "本文深入剖析了分析方法验证中线性可接受标准的制定依据。作者指出，线性相关系数的可接受标准不能简单规定为0.99或0.999，而应基于测定次数和置信水平判断，如n=5时R≥0.991即可满足99.9%置信度。针对有关物质线性截距，文章解释说“25%以内”的常见要求源自USP<621>公式对RSD与范围要求的引申，并通过案例说明该标准与回收率70%-130%的对应关系。此外，本文还讨论了剩余标准偏差（SE）的意义，指出其可用于计算预测值的置信区间，以及线性响应因子RSD用于评估系统偏差。最后，作者建议在自动进样器普及的背景下，线性测试可单样单针，无需双针。文章结合药典、USP指南和实际案例，提供了制定线性可接受标准的具体思路和参考依据。",
+    "insights": [
+      "线性相关系数的可接受标准应结合测定次数和置信度，而非盲目套用0.99或0.999，n=5时R≥0.991即满足99.9%置信度。",
+      "杂质线性截距25%的常见要求实质来源于USP中RSD与范围要求的数学引申，对应回收率70%-130%的控制范围。",
+      "剩余标准偏差（SE）可用于构建预测值的置信区间，为线性评估提供了更多统计信息，而不只依赖相关系数。"
+    ],
+    "verdict": "文章信息密度高，不仅解释指南要求，还深入探讨了背后的统计学原理和实际操作标准，能为分析人员提供可落地的验证接受标准制定方法。",
+    "url": "https://mp.weixin.qq.com/s?__biz=MzUxOTgxNzg4NA==&mid=2247566425&idx=4&sn=bf4f2653f3b5a8c594f233612286723e&chksm=f9f05baace87d2bc33d4e669efb495d18cb34b82f1c6ca3d68f32e1b446768ea7950c0d5798e&mpshare=1&scene=1&srcid=0430jpARrOk0jzdKrleC5TzW&sharer_shareinfo=9fed43823ae93928b419050382f1b020&sharer_shareinfo_first=9fed43823ae93928b419050382f1b020#rd",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%88%86%E6%9E%90%E6%96%B9%E6%B3%95%E9%AA%8C%E8%AF%81%E5%8F%AF%E6%8E%A5%E5%8F%97%E6%A0%87%E5%87%86%E6%B7%B1%E5%BA%A6%E5%89%96%E6%9E%90%E2%80%94%E7%BA%BF%E6%80%A7%E7%AF%87-bf4f26.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "从笨手笨脚到诺奖得主：质谱百年，那些改变世界的质谱学家",
+    "clippedAt": "2026-08-21 14:16",
+    "publishedAt": "2026-08-21",
+    "priority": "高",
+    "keywords": [
+      "质谱历史",
+      "J.J.汤姆逊",
+      "Alfred Nier",
+      "电喷雾电离",
+      "MALDI",
+      "生物质谱"
+    ],
+    "summary": "本文翻译自Analytical Chemistry 2008年的一篇质谱历史综述，系统回顾质谱技术从诞生到成为现代分析化学核心工具的百年历程。文章从J.J.汤姆逊在阴极射线研究中意外发明质谱器开始，讲述了Alfred Nier通过设计扇形磁场质谱仪并积极推广使其走出物理实验室；随后Fred McLafferty、Klaus Biemann和Carl Djerassi三位化学家通过解耦有机分子碎裂机制，将质谱引入化学结构鉴定领域；Alan Marshall和Melvin Comisarow将傅里叶变换应用于离子回旋共振，大幅提升分辨能力；最终聚焦于ESI和MALDI两种软电离技术的出现，解决了大分子电离难题，使质谱进入生物学领域。文章以人物为主线，穿插技术突破背景与科学家的个人故事，展现了质谱技术如何从笨拙的仪器演变为不可或缺的分析利器。",
+    "insights": [
+      "科学发现常源于意外，汤姆逊在寻找其他东西时发明了质谱，而其笨拙的实验技能也被助手的天赋弥补，说明团队协作在科研中至关重要。",
+      "一项技术的普及不仅靠发明者，更需要像Nier这样的推动者，他无私分享仪器和想法，并主动与生物学家、地球化学家合作，让质谱从物理领域走向广泛的应用。",
+      "质谱从定量工具到结构分析工具的关键，在于化学家通过机理研究建立了碎裂规则的语言，使黑魔法般的仪器变成可以被化学家理解的常规手段。",
+      "ESI和MALDI的诞生几乎同时解决了生物大分子电离的世纪难题，它们互补的特性让质谱不仅成为物理化学家的工具，更开启了蛋白质组学和现代生物学的新时代。"
+    ],
+    "verdict": "文章系统梳理质谱发展史，涵盖关键人物与技术突破，信息密度高且具有历史深度，有助于读者从源头理解技术演进的逻辑和科学家的贡献，值得精读。",
+    "url": "https://mp.weixin.qq.com/s/yoYKM0Ley_pR9Psm-qjb0A",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E4%BB%8E%E7%AC%A8%E6%89%8B%E7%AC%A8%E8%84%9A%E5%88%B0%E8%AF%BA%E5%A5%96%E5%BE%97%E4%B8%BB%EF%BC%9A%E8%B4%A8%E8%B0%B1%E7%99%BE%E5%B9%B4%EF%BC%8C%E9%82%A3%E4%BA%9B%E6%94%B9%E5%8F%98%E4%B8%96%E7%95%8C%E7%9A%84%E8%B4%A8%E8%B0%B1%E5%AD%A6%E5%AE%B6-yoYKM0.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "磷酸化修饰的表征案例(+79.97Da)：IgG-based融合蛋白的G4S-linker",
+    "clippedAt": "2026-08-21 11:56",
+    "publishedAt": "2026-08-03",
+    "priority": "高",
+    "keywords": [
+      "磷酸化修饰",
+      "质谱表征",
+      "G4S linker",
+      "融合蛋白",
+      "翻译后修饰",
+      "丝氨酸磷酸化"
+    ],
+    "summary": "本文介绍了一篇来自罗氏制药2016年发表在《MABS》上的研究，该研究在HEK细胞瞬转表达的IgG-based融合蛋白mAb1-F中发现一个+79 Da的未知变体。通过LC-MS胰蛋白酶肽图、CID和EThcD碎裂等手段，将修饰定位到重链第一个(G4S)2 linker的C端丝氨酸残基上。结合98 Da中性丢失、合成肽段加标和碱性磷酸酶酶切，确认该修饰为磷酸化(+79.97 Da)。进一步使用嗜热菌蛋白酶消化发现，磷酸化特异性发生在第一个linker上，且HEK瞬转和CHO稳转表达时磷酸化比例分别为11.3%和0.4%。研究还通过NetPhos 2.0预测和序列分析，发现+2和+3位的谷氨酸（SXE基序）是磷酸化发生的关键。文章强调了在治疗性融合蛋白设计中应仔细评估含有甘氨酸-丝氨酸连接子序列，以避免引入磷酸化位点。",
+    "insights": [
+      "磷酸化和硫酸化的质量差仅约0.01 Da，需结合中性丢失（-98 Da/-80 Da）和酶切验证才能准确区分。",
+      "G4S linker并非总是惰性，特定序列（如SXE基序）可成为激酶底物，导致治疗性蛋白发生非预期磷酸化。",
+      "同一融合蛋白在HEK和CHO细胞中表达时，磷酸化水平差异显著（11.3% vs 0.4%），提示宿主细胞选择影响翻译后修饰谱。",
+      "使用NetPhos等预测工具可提前评估linker序列的磷酸化风险，指导融合蛋白的理性设计。"
+    ],
+    "verdict": "文章提供了磷酸化修饰表征的完整技术路线和关键判别细节，对生物药中linker设计具有重要警示意义，信息密度高且可操作性强。",
+    "url": "https://mp.weixin.qq.com/s/Qmsn_Or7UvRacUisWpwulQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E7%A3%B7%E9%85%B8%E5%8C%96%E4%BF%AE%E9%A5%B0%E7%9A%84%E8%A1%A8%E5%BE%81%E6%A1%88%E4%BE%8B%28%2B79.97Da%29%EF%BC%9AIgG-based%E8%9E%8D%E5%90%88%E8%9B%8B%E7%99%BD%E7%9A%84G4S-linker-Qmsn_O.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "2025版药典方法验证统计学的三大区间及其计算",
+    "clippedAt": "2026-08-21 08:07",
+    "publishedAt": "2026-08-19",
+    "priority": "中",
+    "keywords": [
+      "药典",
+      "方法验证",
+      "置信区间",
+      "预测区间",
+      "容忍区间",
+      "Excel计算"
+    ],
+    "summary": "文章针对2025版药典中出现的置信区间、预测区间和容忍区间三个统计概念进行通俗解析。通过实验室测定药物活性成分含量的场景，分别解释了三个区间的含义：置信区间用于估计总体参数的可信范围，预测区间用于预测单个未来观测值的可能范围，容忍区间用于以一定置信水平包含总体特定比例观测值的范围。文章还结合药典9097中的具体公式，展示了使用Excel计算三种区间的方法，包括t分布临界值、标准正态分布和卡方分布函数的应用，并通过示例帮助读者理解。",
+    "insights": [
+      "三类区间分别回答不同问题：置信区间估计均值，预测区间预测单个值，容忍区间覆盖总体比例。",
+      "容忍区间需同时指定置信水平和包含比例，如95%置信水平下覆盖99%的总体。",
+      "预测区间比置信区间更宽，因为它额外包含了单个观测值的随机变异。",
+      "利用Excel内置函数（T.INV、NORM.S.INV、CHISQ.INV）可简便计算三类区间。"
+    ],
+    "verdict": "内容专业实用，提供了可操作的计算方法，但属于统计学常规科普，无独到或反直觉的核心观点。",
+    "url": "https://mp.weixin.qq.com/s/Q9e2GwI4LuOCHrYhixPuCQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/2025%E7%89%88%E8%8D%AF%E5%85%B8%E6%96%B9%E6%B3%95%E9%AA%8C%E8%AF%81%E7%BB%9F%E8%AE%A1%E5%AD%A6%E7%9A%84%E4%B8%89%E5%A4%A7%E5%8C%BA%E9%97%B4%E5%8F%8A%E5%85%B6%E8%AE%A1%E7%AE%97-Q9e2Gw.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "【课件分享】分析方法的验证、确认和转移（186页PPT）",
+    "clippedAt": "2026-08-21 06:42",
+    "publishedAt": "2026-08-20",
+    "priority": "低",
+    "keywords": [
+      "分析方法验证",
+      "分析方法确认",
+      "分析方法转移",
+      "PPT课件"
+    ],
+    "summary": "该正文仅为课件分享的标题和下载入口提示，未提供具体的课件内容、论据或结论。用户需要通过链接进入医药数据库搜索下载原文，无法从中获取实质性信息。",
+    "insights": [],
+    "verdict": "正文缺乏实质内容，仅为课件分享入口，信息密度极低，无法判断精读价值。",
+    "url": "https://mp.weixin.qq.com/s/YAR22asRi9aeqP0adjUqug",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E3%80%90%E8%AF%BE%E4%BB%B6%E5%88%86%E4%BA%AB%E3%80%91%E5%88%86%E6%9E%90%E6%96%B9%E6%B3%95%E7%9A%84%E9%AA%8C%E8%AF%81%E3%80%81%E7%A1%AE%E8%AE%A4%E5%92%8C%E8%BD%AC%E7%A7%BB%EF%BC%88186%E9%A1%B5PPT%EF%BC%89-YAR22a.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "单克隆抗体非还原SDS-PAGE杂带假象：2007年经典文献揭示真相",
+    "clippedAt": "2026-08-21 06:28",
+    "publishedAt": "2026-08-16",
+    "priority": "高",
+    "keywords": [
+      "非还原SDS-PAGE",
+      "单克隆抗体",
+      "二硫键错配重排",
+      "β-消除",
+      "烷基化试剂",
+      "假杂带"
+    ],
+    "summary": "本文解读2007年发表在《Biotechnol Lett》的一项经典研究，该研究针对重组单克隆抗体在非还原SDS-PAGE中常出现多条小分子杂带的现象展开溯源。作者通过胶内酶切结合MALDI-TOF质谱、Western blot以及对比不同制样条件下的电泳图谱，鉴定出这些杂带对应缺失轻链的抗体、双重链、半抗体、游离重链和游离轻链。实验发现，杂带并非样品原液中的真实杂质，而是制样加热过程中人为产生的假象，核心机制包括二硫键错配重排和β-消除反应。质谱数据证实，加入烷基化试剂封闭游离巯基可显著减少假杂带，而检测到脱氢丙氨酸则证明β-消除断裂二硫键。文章还澄清了常见误区，并提供了优化非还原SDS-PAGE的实操建议，如缩短煮沸时间、调低pH、添加NEM或碘乙酰胺等。",
+    "insights": [
+      "非还原SDS-PAGE上的小分子杂带可能是制样加热人为产生的假象，而非样品本身杂质，切勿盲目怀疑纯化工艺。",
+      "二硫键错配重排是短时煮沸产生杂带的主要机制，游离巯基是催化剂，烷基化试剂可有效抑制。",
+      "长时间煮沸会导致β-消除反应，直接断裂二硫键并生成脱氢丙氨酸，烷基化试剂无法阻止该过程。",
+      "常规制样只需煮沸1-5分钟、使用中性偏酸缓冲液，即可显著减少假杂带。"
+    ],
+    "verdict": "文章揭示了非还原SDS-PAGE中常见杂带的真实成因，提供了明确的实验证据和可操作的优化方案，对相关领域实验人员具有直接指导价值，信息密度高且独到。",
+    "url": "https://mp.weixin.qq.com/s/RlnqrGC4ep-TjrW7YeVQGg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%8D%95%E5%85%8B%E9%9A%86%E6%8A%97%E4%BD%93%E9%9D%9E%E8%BF%98%E5%8E%9FSDS-PAGE%E6%9D%82%E5%B8%A6%E5%81%87%E8%B1%A1%EF%BC%9A2007%E5%B9%B4%E7%BB%8F%E5%85%B8%E6%96%87%E7%8C%AE%E6%8F%AD%E7%A4%BA%E7%9C%9F%E7%9B%B8-RlnqrG.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "不对称结构双特异性抗体错配的系统分析与表征策略",
+    "clippedAt": "2026-08-21 06:16",
+    "publishedAt": "2026-08-20",
+    "priority": "高",
+    "keywords": [
+      "双特异性抗体",
+      "错配杂质",
+      "LC-MS",
+      "疏水相互作用色谱",
+      "二维液相色谱",
+      "纯化工艺"
+    ],
+    "summary": "本文系统介绍了不对称双特异性抗体错配杂质的分析表征策略。首先将双抗形式分为三类，并指出IgG样不对称双抗的关键难题是多肽链配对保真度。早期四源杂交瘤工艺产生多种错配变体，后续通过KiH、静电导向、共同轻链、CrossMab、DuetMab等蛋白工程技术提高组装正确率，残余杂质靠纯化去除。文中以Bis-A和Bis-B为例，提出一套正交分析工具包：早期开发阶段使用LC-MS快速筛查错配杂质，通过完整分子量和亚基分析指导纯化工艺开发；QC放行阶段开发基于HIC的稳健检测方法，可分离多种错配峰；最后利用二维LC-MS在线鉴定HIC色谱峰，结合完整分子量和亚基分子量归属杂质峰。三步策略覆盖药物全研发周期，为不对称双抗工艺开发提供技术支撑。",
+    "insights": [
+      "错配杂质分析需结合完整分子量和亚基分析，以区分质量相同但序列不同的轻链互换杂质。",
+      "HIC基于疏水性差异可有效分离错配变体，比离子交换通用性更强，适合作为QC放行方法。",
+      "二维LC-MS在线峰鉴定可避免离线收集引入的修饰风险，提高鉴定效率。",
+      "早期LC-MS快速筛查与后期HIC放行方法结合，可覆盖双抗药物从开发到放行的全周期分析需求。"
+    ],
+    "verdict": "文章提供了一套完整、系统的双抗错配分析策略，包含具体案例和方法参数，对相关研发人员具有直接指导价值。",
+    "url": "https://mp.weixin.qq.com/s/mAcPg4tvAD5uvjjmsE2BGA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E4%B8%8D%E5%AF%B9%E7%A7%B0%E7%BB%93%E6%9E%84%E5%8F%8C%E7%89%B9%E5%BC%82%E6%80%A7%E6%8A%97%E4%BD%93%E9%94%99%E9%85%8D%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%88%86%E6%9E%90%E4%B8%8E%E8%A1%A8%E5%BE%81%E7%AD%96%E7%95%A5-mAcPg4.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "重组蛋白类生物药品的工艺杂质与有关物质控制",
+    "clippedAt": "2026-08-20 23:32",
+    "publishedAt": "2026-08-05",
+    "priority": "高",
+    "keywords": [
+      "重组蛋白药物",
+      "工艺杂质",
+      "产品相关杂质",
+      "ICH Q6B",
+      "杂质安全因子",
+      "CMC合规"
+    ],
+    "summary": "本文系统梳理重组蛋白类生物药品的杂质控制体系，涵盖工艺相关杂质与产品相关杂质两大类。工艺杂质包括宿主细胞蛋白、残留DNA、内毒素及可提取物/浸出物等，其控制策略随开发阶段递进，并引入杂质安全因子（ISF）进行风险评估。产品相关杂质指目标分子的结构变异体，如聚集体、氧化变体等，需通过多种方法表征并设定合理限度。文章强调杂质控制是持续深入的旅程，监管要求随分析技术进步和风险认知更新而不断提高。",
+    "insights": [
+      "生物药中并非所有分子变异体都是杂质，活性与安全性可比的产品相关物质不算杂质，控制策略与产品相关杂质截然不同。",
+      "工艺杂质控制采用最低CMC合规连续体策略，早期临床阶段可接受较高杂质风险，但上市前需全面表征并收紧限度。",
+      "杂质安全因子（ISF）是快速筛选杂质风险的实用工具，但仅依据急性毒性存在局限，需结合免疫原性等风险综合评估。",
+      "杂质控制面临未知的未知风险，亚硝胺案例表明今天认为安全的工艺可能明天发现新风险，需建立持续监测和更新机制。"
+    ],
+    "verdict": "文章信息密度高，系统整合ICH Q6B等法规要求，并给出ISF工具和实际案例，对从事生物药CMC的专业人员具有较高参考价值。",
+    "url": "https://mp.weixin.qq.com/s/mETLtoyyJO7WTz-KYh2dFA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E9%87%8D%E7%BB%84%E8%9B%8B%E7%99%BD%E7%B1%BB%E7%94%9F%E7%89%A9%E8%8D%AF%E5%93%81%E7%9A%84%E5%B7%A5%E8%89%BA%E6%9D%82%E8%B4%A8%E4%B8%8E%E6%9C%89%E5%85%B3%E7%89%A9%E8%B4%A8%E6%8E%A7%E5%88%B6-mETLto.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "CE-R重链峰分叉？：不是碎片，而是半乳糖型差异",
+    "clippedAt": "2026-08-20 22:42",
+    "publishedAt": "2026-08-10",
+    "priority": "高",
+    "keywords": [
+      "CE-SDS",
+      "半乳糖基化",
+      "单克隆抗体",
+      "重链异质性",
+      "硼酸",
+      "糖型分析"
+    ],
+    "summary": "本文解读了一项关于单克隆抗体还原型CE-SDS中重链峰分叉现象的研究。研究来自中检院，发表在《Electrophoresis》上。针对抗VEGFR-2单抗的重链峰分叉，作者通过质谱排除肽键断裂，结合糖苷酶处理、制备不同半乳糖基化水平的单抗参考品，并利用IdeS酶切和加长毛细管提高分离度，最终证明峰分叉由重链上G0F、G1F、G2F等半乳糖型差异引起。文章还讨论了CE-SDS分离缓冲液中硼酸与半乳糖顺式二醇形成复合物，导致糖基化重链迁移减慢的原理。该研究为CE-SDS中类似峰异质性鉴定提供了系统方法学参考，并引用了再生元制药的类似案例，强调该现象具有普遍性。",
+    "insights": [
+      "CE-SDS中的重链峰分叉不一定是碎片或修饰，可能是半乳糖基化差异导致的迁移率改变。",
+      "硼酸与半乳糖的顺式二醇形成复合物，是CE-SDS分离不同半乳糖型的关键机制。",
+      "使用IdeS酶切将重链转化为scFc片段，可提高糖型分离度并实现定量分析。",
+      "制备单一糖型参考品结合混合进样验证，可准确鉴定和定量糖基化变异体。"
+    ],
+    "verdict": "文章提供了系统鉴定CE-SDS峰分叉的方法学案例，包含酶切、参考品制备和机理探讨，对生物药分析从业人员具有直接借鉴价值。",
+    "url": "https://mp.weixin.qq.com/s/r_-WoF2jo9RPLZIl_X65tg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/CE-R%E9%87%8D%E9%93%BE%E5%B3%B0%E5%88%86%E5%8F%89%EF%BC%9F%EF%BC%9A%E4%B8%8D%E6%98%AF%E7%A2%8E%E7%89%87%EF%BC%8C%E8%80%8C%E6%98%AF%E5%8D%8A%E4%B9%B3%E7%B3%96%E5%9E%8B%E5%B7%AE%E5%BC%82-r_-WoF.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "HCP方法验证的几个问题",
+    "clippedAt": "2026-08-20 22:39",
+    "publishedAt": "2026-08-11",
+    "priority": "高",
+    "keywords": [
+      "HCP检测",
+      "方法验证",
+      "ELISA",
+      "专属性",
+      "稀释线性",
+      "MRD"
+    ],
+    "summary": "本文系统梳理了HCP（宿主细胞蛋白）ELISA方法验证的6个核心误区：专属性需覆盖空白基质干扰、产品交叉反应和基质干扰加标三个维度；准确度加标回收需多浓度、先稀释后加标，LOQ附近可放宽至50%-200%；标曲线性不等于样品稀释线性，必须用高HCP样品做压力测试；试剂盒LOQ不能直接作为方法LOQ，需在MRD下独立验证；MRD需同时考虑基质效应和抗原饱和，最终取两者最大值；全工艺流验证需分级设计。文章结合USP <1132>要求和实际案例，给出了从标曲建立到MRD确认的完整逻辑链和操作建议。",
+    "insights": [
+      "HCP方法专属性是三个独立维度（空白基质、产品交叉反应、基质效应）的验证，缺一不可。",
+      "加标回收合格不能证明共纯化HCP的准确度，必须依赖稀释线性来发现抗原饱和问题。",
+      "MRD最终取值是基质MRD和抗原饱和MRD的最大值，收获液常因抗原饱和而非基质效应需要极高稀释倍数。",
+      "方法LOQ必须在产品基质和MRD下独立验证，不能直接套用试剂盒LOQ，且每个产品需分别验证。"
+    ],
+    "verdict": "信息密度高，系统纠正HCP方法验证中的常见误区，提供法规依据和实战案例，具可操作性。",
+    "url": "https://mp.weixin.qq.com/s/XgqX8FK_yRvndERkQ0jjyw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/HCP%E6%96%B9%E6%B3%95%E9%AA%8C%E8%AF%81%E7%9A%84%E5%87%A0%E4%B8%AA%E9%97%AE%E9%A2%98-XgqX8F.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "AQbD实战案例——ELISA效价测定的完整开发路径与法规演进",
+    "clippedAt": "2026-08-20 22:37",
+    "publishedAt": "2026-08-14",
+    "priority": "高",
+    "keywords": [
+      "AQbD",
+      "ELISA效价测定",
+      "USP〈1033〉",
+      "设计空间",
+      "风险评估",
+      "控制策略"
+    ],
+    "summary": "本文基于《Vaccine Analysis》第12章案例，系统拆解了分析方法QbD（AQbD）在ELISA效价测定开发中的完整流程，包括建立ATP、方法选择、风险评估、设计空间开发、控制策略与方法维护。文章详细展示了双抗体夹心ELISA的开发案例，并引入标准曲线中点与内部对照的双轴控制图监测方法。同时，结合USP〈1033〉的最新要求，指出十年前方法论在OOS概率框架、方法与程序区分、统计区间使用、稀释线性等方面的不足，并给出具体改进建议。文章强调AQbD的核心在于将分析方法视为动态系统，通过风险驱动和知识管理实现全生命周期控制，而统计严谨性是当前法规合规的关键。",
+    "insights": [
+      "分析方法应被视作一种特殊的工艺，其产品是测量结果，客户是依赖结果做决策的人，AQbD的核心是从源头设计质量而非事后验证。",
+      "ELISA抗体筛选的关键不是信号强度，而是区分天然与降解抗原的能力，这是稳定性指示方法的核心。",
+      "标准曲线中点与内部对照抗原性的双轴控制图，可快速定位OOS问题的来源：若IC偏移而中点稳定，问题在样品制备；若同时偏移，问题在公共试剂或仪器。",
+      "USP〈1033〉要求使用OOS概率框架替代传统总误差框架，精密度20%在宽质量标准下会导致约10%的OOS概率，统计区间和稀释线性研究是验证中不可忽视的严谨性升级。"
+    ],
+    "verdict": "文章信息密度高，既有系统化的AQbD实操案例，又结合最新法规提出可落地的统计升级建议，是理论与实践兼备的深度技术内容。",
+    "url": "https://mp.weixin.qq.com/s/o7KzR0eYfn_0qVgBzrMgRg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/AQbD%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B%E2%80%94%E2%80%94ELISA%E6%95%88%E4%BB%B7%E6%B5%8B%E5%AE%9A%E7%9A%84%E5%AE%8C%E6%95%B4%E5%BC%80%E5%8F%91%E8%B7%AF%E5%BE%84%E4%B8%8E%E6%B3%95%E8%A7%84%E6%BC%94%E8%BF%9B-o7KzR0.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "双特异性抗体纯化中 Knob‑into‑Hole（杵‑臼）技术相关杂质的研究",
+    "clippedAt": "2026-08-20 22:37",
+    "publishedAt": "2026-08-15",
+    "priority": "高",
+    "keywords": [
+      "双特异性抗体",
+      "杵-臼技术",
+      "同源二聚体",
+      "阳离子交换层析",
+      "假KiH",
+      "杂质去除"
+    ],
+    "summary": "本文研究双特异性抗体纯化中杵-臼（KiH）技术相关杂质的去除策略。研究发现，将分别含杵-杵、臼-臼同源二聚体的样品混合后，虽在iCIEF、SEC等常规检测中表现出与目标异二聚体相似的理化性质，但非还原Caliper电泳证实其为非共价结合的“假KiH”复合物，并非功能性双抗。亲和层析仅对预先混合的样品有效，无法去除单独的杵或臼杂质。通过机制解析，作者利用电荷差异，采用POROS XS阳离子交换层析（CEX），在pH 7.5或5.5条件下可有效去除杵相关杂质，在pH 7.5时使臼杂质流穿，从而提升功能性KiH纯度至96-97%。该CEX工艺显著提高下游AEX载量至300 g/L，为双抗纯化提供了实践依据，但分离效果依赖pI差异，不具备普适性。",
+    "insights": [
+      "杵-杵与臼-臼同源二聚体混合后可形成非共价的“假KiH”复合物，常规检测难以区分，需结合非还原Caliper电泳等破坏非共价作用的方法进行鉴别。",
+      "亲和层析去除KiH相关杂质的前提是样品预先混合，否则无效，其本质依赖于异二聚体组装而非亲和选择性。",
+      "基于pI差异，阳离子交换层析可在pH 7.5或5.5下有效分离目标双抗与杵、臼同源二聚体，并可将后续AEX改为流穿模式，载量提升至300 g/L。",
+      "双抗纯化工艺开发需对混合克隆样品进行全面表征，避免因“假KiH”误导工艺路线，同时应警惕同源二聚体对药效、稳定性和免疫原性的潜在风险。"
+    ],
+    "verdict": "文章针对双抗纯化中的关键杂质问题，提供了实验验证的CEX去除策略和假KiH现象的新发现，具有较高的信息密度和实际工艺参考价值。",
+    "url": "https://mp.weixin.qq.com/s/VK_DTdTGaEbmbgoL3SgwcA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%8F%8C%E7%89%B9%E5%BC%82%E6%80%A7%E6%8A%97%E4%BD%93%E7%BA%AF%E5%8C%96%E4%B8%AD_Knob%E2%80%91into%E2%80%91Hole%EF%BC%88%E6%9D%B5%E2%80%91%E8%87%BC%EF%BC%89%E6%8A%80%E6%9C%AF%E7%9B%B8%E5%85%B3%E6%9D%82%E8%B4%A8%E7%9A%84%E7%A0%94%E7%A9%B6-VK_DTd.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "质谱裂解规律——McLafferty 重排",
+    "clippedAt": "2026-08-20 22:36",
+    "publishedAt": "2026-08-13",
+    "priority": "高",
+    "keywords": [
+      "McLafferty重排",
+      "质谱裂解",
+      "六元环过渡态",
+      "γ-H迁移",
+      "特征峰"
+    ],
+    "summary": "本文系统讲解质谱分析中 McLafferty 重排的核心原理与必要条件。麦氏重排本质是六元环过渡态协同过程：γ-位氢迁移至含π键的杂原子，同时β位C-C键断裂，生成烯酮/烯醇碎片与中性烯烃。文章提出三个缺一不可的条件：γ-H存在、π体系杂原子、β键可断。通过4-甲基-2-戊酮、丁酸等案例演示特征峰（如m/z 58、m/z 60）的识别，并指出无γ-H时α-断裂和i-断裂仍可发生。内容聚焦实战，提供快速判断麦氏重排特征峰的方法。",
+    "insights": [
+      "麦氏重排是'先搬家后分家'的协同过程，氢迁移与键断裂同步完成。",
+      "γ-H、π杂原子、β可断键三者缺一不可，缺少γ-H时需转向α-断裂或i-断裂分析。",
+      "酮、醛、酸含C=O且存在γ-H时，可优先寻找M-烯烃的偶数质量碎片作为重排证据。",
+      "m/z 58（酮）、m/z 60（酸）是麦氏重排的典型'签名'峰，可快速锁定结构类型。"
+    ],
+    "verdict": "内容精炼，直接给出麦氏重排的条件与判据，案例清晰，对质谱解析具有实操指导价值。",
+    "url": "https://mp.weixin.qq.com/s/FbRc-fXrjVNsPzfOilHnuw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E8%B4%A8%E8%B0%B1%E8%A3%82%E8%A7%A3%E8%A7%84%E5%BE%8B%E2%80%94%E2%80%94McLafferty_%E9%87%8D%E6%8E%92-FbRc-f.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "ADC质谱表征过程中，常见的挑战及实用方法举例",
+    "clippedAt": "2026-08-20 22:36",
+    "publishedAt": "2026-08-17",
+    "priority": "高",
+    "keywords": [
+      "ADC",
+      "质谱表征",
+      "连接子-有效载荷",
+      "Native SEC-MS",
+      "二苯基柱",
+      "马来酰亚胺开环"
+    ],
+    "summary": "本文基于辉瑞公司2018年发表在《mAbs》上的综述，总结了抗体药物偶联物（ADC）质谱表征中常见的六种挑战及解决方法。内容涵盖完整分子量、亚基分子量和肽图三个层面。具体挑战包括：半胱氨酸偶联ADC在变性条件下难以检测完整四链结构（需使用Native SEC-MS）；含有酸不稳定连接子的ADC需优化流动相pH以保留连接子-有效载荷；表面暴露的连接子-有效载荷在ESI源中易裂解（需优化锥孔电压和流动相）；高疏水性连接子导致亚基色谱回收率低（可用二苯基柱替代C4柱）；马来酰亚胺偶联ADC在酶解时需控制pH以防止开环。文章强调针对不同ADC化学特性定制LC/MS方法的重要性，并通过实例展示了方法开发策略。",
+    "insights": [
+      "ADC的质谱分析不能简单套用单抗方法，需根据连接子-有效载荷的化学不稳定性、疏水性和表面可及性调整条件。",
+      "使用天然质谱（Native SEC-MS）可检测半胱氨酸偶联ADC的完整四链结构，弥补变性条件下游离亚基信息的不足。",
+      "将C4色谱柱更换为二苯基柱，可显著提高疏水性ADC亚基的回收率，优化色谱分离效果。",
+      "在肽图分析中，将消化缓冲液pH从8.2降至7.5，可有效抑制马来酰亚胺开环的人为修饰。"
+    ],
+    "verdict": "文章信息密度高，提供了针对ADC质谱表征具体问题的可操作解决方案和实例，对生物制药分析人员具有直接参考价值。",
+    "url": "https://mp.weixin.qq.com/s/oIaQcyKtItCvTZ94YGJ_6w",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/ADC%E8%B4%A8%E8%B0%B1%E8%A1%A8%E5%BE%81%E8%BF%87%E7%A8%8B%E4%B8%AD%EF%BC%8C%E5%B8%B8%E8%A7%81%E7%9A%84%E6%8C%91%E6%88%98%E5%8F%8A%E5%AE%9E%E7%94%A8%E6%96%B9%E6%B3%95%E4%B8%BE%E4%BE%8B-oIaQcy.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "基于 Protein A 纯化的填料选型、淋洗与洗脱参数的优化",
+    "clippedAt": "2026-08-20 22:36",
+    "publishedAt": "2026-08-19",
+    "priority": "高",
+    "keywords": [
+      "Protein A纯化",
+      "自动化高通量筛选",
+      "淋洗与洗脱优化",
+      "抗体聚集体控制",
+      "HCP去除"
+    ],
+    "summary": "本文针对抗体药物下游纯化中Protein A层析工艺优化问题，介绍了一种基于自动化dSPE枪头平台的高通量筛选方法。研究使用IMCStips装填四种Protein A填料，对单抗和双抗样品进行微量纯化，系统考察了填料结合容量、淋洗缓冲液组成及洗脱pH对收率、HCP去除和聚集体水平的影响。结果表明，填料结合容量与厂家数据基本一致，碱性中间淋洗（pH 9.0 Tris-NaCl）可在不损失收率的情况下显著降低HCP；洗脱pH对收率和聚集影响显著，HipH填料在温和pH下仍能保持高收率，适合易聚集分子。组合优化验证了方法的可靠性，最佳条件下HCP可降至上市抗体水平。该平台2.5小时可处理96个样品，大幅缩短开发周期，为工艺放大提供数据支持。",
+    "insights": [
+      "碱性中间淋洗（pH 9.0 Tris-NaCl）可在不损失抗体收率的前提下显著去除HCP，优于盐酸胍等强变性淋洗剂。",
+      "洗脱pH与填料类型共同决定收率与聚集的权衡：HipH填料在pH 4.2-4.4温和条件下仍能保持高收率，大幅降低HMW，适合易聚集的双抗和单抗。",
+      "dSPE枪头结合自动化液体处理平台可快速生成高质量工艺数据，其结合容量与批次实验一致，能有效替代传统柱层析进行填料选型和条件筛选，并支持机器学习预测。"
+    ],
+    "verdict": "文章提供了一套可操作的Protein A纯化高通量筛选方法，包含填料选型、淋洗和洗脱参数的系统优化数据，信息密度高，对下游工艺开发具有直接指导价值。",
+    "url": "https://mp.weixin.qq.com/s/xxqyJsKan7WVtMZNajxAgQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/%E5%9F%BA%E4%BA%8E_Protein_A_%E7%BA%AF%E5%8C%96%E7%9A%84%E5%A1%AB%E6%96%99%E9%80%89%E5%9E%8B%E3%80%81%E6%B7%8B%E6%B4%97%E4%B8%8E%E6%B4%97%E8%84%B1%E5%8F%82%E6%95%B0%E7%9A%84%E4%BC%98%E5%8C%96-xxqyJs.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-08",
+    "title": "Cpk为什么要大于1.33？1.33和1.67 这两条线是谁定的",
+    "clippedAt": "2026-08-20 22:36",
+    "publishedAt": "2026-08-20",
+    "priority": "高",
+    "keywords": [
+      "Cpk",
+      "1.33",
+      "1.67",
+      "西格玛水平",
+      "过程能力",
+      "PPM"
+    ],
+    "summary": "本文围绕制造业中常见的Cpk判定值1.33和1.67展开，解释了这两个数字的来源和含义。作者指出Cpk=1.33对应西格玛水平4，短期双侧不良率约63PPM；Cpk=1.67对应5σ，双侧不良率约0.57PPM。文章从Cpk与西格玛水平的关系（Cpk=Z/3）出发，用标准正态分布和Minitab验算了不良率，并引入1.5σ漂移说明长期能力衰减。结论是：1.33是长期量产的最低可接受底线，1.67是新项目或特殊特性的预留缓冲，两者都是行业长期形成的风险约定，并非标准硬性规定。最后给出了不同Cpk值对应的管理动作分级。",
+    "insights": [
+      "Cpk=1.33本质是4σ水平，短期双侧不良率63PPM，这是行业选择它作为量产门槛的统计基础。",
+      "1.67对应5σ，之所以用于新项目，是因为初始样本未经历长期漂移，需要预留余量以应对均值漂移。",
+      "Cpk判定线不是拍脑袋定的，而是基于正态分布和不良率的量化平衡：质量与成本的最优折中。",
+      "1.5σ漂移是理解短期与长期能力差异的关键，六西格玛的3.4DPMO正是6σ叠加漂移后的结果。"
+    ],
+    "verdict": "文章清晰拆解了Cpk关键值的数学来源与行业惯例，包含推导、验算和管理分级，信息密度高且有实操参照，值得精读。",
+    "url": "https://mp.weixin.qq.com/s/SHhaFU5g-SasYQRu4NX7_g",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-08/Cpk%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%A4%A7%E4%BA%8E1.33%EF%BC%9F1.33%E5%92%8C1.67_%E8%BF%99%E4%B8%A4%E6%9D%A1%E7%BA%BF%E6%98%AF%E8%B0%81%E5%AE%9A%E7%9A%84-SHhaFU.md"
+  }
+]
