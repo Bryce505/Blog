@@ -253,3 +253,78 @@ a:focus-visible, button:focus-visible {
   .prose th, .prose td { padding: 6px 8px; }
   .prose th { white-space: normal; }
 }
+
+/* ---- 剪藏栏目（src/pages/clips.astro）---- */
+.clip-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px;
+  padding: 12px 0 16px; margin-bottom: 8px;
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.clip-facet { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.clip-facet-label { font-size: 13px; color: var(--muted); margin-right: 2px; }
+.clip-bar button {
+  font: inherit; font-size: 13px; line-height: 1.4; cursor: pointer;
+  padding: 3px 11px; border-radius: 999px;
+  border: 1px solid var(--border); background: transparent; color: var(--muted);
+}
+.clip-bar button:hover { color: var(--fg); border-color: var(--muted); }
+.clip-bar button[aria-pressed='true'] {
+  background: var(--accent); border-color: var(--accent); color: var(--bg);
+}
+.clip-count { margin-left: auto; font-size: 13px; color: var(--muted); }
+
+.clip-month {
+  font-family: var(--serif); font-size: 15px; font-weight: 600;
+  letter-spacing: 0.04em; color: var(--muted);
+  margin: 34px 0 0; padding-bottom: 8px;
+}
+.clip-month-n { font-size: 12px; margin-left: 12px; opacity: 0.75; font-weight: 400; }
+
+.clip { padding: 20px 0; border-bottom: 1px solid var(--border); }
+.clip-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.clip-title {
+  font-family: var(--serif); font-size: 18px; font-weight: 600;
+  line-height: 1.5; margin: 0; flex: 1 1 16rem;
+}
+.clip-title a { color: var(--fg); }
+
+/* 来源用描边、优先级用实心：两者挨在同一行，同一种做法会糊成一片 */
+.clip-tag, .clip-prio {
+  font-size: 11.5px; line-height: 1.6; padding: 1px 8px; border-radius: 3px;
+  white-space: nowrap; flex: none;
+}
+.clip-tag { border: 1px solid var(--border); color: var(--muted); }
+/* 按 data-priority 选而不是给徽标另加一个类：筛选本来就要读这个属性，
+   再加一个类就是同一个值存两处 */
+.clip[data-priority='高'] .clip-prio { background: var(--accent); color: var(--bg); }
+.clip[data-priority='中'] .clip-prio {
+  background: var(--surface); color: var(--muted); border: 1px solid var(--border);
+}
+/* 低优先级本来就是「不必读」，做得比中更淡，扫的时候自然跳过 */
+.clip[data-priority='低'] .clip-prio {
+  color: var(--muted); border: 1px dashed var(--border); opacity: 0.75;
+}
+
+.clip-meta {
+  display: flex; flex-wrap: wrap; gap: 6px; margin: 7px 0 0;
+  font-size: 12.5px; color: var(--muted);
+}
+.clip-kw { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
+.clip-kw span {
+  font-size: 12px; color: var(--muted);
+  background: var(--surface); border-radius: 3px; padding: 1px 7px;
+}
+.clip-summary { max-width: var(--measure); margin: 11px 0 0; font-size: 14.5px; line-height: 1.8; }
+.clip-insights {
+  max-width: var(--measure); margin: 12px 0 0; padding: 2px 0 2px 15px;
+  border-left: 2px solid var(--accent); list-style: none;
+}
+.clip-insights li { font-size: 14px; line-height: 1.75; color: var(--muted); }
+.clip-insights li + li { margin-top: 5px; }
+/* 「是否值得读」是判断不是内容，压到最小字号免得跟摘要抢注意力 */
+.clip-verdict { max-width: var(--measure); margin: 11px 0 0; font-size: 12.5px; color: var(--muted); }
+
+@media (max-width: 520px) {
+  .clip-count { margin-left: 0; }
+  .clip-title { font-size: 16.5px; }
+}

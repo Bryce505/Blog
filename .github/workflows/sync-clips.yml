@@ -1,0 +1,58 @@
+# 把 Bryce505/Notes 的月度剪藏索引解析进 src/data/clips.json。
+# 只取索引不取全文快照：公众号正文是别人的版权内容，而且上游 archive/ 一个月
+# 就几百 KB，镜像进来会持续撑大本仓库。站上展示摘要与洞见，正文链回上游。
+name: sync-clips
+
+on:
+  schedule:
+    # 北京时间次日 06:23，取前一天剪的。刻意避开整点：本仓库实测整点排队会让
+    # schedule 整天不触发，见 docs/devlog/2026-08-27-定时任务整点排队延迟.md
+    - cron: '23 22 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-clips
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Notes 是公开仓库，内置 GITHUB_TOKEN 就能读，不需要 PAT。
+      # 它要是哪天转回私有，这一步会 404（GitHub 对无权限的私有仓库返回 404
+      # 而不是 403），那时候要配的是一个能读它的 PAT，不是在这里加重试。
+      - uses: actions/checkout@v4
+        with:
+          repository: Bryce505/Notes
+          path: .clips
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # clips.py 只用标准库，不装 pipeline/requirements.txt。
+      # 上游格式变了它会抛错让这条红——那正是要的，见 pipeline/clips.py 的注释。
+      - name: 解析剪藏索引
+        run: python pipeline/clips.py --notes .clips --out src/data/clips.json
+
+      - name: 提交
+        run: |
+          rm -rf .clips
+          git config user.name  'blog-bot'
+          git config user.email 'makejun505@gmail.com'
+          git add src/data/clips.json
+          if git diff --staged --quiet; then
+            echo '剪藏没有更新'
+          else
+            git commit -m "同步剪藏：$(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+# 刻意没有 sync-reports.yml 那样的第二条备份 cron：周报一周一期，漏一次就是
+# 站上少一整周；剪藏每天跑且同步幂等（同一份上游跑两次产出逐字节一致），
+# 漏一天第二天连着补上，没有窗口会丢。

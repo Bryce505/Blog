@@ -1,0 +1,125 @@
+---
+import Base from '../layouts/Base.astro';
+import clips from '../data/clips.json';
+
+// clips.json 已经按剪藏时间倒序（pipeline/clips.py 的 collect 排好的），这里
+// 顺序扫一遍就分好组，不再排第二次 —— 同一份顺序在两处维护必然漂移。
+const months: { month: string; items: typeof clips }[] = [];
+for (const c of clips) {
+  let last = months[months.length - 1];
+  if (!last || last.month !== c.month) {
+    last = { month: c.month, items: [] };
+    months.push(last);
+  }
+  last.items.push(c);
+}
+
+const facets = [
+  { name: 'source', label: '来源', options: [['all', '全部'], ['weixin', '公众号'], ['x', 'X']] },
+  { name: 'priority', label: '优先级', options: [['all', '全部'], ['高', '高'], ['中', '中'], ['低', '低']] },
+];
+---
+<Base title="剪藏" description="读到的公众号文章与 X 帖子，附 AI 摘要、洞见与阅读优先级">
+  <div class="wrap" style="padding-top: 48px; padding-bottom: 72px;">
+    <h1 style="font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0 0 6px;">剪藏</h1>
+    <p style="max-width: var(--measure); margin: 0 0 24px; color: var(--muted); font-size: 15px; line-height: 1.8;">
+      平时读到的微信公众号文章与 X 帖子，经 AI 提炼成摘要、关键词、洞见与阅读优先级，
+      收在 <a href="https://github.com/Bryce505/Notes">Bryce505/Notes</a>，本站原样索引。
+      <strong style="color: var(--fg); font-weight: 500;">摘要与洞见由 AI 生成，不是我本人的判断；正文不在本站</strong>——
+      点标题去原文，点「全文快照」看剪藏当时的存档。
+    </p>
+
+    {clips.length === 0 ? (
+      <p style="color: var(--muted);">还没有同步到剪藏。</p>
+    ) : (
+      <>
+        {/* 没有 JS 时这一条整条不出现：筛选是便利不是内容的前提，而一排点不动
+            的按钮比没有按钮更糟。页尾的脚本把它显出来。 */}
+        <div class="clip-bar" data-clip-bar hidden>
+          {facets.map((f) => (
+            <div class="clip-facet" role="group" aria-label={`按${f.label}筛选`}>
+              <span class="clip-facet-label">{f.label}</span>
+              {f.options.map(([value, text], i) => (
+                <button type="button" data-facet={f.name} data-value={value}
+                        aria-pressed={i === 0 ? 'true' : 'false'}>{text}</button>
+              ))}
+            </div>
+          ))}
+          <span class="clip-count num" data-clip-count>共 {clips.length} 条</span>
+        </div>
+
+        {months.map((m) => (
+          <section data-clip-group>
+            <h2 class="clip-month">
+              {m.month.replace('-', ' 年 ')} 月
+              {/* 必须带「条」：光一个数字紧跟在月份后面会被读成日期
+                  （「2026 年 09 月 2」实测就是这个效果） */}
+              <span class="clip-month-n num">{m.items.length} 条</span>
+            </h2>
+            {m.items.map((c) => (
+              <article class="clip" data-clip data-source={c.source} data-priority={c.priority}>
+                <div class="clip-head">
+                  <span class="clip-tag">{c.source === 'x' ? 'X' : '公众号'}</span>
+                  <span class="clip-prio">{c.priority}</span>
+                  <h3 class="clip-title">
+                    <a href={c.url} target="_blank" rel="noopener">{c.title}</a>
+                  </h3>
+                </div>
+                <p class="clip-meta num">
+                  <span>剪藏 {c.clippedAt}</span>
+                  {c.publishedAt && <span>· 发布 {c.publishedAt}</span>}
+                  {c.snapshot && <a href={c.snapshot} target="_blank" rel="noopener">· 全文快照 ↗</a>}
+                </p>
+                {c.keywords.length > 0 && (
+                  <p class="clip-kw">{c.keywords.map((k) => <span>{k}</span>)}</p>
+                )}
+                {c.summary && <p class="clip-summary">{c.summary}</p>}
+                {c.insights.length > 0 && (
+                  <ul class="clip-insights">{c.insights.map((s) => <li>{s}</li>)}</ul>
+                )}
+                {c.verdict && <p class="clip-verdict">值不值得读：{c.verdict}</p>}
+              </article>
+            ))}
+          </section>
+        ))}
+      </>
+    )}
+  </div>
+</Base>
+
+<script>
+  // 纯前端筛选：条目全部渲染进 HTML，这里只切 hidden。实测 68 条，分页或
+  // 搜索都是过度设计。
+  const bar = document.querySelector('[data-clip-bar]');
+  if (bar) {
+    const items = [...document.querySelectorAll('[data-clip]')];
+    const groups = [...document.querySelectorAll('[data-clip-group]')];
+    const count = document.querySelector('[data-clip-count]');
+    const picked = { source: 'all', priority: 'all' };
+
+    const apply = () => {
+      let n = 0;
+      for (const el of items) {
+        const ok = Object.entries(picked).every(
+          ([k, v]) => v === 'all' || el.dataset[k] === v);
+        el.hidden = !ok;
+        if (ok) n += 1;
+      }
+      // 整月都被筛掉时连月份标题一起收起来，否则会留下一排空标题
+      for (const g of groups) g.hidden = !g.querySelector('[data-clip]:not([hidden])');
+      count.textContent = `共 ${n} 条`;
+    };
+
+    bar.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-facet]');
+      if (!btn) return;
+      const facet = btn.dataset.facet;
+      picked[facet] = btn.dataset.value;
+      for (const b of bar.querySelectorAll(`button[data-facet="${facet}"]`))
+        b.setAttribute('aria-pressed', String(b === btn));
+      apply();
+    });
+
+    bar.hidden = false;
+  }
+</script>

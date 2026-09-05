@@ -1,0 +1,266 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    /* 令牌与 src/styles/global.css 的 :root 逐值一致 —— 视觉稿和站点两处
+       漂移的话，改稿子就等于白改。 */
+    :root {
+      --han: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+      --han-serif: "Songti SC", "SimSun", "Source Han Serif SC", serif;
+      --sans: "IBM Plex Sans", var(--han);
+      --serif: "IBM Plex Serif", var(--han-serif);
+      --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      --measure: 44rem;
+    }
+    [data-theme="light"] {
+      --bg: oklch(0.992 0.003 240); --surface: oklch(0.972 0.005 245);
+      --fg: oklch(0.26 0.015 250);  --muted: oklch(0.53 0.012 250);
+      --border: oklch(0.90 0.008 250); --accent: oklch(0.47 0.085 232);
+      --warn: oklch(0.52 0.085 68);   --ok: oklch(0.48 0.070 160);
+    }
+    [data-theme="dark"] {
+      --bg: oklch(0.185 0.012 252); --surface: oklch(0.232 0.013 252);
+      --fg: oklch(0.925 0.008 250); --muted: oklch(0.665 0.011 250);
+      --border: oklch(0.325 0.013 252); --accent: oklch(0.755 0.085 232);
+      --warn: oklch(0.79 0.085 74);   --ok: oklch(0.76 0.070 162);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .root { background: var(--bg); color: var(--fg); font-family: var(--sans);
+            min-height: 100%; font-size: 16px; line-height: 1.75; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 40px; }
+    .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .chip { font: inherit; font-size: 13px; line-height: 1.4; cursor: pointer;
+            padding: 3px 11px; border-radius: 999px; border: 1px solid var(--border);
+            background: transparent; color: var(--muted); }
+    .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent);
+                                 color: var(--bg); }
+  </style>
+</helmet>
+
+<div class="root" data-theme="{{theme}}">
+
+  <header style="border-bottom: 1px solid var(--border); background: var(--bg);">
+    <div class="wrap" style="display: flex; flex-wrap: wrap; align-items: baseline;
+                             gap: 32px; min-height: 68px; padding-top: 12px;
+                             padding-bottom: 12px;">
+      <a href="/" style="font-family: var(--serif); font-size: 19px; font-weight: 600;
+                         color: var(--fg); letter-spacing: -0.01em;">表征笔记</a>
+      <!-- nav 换行而不是溢出：6 条导航在 375px 手机上已经横向溢出，这次加第
+           7 条会更糟。折两行完全可读，不值得为它引入汉堡菜单。 -->
+      <nav style="display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px;
+                  margin-left: auto;">
+        <a href="/series" style="color: var(--muted);">系列</a>
+        <a href="/reports" style="color: var(--muted);">文献周报</a>
+        <a href="/clips" style="color: var(--fg); font-weight: 500;">剪藏</a>
+        <a href="/archive" style="color: var(--muted);">归档</a>
+        <a href="/tags" style="color: var(--muted);">标签</a>
+        <a href="/tools" style="color: var(--muted);">工具与效率</a>
+        <a href="/about" style="color: var(--muted);">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-top: 48px; padding-bottom: 72px;">
+
+    <h1 style="font-family: var(--serif); font-size: 26px; font-weight: 600;
+               margin: 0 0 6px;">剪藏</h1>
+    <!-- 三件事必须说到：这是什么、摘要是 AI 产出的、正文不在本站。
+         第三件尤其重要——读者点进来看到一堆标题，得知道正文在别处。 -->
+    <p style="max-width: var(--measure); margin: 0 0 24px; color: var(--muted);
+              font-size: 15px; line-height: 1.8;">
+      平时读到的微信公众号文章与 X 帖子，经 AI 提炼成摘要、关键词、洞见与阅读优先级，
+      收在 <a href="https://github.com/Bryce505/Notes">Bryce505/Notes</a>，本站原样索引。
+      <strong style="color: var(--fg); font-weight: 500;">摘要与洞见由 AI 生成，不是我本人的判断；正文不在本站</strong>——
+      点标题去原文，点「全文快照」看剪藏当时的存档。
+    </p>
+
+    <!-- 工具条：两组筛选 + 实时条数。站点侧无 JS 时整条不渲染（筛选是便利，
+         不是内容的前提，一排点不动的按钮比没有按钮更糟）。 -->
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px;
+                padding: 12px 0 16px; margin-bottom: 8px;
+                border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
+        <span style="font-size: 13px; color: var(--muted); margin-right: 2px;">来源</span>
+        <sc-for list="{{sources}}" as="s" hint-placeholder-count="3">
+          <button type="button" class="chip" aria-pressed="{{s.on}}"
+                  onClick="{{s.pick}}">{{s.label}}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
+        <span style="font-size: 13px; color: var(--muted); margin-right: 2px;">优先级</span>
+        <sc-for list="{{prios}}" as="p" hint-placeholder-count="4">
+          <button type="button" class="chip" aria-pressed="{{p.on}}"
+                  onClick="{{p.pick}}">{{p.label}}</button>
+        </sc-for>
+      </div>
+      <span class="num" style="margin-left: auto; font-size: 13px; color: var(--muted);">共 {{shownCount}} 条</span>
+    </div>
+
+    <sc-for list="{{months}}" as="m" hint-placeholder-count="2">
+      <section>
+        <h2 style="font-family: var(--serif); font-size: 15px; font-weight: 600;
+                   letter-spacing: 0.04em; color: var(--muted); margin: 34px 0 0;
+                   padding-bottom: 8px;">
+          {{m.label}}
+          <span class="num" style="font-size: 12px; margin-left: 8px; opacity: 0.75;">{{m.count}}</span>
+        </h2>
+
+        <sc-for list="{{m.items}}" as="c" hint-placeholder-count="3">
+          <article style="padding: 20px 0; border-bottom: 1px solid var(--border);">
+            <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px;">
+              <!-- 来源用描边、优先级用实心：两个徽标同行才不至于糊成一片 -->
+              <span style="font-size: 11.5px; line-height: 1.6; padding: 1px 8px;
+                           border-radius: 3px; white-space: nowrap; flex: none;
+                           border: 1px solid var(--border); color: var(--muted);">{{c.sourceLabel}}</span>
+              <span style="font-size: 11.5px; line-height: 1.6; padding: 1px 8px;
+                           border-radius: 3px; white-space: nowrap; flex: none;
+                           {{c.prioStyle}}">{{c.priority}}</span>
+              <h3 style="font-family: var(--serif); font-size: 18px; font-weight: 600;
+                         line-height: 1.5; margin: 0; flex: 1 1 16rem;">
+                <a href="{{c.url}}" style="color: var(--fg);">{{c.title}}</a>
+              </h3>
+            </div>
+
+            <p class="num" style="display: flex; flex-wrap: wrap; gap: 6px;
+                                  margin: 7px 0 0; font-size: 12.5px; color: var(--muted);">
+              <span>剪藏 {{c.clippedAt}}</span>
+              <span>· 发布 {{c.publishedAt}}</span>
+              <a href="{{c.snapshot}}">· 全文快照 ↗</a>
+            </p>
+
+            <p style="display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0;">
+              <sc-for list="{{c.keywords}}" as="k" hint-placeholder-count="4">
+                <span style="font-size: 12px; color: var(--muted); background: var(--surface);
+                             border-radius: 3px; padding: 1px 7px;">{{k}}</span>
+              </sc-for>
+            </p>
+
+            <p style="max-width: var(--measure); margin: 11px 0 0; font-size: 14.5px;
+                      line-height: 1.8;">{{c.summary}}</p>
+
+            <!-- 洞见借用 .callout 的视觉语言：左侧一条 accent 竖线 -->
+            <sc-if value="{{c.hasInsights}}" hint-placeholder-val="{{true}}">
+              <ul style="max-width: var(--measure); margin: 12px 0 0;
+                         padding: 2px 0 2px 15px; border-left: 2px solid var(--accent);
+                         list-style: none;">
+                <sc-for list="{{c.insights}}" as="s" hint-placeholder-count="3">
+                  <li style="font-size: 14px; line-height: 1.75; color: var(--muted);
+                             margin-bottom: 5px;">{{s}}</li>
+                </sc-for>
+              </ul>
+            </sc-if>
+
+            <!-- 「是否值得读」是判断不是内容，压到最小字号免得跟摘要抢注意力 -->
+            <p style="max-width: var(--measure); margin: 11px 0 0; font-size: 12.5px;
+                      color: var(--muted);">值不值得读：{{c.verdict}}</p>
+          </article>
+        </sc-for>
+      </section>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light","section":"主题"}}'>
+class Component extends DCLogic {
+  // 样例取自 src/data/clips.json 的真实条目（68 条里挑了 4 条，覆盖两个来源
+  // 与三档优先级，含一条没有洞见的），不另编内容。
+  clips() {
+    return [
+      { source: 'weixin', month: '2026-09', priority: '高',
+        title: 'PPQ批次数量怎么定？（下篇）',
+        clippedAt: '2026-09-04 11:53', publishedAt: '2026-09-03',
+        url: 'https://mp.weixin.qq.com/s/DNC_v2x5sbICwgsHIjlqsw', snapshot: '#',
+        keywords: ['PPQ批次数量', '容差区间', '批次成功概率', 'ANOVA', '工艺验证'],
+        summary: '本文基于 ISPE 补充讨论论文，详解确定 PPQ 批次数量的四种统计工具：容差区间法、批次成功概率法、ANOVA 组合法和变异性方法。每种方法均从底层逻辑、统计原理、操作流程、案例和局限展开。',
+        insights: [
+          'PPQ 批次数量不是固定数字，而是风险、统计和生命周期阶段的函数，企业应在方案中预先论证选择依据。',
+          'ANOVA 组合法利用批间变异而非总变异计算样本量，可避免高估批次需求，但无法用于合格率声明。',
+        ],
+        verdict: '文章系统介绍四种统计方法并给出对比与决策指南，信息密度高且有实操价值，适合质量与验证专业人员精读。' },
+      { source: 'x', month: '2026-08', priority: '高',
+        title: 'Agent = Model + Harness：六层实战手册',
+        clippedAt: '2026-08-28 18:16', publishedAt: '2026-08-28',
+        url: 'https://x.com/shao__meng/status/2093228362965651665', snapshot: '#',
+        keywords: ['Harness', 'Agent工程', '六层架构', '棘轮原则', '智能体'],
+        summary: '文章提出 Agent = Model + Harness 的核心观点：模型只提供推理能力，决定 Agent 能否走向生产的是围绕模型的工程基础设施。',
+        insights: [
+          '只改 Harness 不换模型，收益可超过模型升级，同一模型在 GAIA 基准上提升 43.64 分。',
+          '权限层与可观测层是安全边界，模型无法自我约束，Harness 是唯一可靠护栏。',
+        ],
+        verdict: '信息密度高，提供完整的六层架构和棘轮方法，对构建生产级 Agent 有直接可操作的指导价值。' },
+      { source: 'x', month: '2026-08', priority: '低',
+        title: 'Karpathy课程推广帖',
+        clippedAt: '2026-08-28 18:12', publishedAt: '2026-08-28',
+        url: 'https://x.com/0xApexAi/status/2093076565563248894', snapshot: '#',
+        keywords: ['Karpathy', 'LLM', '课程推广'],
+        summary: '帖子宣称 Karpathy 重写了 LLM 使用规则，推出斯坦福图形原生研究课程。内容为课程推广，附时间戳和视频链接，缺乏实质观点。',
+        insights: [],
+        verdict: '内容为课程广告和情绪化推广，无独到观点或实质信息。' },
+      { source: 'weixin', month: '2026-08', priority: '中',
+        title: '挖到一个GitHub宝藏：一键下载全网电子书，2.4万本！',
+        clippedAt: '2026-08-27 12:48', publishedAt: '2026-08-26',
+        url: 'https://mp.weixin.qq.com/s/Z3kZU_TwicqBK_oQclrNsw', snapshot: '#',
+        keywords: ['GitHub', '电子书', '中文书库', '索引'],
+        summary: '文章介绍了名为 ebook-treasure-chest 的 GitHub 项目，收录约 2.4 万本中文电子书的索引和下载链接，提供 epub、mobi、azw3 三种格式。',
+        insights: ['电子书资源分散且常被引流套路困扰，集中索引能极大提升找书效率。'],
+        verdict: '文章是实用的工具推荐，信息清晰但观点平实，无深度分析，不算高价值精读内容。' },
+    ];
+  }
+
+  prioStyle(p) {
+    // 高实心、中浅底、低虚线更淡 —— 低优先级本来就是「不必读」，
+    // 做得比中更淡，扫的时候自然跳过
+    if (p === '高') return 'background: var(--accent); color: var(--bg);';
+    if (p === '中') return 'background: var(--surface); color: var(--muted); border: 1px solid var(--border);';
+    return 'background: transparent; color: var(--muted); border: 1px dashed var(--border); opacity: 0.75;';
+  }
+
+  renderVals() {
+    const source = this.state?.source ?? 'all';
+    const prio = this.state?.prio ?? 'all';
+    const shown = this.clips().filter(
+      (c) => (source === 'all' || c.source === source) &&
+             (prio === 'all' || c.priority === prio));
+
+    const months = [];
+    for (const c of shown) {
+      if (months.at(-1)?.month !== c.month) {
+        months.push({ month: c.month, label: c.month.replace('-', ' 年 ') + ' 月', items: [] });
+      }
+      months.at(-1).items.push({
+        ...c,
+        sourceLabel: c.source === 'x' ? 'X' : '公众号',
+        prioStyle: this.prioStyle(c.priority),
+        hasInsights: c.insights.length > 0,
+      });
+    }
+    for (const m of months) m.count = m.items.length;
+
+    const chips = (vals, cur, key) => vals.map(([value, label]) => ({
+      label, on: cur === value ? 'true' : 'false',
+      pick: () => this.setState({ [key]: value }),
+    }));
+
+    return {
+      theme: this.props.theme ?? 'light',
+      months,
+      shownCount: shown.length,
+      sources: chips([['all', '全部'], ['weixin', '公众号'], ['x', 'X']], source, 'source'),
+      prios: chips([['all', '全部'], ['高', '高'], ['中', '中'], ['低', '低']], prio, 'prio'),
+    };
+  }
+}
+</script>
+</body>
+</html>

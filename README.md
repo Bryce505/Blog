@@ -30,10 +30,10 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
 | | |
 |---|---|
 | **站点** | https://bryce505.github.io/Blog |
-| **数据源** | `Bryce505/Obsidian-base`（生物医药 CMC 与分析方法笔记，私有）、`Bryce505/RoutineRun`（工具与效率栏目，私有） |
+| **数据源** | 走流水线的：`Bryce505/Obsidian-base`（CMC 与分析方法笔记，私有）、`Bryce505/RoutineRun`（工具与效率栏目，私有）<br>只镜像不改写的：`Bryce505/zotero-arxiv-daily`（文献周报，公开）、`Bryce505/Notes`（公众号与 X 剪藏，公开） |
 | **图片** | Google Drive `image&attachment` 文件夹，取下来转 WebP 自托管 |
 | **整理模型** | DeepSeek（当前默认见 [`pipeline/config.py`](pipeline/config.py) 的 `DEEPSEEK_MODEL`，写这份文档时是 `deepseek-v4-flash`） |
-| **发布节奏** | 每晚 21:00（北京时间）自动发一篇；`drafts/` 推送即时处理 |
+| **发布节奏** | 文章每晚 21:00（北京时间）自动发一篇，`drafts/` 推送即时处理；文献周报每周五同步；剪藏每天同步 |
 | **托管与调度** | GitHub Pages + GitHub Actions（定时 / 手动 / push 触发） |
 
 ## 架构总览
@@ -74,6 +74,20 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
                          │
                          ▼
    Astro 原样输出 + 一个索引页（src/pages/reports.astro）→ 同一条 deploy 线上线
+
+
+   第三条通道（剪藏，同样不经过 pipeline/ 的五步流程，也不经过校验器）：
+
+   Bryce505/Notes（公开）的 notes/<年月>.md 与 notes/x/<年月>.md
+                         │
+                         │  GitHub Actions（sync-clips.yml：每天一次）
+                         │  pipeline/clips.py 解析 md → 结构化 JSON
+                         ▼
+   src/data/clips.json —— 唯一产物，可 diff；只存摘要/洞见等元信息，
+                          正文快照不镜像，链回上游仓库
+                         │
+                         ▼
+   src/pages/clips.astro 一句 import 渲染 → 同一条 deploy 线上线
 ```
 
 **为什么是单仓库**：流水线只读两个私有笔记仓库、只写这一个仓库。拆成
@@ -93,28 +107,29 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
 | 图表 | Mermaid（自定义 remark 插件） | |
 | 代码高亮 | Shiki（`github-light` / `github-dark` 双主题） | |
 | SEO / 订阅 | `@astrojs/sitemap` + 自定义 `src/pages/rss.xml.js` | |
-| CI/CD | GitHub Actions | 四个 workflow，见下表 |
+| CI/CD | GitHub Actions | 五个 workflow，见下表 |
 | 托管 | GitHub Pages | |
 
-### 四个 workflow
+### 五个 workflow
 
 | workflow | 触发方式 | 做什么 |
 |---|---|---|
 | [`publish.yml`](.github/workflows/publish.yml) | 定时（每晚 UTC 13:13 + UTC 15:37 备份，故意避开整点排队高峰）/ `workflow_dispatch` / push 到 `drafts/**` | 跑内容流水线，产出通过就 commit + push |
-| [`deploy.yml`](.github/workflows/deploy.yml) | push 到 `master`（忽略 `drafts/` `pipeline/` `docs/` `design/` `README.md` 等不影响构建产物的路径）/ `publish` 或 `sync-reports` 运行完 / `workflow_dispatch` | `npm run build` → 部署到 GitHub Pages |
+| [`deploy.yml`](.github/workflows/deploy.yml) | push 到 `master`（忽略 `drafts/` `pipeline/` `docs/` `design/` `README.md` 等不影响构建产物的路径）/ `publish`、`sync-reports` 或 `sync-clips` 运行完 / `workflow_dispatch` | `npm run build` → 部署到 GitHub Pages |
 | [`sample.yml`](.github/workflows/sample.yml) | 仅 `workflow_dispatch` | 引子通道试运行，产出一律带 `draft: true`，不传 `--publish`——不存在自动上线的可能，试验性质 |
 | [`sync-reports.yml`](.github/workflows/sync-reports.yml) | 定时（周五 UTC 13:30 + 周六 UTC 09:40 备份）/ `workflow_dispatch` | 把 zotero-arxiv-daily 的 HTML 周报镜像到 `public/reports/`，有变化才提交 |
+| [`sync-clips.yml`](.github/workflows/sync-clips.yml) | 定时（每天 UTC 22:23）/ `workflow_dispatch` | 把 Notes 的月度剪藏索引解析进 `src/data/clips.json`，有变化才提交 |
 
 > **GitHub 的坑**：workflow 用内置 `GITHUB_TOKEN` 推的提交不会触发其他
 > workflow 的 `push` 事件（防递归安全规则），所以 `deploy.yml` 额外监听
-> `publish` 与 `sync-reports` 的 `workflow_run` 事件——否则每晚发的文章、
-> 每周同步的周报都会一直躺在仓库里不上线。
+> `publish`、`sync-reports` 与 `sync-clips` 的 `workflow_run` 事件——否则
+> 每晚发的文章、每周同步的周报、每天同步的剪藏都会一直躺在仓库里不上线。
 
 ## 仓库目录结构
 
 ```
 Blog/
-├─ .github/workflows/        publish · deploy · sample · sync-reports 四个 workflow
+├─ .github/workflows/        publish · deploy · sample · sync-reports · sync-clips 五个 workflow
 ├─ .claude/                  Claude Code 技能包与项目设置（brainstorming / TDD / 分支管理等）
 ├─ pipeline/                  Python 内容流水线
 │  ├─ main.py                  入口：串起 选材→取图→整理→校验→落盘，见「内容流水线」
@@ -132,6 +147,8 @@ Blog/
 │  ├─ images.py                 Google Drive 取图 → WebP 转换
 │  ├─ render.py                  Obsidian 语法 → 站点 markdown
 │  ├─ notify.py                  校验未通过时写日志 / 开 issue / 发邮件
+│  ├─ clips.py                  剪藏通道：解析 Notes 的月度索引 → src/data/clips.json
+│  │                            独立模块，不进 main.py 的五步流程也不过校验器
 │  ├─ prompt.md / prompt_seed.md  两条通道各自的系统提示词
 │  ├─ test_pipeline.py           自检：assert + 文件底部 runner，零依赖
 │  ├─ fixtures/                  自检用的样本笔记，不依赖真实 vault
@@ -145,8 +162,11 @@ Blog/
 │  ├─ content.config.ts         posts / series 两个 collection 的 zod schema
 │  ├─ layouts/                  Base（全局骨架）/ Post（文章页）
 │  ├─ components/               Header / Footer / PostCard
-│  ├─ pages/                    路由：index / archive / category / posts / series / tags / tools / reports / about / rss.xml
+│  ├─ pages/                    路由：index / archive / category / posts / series / tags / tools / reports / clips / about / rss.xml
 │  ├─ pages/reports.astro       文献周报索引页：读 public/reports/ 列目录，正文不经手
+│  ├─ pages/clips.astro         剪藏栏目页：import src/data/clips.json 渲染 + 前端筛选
+│  ├─ data/clips.json           剪藏数据，sync-clips.yml 生成，不手改（不是 collection，
+│  │                            所以不放 src/content/）
 │  ├─ lib/posts.ts              `listPosts()`——全站唯一的文章入口，草稿过滤只在这一处
 │  ├─ lib/series.ts             系列解析、上下篇计算
 │  ├─ plugins/                  自定义 remark 插件（callout / 高亮 / mermaid / base path 补全）
@@ -186,7 +206,7 @@ uv venv && uv pip install -r pipeline/requirements.txt
 .venv/bin/python pipeline/test_pipeline.py
 ```
 
-跑完终端会打印 `通过数/总数`（写这份文档时是 128/128；这个数字会随新增
+跑完终端会打印 `通过数/总数`（写这份文档时是 162/162；这个数字会随新增
 自检增长，**以终端实际输出为准**，不要以本文的数字为准）。这套自检不
 引入测试框架，纯 `assert` + 文件底部的 runner，CI 里直接
 `python pipeline/test_pipeline.py` 就能跑。
@@ -572,6 +592,53 @@ tags:
 第二个测试造的假文件没有 `<title>` 和「覆盖期」行，**在被同步清掉之前那次
 `deploy` 会构建失败**——那是硬校验在干活，不是 bug，跑一次 `sync-reports`
 就恢复。
+
+### 剪藏是怎么上站的
+
+`/Blog/clips` 这一栏收的是平时读到的**微信公众号文章与 X 帖子**。上游是
+[`Bryce505/Notes`](https://github.com/Bryce505/Notes) —— 手机上复制链接、点一下桌面
+小组件，约 15 秒后那边就写好一条带 AI 摘要、关键词、洞见与阅读优先级的记录。
+**它不经过 `pipeline/` 的五步流程，也不经过校验器** —— 校验器管的是「AI 有没有把
+笔记里的流速、法规条款号改错」，而剪藏是别人的文章加一段 AI 摘要，没有这个风险面。
+
+- **只取索引，不镜像正文**：上游 `archive/` 里的全文快照是别人的版权内容，转载到
+  公网站点有风险，而且一个月就几百 KB，镜像会持续撑大本仓库。站上展示的是摘要与
+  洞见（自己这边产出的判断），正文点「原文」或「全文快照」跳走
+- **快照链接指 `raw.githubusercontent.com`，不是 `github.com/.../blob/...`**：实测
+  68 条里有一篇标题带百分号（《…Token消耗降60%、提速50%》），文件名里那个字面的
+  `%` 编码出来是 `%25`，GitHub 的 blob 路由对含 `%25` 的路径一律返回 **400** ——
+  连 GitHub 自己 API 给出的 `html_url` 都 400，不是编码写错了，是那条路由的限制。
+  raw 对 68 条逐条实测全部 200
+- **解析器在 Python 不在 Astro**：要从 md 里抽 10 个字段、其中 4 个允许缺失，有分支
+  就要测，而本仓库的自检体系（`pipeline/test_pipeline.py`）只覆盖 Python。产出
+  `src/data/clips.json` 是可 diff 的，上游改了什么看提交 diff 就知道
+- **`clips.json` 刻意不做成 content collection**：`series.json` 用 zod 是因为它手写，
+  手滑要有人拦；`clips.json` 是生成的，该抛的错在 `clips.py` 里已经抛过且有自检覆盖，
+  再用 zod 抄一份规则到 TypeScript 里，等于同一条约束养两个版本
+- **上游格式变了就红一条**：标题、剪藏时间、原文链接、优先级（必须是 高/中/低 之一）
+  缺任一项就抛错；一份月度文件解析出 0 条也抛错。**不静默降级** —— 降级的后果是站上
+  一排缺字段的空卡片，而没有任何人会收到通知
+
+#### 手动触发一次同步
+
+Actions → **sync-clips** → Run workflow，分支 `master`，**没有任何开关要填**。
+
+跑完按这三步确认这条通道是活的：
+
+1. **看日志**。上游没有新剪藏时应该打印「剪藏没有更新」——这就是正确结果，它证明
+   「解析 → diff 判定」这条链路通且幂等（同一份上游跑两次产出逐字节一致，实测过）
+2. **看 Actions 列表里紧跟着有没有一条 `deploy`**。这条自动出现，才说明 `deploy.yml`
+   的 `workflow_run` 列表里确实有 `sync-clips`；不出现的话同步进来的剪藏会永远躺在
+   仓库里不上线
+3. **上站看**：`https://bryce505.github.io/Blog/clips`，顶部「共 N 条」与
+   `src/data/clips.json` 的条数对得上，点一下「X」「高」这些按钮条数会跟着变
+
+**手机 GitHub App 一样能点**，路径同「[手动触发一次发布](#手动触发一次发布)」。
+安卓端那个已知毛病也一样：一个 workflow 从没被手动跑过时「运行工作流」按钮不出现，
+绕法是用手机浏览器开 Actions 页切「桌面版网站」，或者等第二天的定时自己跑。
+
+> **为什么只有一条 cron，不像 `sync-reports` 那样配备份触发。** 周报一周一期，漏一次
+> 就是站上少一整周；剪藏每天跑且同步幂等，漏一天第二天连着补上，没有窗口会丢。
 
 ### 手动触发一次发布
 
