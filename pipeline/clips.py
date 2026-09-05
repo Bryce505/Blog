@@ -36,7 +36,7 @@ PRIORITIES = ('高', '中', '低')
 
 _HEADING = re.compile(r'(?m)^## (.+)$')
 _CLIPPED = re.compile(r'^- \*\*剪藏\*\*：(.+?) ｜ \*\*发布\*\*：(.+)$')
-_PRIORITY = re.compile(r'^- \*\*优先级\*\*：(.+?) ｜ \*\*状态\*\*：(.+)$')
+_PRIORITY = re.compile(r'^- \*\*优先级\*\*：(.+?) ｜ \*\*状态\*\*：.+$')
 _KEYWORDS = re.compile(r'^- \*\*关键词\*\*：(.+)$')
 _SUMMARY = re.compile(r'^- \*\*摘要\*\*：(.+)$')
 _VERDICT = re.compile(r'^- \*\*是否值得读\*\*：(.+)$')
@@ -96,7 +96,12 @@ def _parse_entry(title: str, body: str, source: str, month: str,
         elif m := _PRIORITY.match(line):
             entry['priority'] = m.group(1).strip()
         elif m := _KEYWORDS.match(line):
-            entry['keywords'] = _split_keywords(m.group(1).strip())
+            kw = m.group(1).strip()
+            # 按 ' / ' 切不按 '/' 切：真实语料里有 LC-MS/MS、敲除/敲低 这类自带
+            # 斜杠的词，按裸斜杠切会把一个词劈成两个假关键词（上游 md_writer
+            # 用的正是 ' / '.join()）。'无' 是上游对「没有关键词」的写法。
+            entry['keywords'] = [] if kw == '无' else [
+                k.strip() for k in kw.split(' / ') if k.strip()]
         elif m := _SUMMARY.match(line):
             entry['summary'] = m.group(1).strip()
         elif m := _VERDICT.match(line):
@@ -109,17 +114,6 @@ def _parse_entry(title: str, body: str, source: str, month: str,
             entry['insights'] = _take_insights(lines[i + 1:])
     _require(entry, notes_path)
     return entry
-
-
-def _split_keywords(raw: str) -> list[str]:
-    """按 ' / ' 切，不按 '/' 切。
-
-    真实语料里有 `LC-MS/MS`、`敲除/敲低` 这类自带斜杠的词，按裸斜杠切会把一个
-    词劈成两个假关键词。上游 md_writer 用的正是 ' / '.join()。
-    """
-    if raw == '无':          # 上游对「没有关键词」的写法
-        return []
-    return [k.strip() for k in raw.split(' / ') if k.strip()]
 
 
 def _take_insights(rest: list[str]) -> list[str]:
