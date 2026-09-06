@@ -1,5 +1,103 @@
 [
   {
+    "source": "x",
+    "month": "2026-09",
+    "title": "低价获取OpenAI验证码教程",
+    "clippedAt": "2026-09-06 23:10",
+    "publishedAt": "2026-05-25",
+    "priority": "低",
+    "keywords": [
+      "OpenAI",
+      "接码平台",
+      "验证码",
+      "教程"
+    ],
+    "summary": "作者分享利用接码平台Hero-sms获取菲律宾号码，先注册WhatsApp，再用于OpenAI账号验证，称仅需0.5元即可完成。此方法利用WhatsApp接收验证码，并声称后续可复用，但涉及绕过手机验证，存在风险。",
+    "insights": [
+      "作者声称通过接码平台低价获取国外号码，成本约0.5元。",
+      "方法本质是利用WhatsApp作为中转接收验证码，但可能违反平台规则。"
+    ],
+    "verdict": "内容为利用接码平台的灰色教程，信息价值低且存在合规风险，不值得精读。",
+    "url": "https://x.com/Weiyu320169/status/2058931520203809079",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-09/%E4%BD%8E%E4%BB%B7%E8%8E%B7%E5%8F%96OpenAI%E9%AA%8C%E8%AF%81%E7%A0%81%E6%95%99%E7%A8%8B-809079.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-09",
+    "title": "深度拆解：AI Agent Harness 的构造【译】",
+    "clippedAt": "2026-09-06 23:05",
+    "publishedAt": "2026-05-11",
+    "priority": "高",
+    "keywords": [
+      "AI Agent",
+      "Harness",
+      "上下文管理",
+      "ReAct循环",
+      "多智能体",
+      "LangGraph"
+    ],
+    "summary": "文章深入拆解了AI Agent Harness的概念、构成与工程实践。作者指出，智能体性能不佳的根源往往不在模型本身，而在于包裹模型的外围基础设施——Harness。文中以LangChain在TerminalBench 2.0上仅靠改变架构排名从30名外升至第5名为例，证明Harness的重要性。文章系统阐述了Harness的12个核心组件，包括编排循环、工具、记忆、上下文管理、提示词构建、输出解析、状态管理、错误处理、护栏、验证循环和子智能体编排，并对比了Anthropic、OpenAI、LangChain等主流方案。最后强调Harness是硬核工程，应随模型能力增强而变薄，但不会消失。",
+    "insights": [
+      "模型能力相同，Harness设计不同会导致性能天差地别，改变Harness可使基准测试排名提升20多位。",
+      "Harness是操作系统的比喻：模型是CPU，上下文窗口是内存，外部数据库是硬盘，工具是驱动，Harness整合它们。",
+      "生产级智能体的关键在于验证循环，让模型验证自身工作可将输出质量提升2到3倍。",
+      "上下文管理需对抗“上下文腐烂”和“迷失在中间”，采用压缩、观察掩码、即时检索等策略。"
+    ],
+    "verdict": "系统性地拆解了AI Agent的底层架构，提供大量工程细节和可迁移的方法论，信息密度高，对实践者有较强参考价值。",
+    "url": "https://x.com/dotey/status/2053601852261110201",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-09/%E6%B7%B1%E5%BA%A6%E6%8B%86%E8%A7%A3%EF%BC%9AAI_Agent_Harness_%E7%9A%84%E6%9E%84%E9%80%A0%E3%80%90%E8%AF%91%E3%80%91-110201.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-09",
+    "title": "Anthropic工程师免费智能体课程",
+    "clippedAt": "2026-09-06 23:03",
+    "publishedAt": "2026-09-05",
+    "priority": "中",
+    "keywords": [
+      "Anthropic",
+      "智能体",
+      "Claude",
+      "免费课程",
+      "自改进循环"
+    ],
+    "summary": "Anthropic高级工程师发布了一小时免费课程，教授用loops和graphs构建智能体团队，内容涵盖CLAUDE.md、Plan模式、技能、hooks、子代理及自改进循环，并附时间戳。作者称此课程可替代500美元的付费工程课，建议观看后学习构建协同工作的自改进智能体。",
+    "insights": [
+      "构建多智能体系统可借助loops和graphs实现结构化协作。",
+      "CLAUDE.md和Plan模式是配置智能体行为的关键入口。",
+      "课程提供了从基础技能到自改进循环的完整学习路径。"
+    ],
+    "verdict": "内容为资源推荐，虽附具体课程结构，但缺乏独到分析或深入方法，适合按需观看而非精读。",
+    "url": "https://x.com/0xCodez/status/2095987472328958435",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-09/Anthropic%E5%B7%A5%E7%A8%8B%E5%B8%88%E5%85%8D%E8%B4%B9%E6%99%BA%E8%83%BD%E4%BD%93%E8%AF%BE%E7%A8%8B-958435.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-09",
+    "title": "抗体结构和功能——20年工程化治疗性抗体的基础",
+    "clippedAt": "2026-09-06 12:43",
+    "publishedAt": "2026-09-06",
+    "priority": "高",
+    "keywords": [
+      "抗体结构",
+      "免疫球蛋白折叠",
+      "CDR-H3",
+      "抗体工程",
+      "人源化",
+      "双特异性抗体"
+    ],
+    "summary": "文章系统综述了抗体结构与功能的关系，及其在治疗性抗体工程化中的应用。首先详细介绍了免疫球蛋白的总体结构，包括Fab、Fc、铰链区的结构特征，以及CDR的规范结构、CDR-H3的构象多样性和抗体建模方法。随后讨论了基于结构的抗体工程，重点阐述人源化（CDR移植、框架选择、回复突变）、亲和力成熟、溶解度与稳定性优化等策略。接着介绍了双特异性抗体的设计平台，如杵臼技术、静电转向、受控Fab臂交换等。最后探讨了多特异性分子和细胞内递送等新兴应用。文章强调结构知识对于抗体药开发的重要性，并结合实例说明如何将结构信息转化为治疗性抗体的设计原则，为抗体工程领域提供了系统性的理论基础。",
+    "insights": [
+      "结构决定功能是抗体工程的核心，对Fab、Fc、铰链区的精细结构理解是设计有效治疗性抗体的基础。",
+      "CDR-H3的构象多样性和灵活性使其在抗原结合中起主导作用，但也是抗体建模和工程化中最具挑战的部分。",
+      "抗体人源化并非简单移植CDR，还需关注框架残基的回复突变，以维持亲和力和稳定性。",
+      "双特异性抗体的成功依赖于重链异二聚化和轻链配对控制，多种工程平台提供了不同权衡的解决方案。"
+    ],
+    "verdict": "文章信息密度高，系统梳理了抗体结构功能基础与工程化方法，包含大量技术细节和关键策略，适合抗体研发人员或结构生物学研究者精读。",
+    "url": "https://mp.weixin.qq.com/s/ELxsv33orTLihVvDzoVnBQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-09/%E6%8A%97%E4%BD%93%E7%BB%93%E6%9E%84%E5%92%8C%E5%8A%9F%E8%83%BD%E2%80%94%E2%80%9420%E5%B9%B4%E5%B7%A5%E7%A8%8B%E5%8C%96%E6%B2%BB%E7%96%97%E6%80%A7%E6%8A%97%E4%BD%93%E7%9A%84%E5%9F%BA%E7%A1%80-ELxsv3.md"
+  },
+  {
     "source": "weixin",
     "month": "2026-09",
     "title": "普通人最该补的5门AI工具：MD、SVG、HTML、GitHub、Skill",
