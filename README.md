@@ -33,7 +33,7 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
 | **数据源** | 走流水线的：`Bryce505/Obsidian-base`（CMC 与分析方法笔记，私有）、`Bryce505/RoutineRun`（工具与效率栏目，私有）<br>只镜像不改写的：`Bryce505/zotero-arxiv-daily`（文献周报，公开）、`Bryce505/Notes`（公众号与 X 剪藏，公开） |
 | **图片** | Google Drive `image&attachment` 文件夹，取下来转 WebP 自托管 |
 | **整理模型** | DeepSeek（当前默认见 [`pipeline/config.py`](pipeline/config.py) 的 `DEEPSEEK_MODEL`，写这份文档时是 `deepseek-v4-flash`） |
-| **发布节奏** | 文章每晚 21:00（北京时间）自动发一篇，`drafts/` 推送即时处理；文献周报每周五同步；剪藏每天同步 |
+| **发布节奏** | 文章每晚 21:00（北京时间）生成一篇候选，默认落草稿等人工确认后上线（自动发布已关闭，见「[手动触发一次发布](#手动触发一次发布)」）；`drafts/` 推送同样先落草稿；文献周报每周五同步；剪藏每天同步 |
 | **托管与调度** | GitHub Pages + GitHub Actions（定时 / 手动 / push 触发） |
 
 ## 架构总览
@@ -49,7 +49,9 @@ LLM 整理成结构完整的中文技术文章，经机械校验后定时发布�
                          │
                          ▼
        src/content/posts/YYYY-MM/<slug>.md —— 校验过与没过都写这里
-       校验没过 → 额外带 frontmatter `draft: true` + `reviewNotes`
+       自动发布已关闭：默认一律带 frontmatter `draft: true`（+ 校验没过时
+       附 `reviewNotes`）；只有手动触发 publish.yml 且勾选 publish、校验
+       又全过，才跳过草稿位直接发布
                 （published.json 自动对账、写日志、开 issue / 发邮件）
                          │
                          ▼
@@ -488,9 +490,11 @@ tags:
 **三、AI 处理并发布**
 
 稿子会走**和自动文章完全一样**的一套：按体量判定加减法 → 整理 → 取图 →
-两组校验 → 全过就直接发布，不过就带 `draft: true` 等你放行（见
-「[校验没过怎么办](#校验没过怎么办)」）。处理完原稿会从 `drafts/` 撤走
-（已经转成文章了，留着会被重复处理）。
+两组校验 → 落 `posts/`。自动发布已关闭，推 `drafts/` 触发的这条路径不管
+校验过没过一律带 `draft: true` 等你放行（见
+「[校验没过怎么办](#校验没过怎么办)」）；只有手动跑 `mode: manual` 又
+显式勾上 `publish`，校验全过才会跳过草稿位直接发布。处理完原稿会从
+`drafts/` 撤走（已经转成文章了，留着会被重复处理）。
 
 > **不想让 AI 动内容、要原样发布**：本地跑 `python pipeline/main.py --drafts`。
 > 这条直通道只做格式转换和取图，不调模型、不做加减法。
@@ -649,7 +653,7 @@ Actions → publish → Run workflow，五个开关：
 | `mode` | `seed` 引子通道（默认）／`manual` 处理 drafts／`auto` 旧的多篇重组 |
 | `seed_url` | 指定这次用哪篇笔记当引子，见下面「自己选一篇笔记发布」；留空则自动挑 |
 | `count` | 本次发几篇（指定了 `seed_url` 就只发这一篇，这个开关不生效） |
-| `publish` | 勾上=校验全过就直接发布；不勾=一律带 `draft: true` 等人工放行 |
+| `publish` | 默认不勾：一律带 `draft: true` 等人工放行（自动发布已关闭）。勾上=校验全过就直接发布——定时与 `drafts/` 推送触发不带这个开关，永远走不勾这条路径 |
 | `refresh_index` | 刚往 Drive 补传了图就勾上，强制重建索引 |
 
 发布成功后 `deploy` 会自动跟着跑（靠 `workflow_run` 触发，见「[架构总览](#架构总览)」
@@ -679,10 +683,11 @@ workflow：直接去 `src/content/posts/` 对应月份的子目录翻到那个�
 工作流详情页顶部会有一条"此工作流具有 `workflow_dispatch` 事件触发器"的
 提示，点右边的**运行工作流**。分支选默认的 `master`。五个开关手机端能不能
 填不确定，如果没看到这些字段、只有个直接确认，也不影响——默认值
-`mode: seed` + 勾选 `publish` 本来就是"拉一篇笔记 → AI 改写 → 校验过了
-直接发布"这条完整链路，照样能覆盖大部分场景。安卓端有个已知小毛病：一个
-workflow 从没被手动跑过时，这个按钮不会出现——这仓库的 `publish` 已经手动
-跑过多次，不受影响。
+`mode: seed` + 不勾 `publish`，本来就是"拉一篇笔记 → AI 改写 → 落草稿位
+等人工过目"这条链路（自动发布已关闭），不会因为手机端漏填某个开关就
+误发一篇没人看过的文章。想直接发布，得在能看到开关的地方显式勾上
+`publish`。安卓端有个已知小毛病：一个 workflow 从没被手动跑过时，这个
+按钮不会出现——这仓库的 `publish` 已经手动跑过多次，不受影响。
 
 跑完别只看这条记录变不变绿——`verify.py` 是失败关闭设计，没过校验的产出
 会带 `draft: true` 落草稿位，那次 Actions 运行照样显示成功。确认真的发布
