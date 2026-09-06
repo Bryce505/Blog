@@ -1,7 +1,7 @@
 """流水线入口：串起选题 → 取图 → 整理 → 校验 → 落盘。
 
 两条通道：
-  自动通道  python main.py --vault <路径> [--count N]
+  自动通道  python main.py --vault <路径> [--count N] [--publish]
   手动通道  python main.py --drafts
 引子通道（单篇笔记做引子，按加减法整理）：
   python main.py --seed [笔记路径...] --vault <路径> [--count N] [--publish]
@@ -263,7 +263,7 @@ def title_slug_map(published):
             for t in rec.get('noteTitles', [])}
 
 
-def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
+def run_auto(vault_root, blog_root, api_key, sa_json, count=1, publish=False):
     vault_root, blog_root = Path(vault_root), Path(blog_root)
     published = load_published(blog_root)
     month = dt.date.today().strftime('%Y-%m')
@@ -301,8 +301,12 @@ def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
         caption_of = {i: render.caption_for(n) for n in g.notes for i in n.images}
         body = render.rewrite_images(article, img_map, missing, caption_of)
         body = render.resolve_wikilinks(body, title_slug_map(published))
+        # 校验过 ≠ 直接上线：自动发布默认关闭（publish=False），跟
+        # seed.process() 的 live = ok and publish 是同一条口径——不然这里
+        # 单独漏一个通道，「不勾 publish 就不自动发」这条线就不是真的成立
+        live = res.ok and publish
         doc = assemble_frontmatter(g, title, first_paragraph(article),
-                                   draft_notes=None if res.ok else res.failures) + body
+                                   draft_notes=None if live else res.failures) + body
 
         out = post_path(posts_dir, g.slug, month)
         # pick_next() 会在源笔记改动（source_hash 对不上）时重新选中已发布
@@ -314,10 +318,10 @@ def run_auto(vault_root, blog_root, api_key, sa_json, count=1):
             old.unlink()
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(doc, encoding='utf-8')
-        record_published(blog_root, published, g, draft=not res.ok)
+        record_published(blog_root, published, g, draft=not live)
 
         results.append({'slug': g.slug, 'tag': g.tag, 'notes': len(g.notes),
-                        'status': 'published' if res.ok else 'draft',
+                        'status': 'published' if live else 'draft',
                         'ok': res.ok, 'file': str(out.relative_to(blog_root)),
                         'failures': res.failures, 'missingImages': missing})
     return results
@@ -401,7 +405,7 @@ def main():
         if not a.vault:
             ap.error('自动通道需要 --vault')
         rs = run_auto(a.vault, a.blog, os.environ['DEEPSEEK_API_KEY'],
-                      os.environ['GDRIVE_SA_JSON'], a.count)
+                      os.environ['GDRIVE_SA_JSON'], a.count, publish=a.publish)
     # 写日志；有未通过的就开 issue、发邮件。通知失败不影响已经落盘的产出。
     if rs and isinstance(rs, list) and any(isinstance(r, dict) and 'ok' in r for r in rs):
         import notify

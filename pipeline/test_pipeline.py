@@ -946,7 +946,10 @@ def test_run_auto_end_to_end_offline():
     mn.images.load_index = lambda *a, **k: {}
     mn.images.fetch_images = fake_fetch
     try:
-        rs = mn.run_auto(root, blog, 'fake-key', '{}', count=2)
+        # publish=True：这个用例测的是「校验全过时产出长什么样」，不是
+        # 发布开关本身——开关本身另有 test_run_auto_default_is_draft_
+        # even_when_verification_passes 覆盖
+        rs = mn.run_auto(root, blog, 'fake-key', '{}', count=2, publish=True)
     finally:
         (mn.compose.compose, mn.images.drive_service,
          mn.images.load_index, mn.images.fetch_images) = orig
@@ -975,12 +978,56 @@ def test_run_auto_end_to_end_offline():
     mn.images.load_index = lambda *a, **k: {}
     mn.images.fetch_images = fake_fetch
     try:
-        again = mn.run_auto(root, blog, 'fake-key', '{}', count=2)
+        again = mn.run_auto(root, blog, 'fake-key', '{}', count=2, publish=True)
     finally:
         (mn.compose.compose, mn.images.drive_service,
          mn.images.load_index, mn.images.fetch_images) = orig
     assert {r['slug'] for r in again}.isdisjoint({r['slug'] for r in rs}), \
         '重跑发布了同一组'
+
+
+def test_run_auto_default_is_draft_even_when_verification_passes():
+    """自动发布已关闭：run_auto() 曾经不认 publish 开关，只要校验过就
+    直接发布，跟 seed.process() 的 live = ok and publish 口径不一致——
+    这里补的是这条安全阀本身，不依赖真实 vault，不会在 CI 里被跳过。"""
+    TMP.mkdir(parents=True, exist_ok=True)
+    v = TMP / 'v-auto-draft-gate'
+    shutil.rmtree(v, ignore_errors=True)
+    v.mkdir(parents=True)
+    tag = '03质量控制/残留/HCP'
+    for i in range(2):
+        (v / f'n{i}.md').write_text(
+            f'---\ntags:\n  - {tag}\ntype: note\n---\n正文{i}' + '正' * 3000,
+            encoding='utf-8')
+
+    blog = TMP / 'blog-auto-draft-gate'
+    shutil.rmtree(blog, ignore_errors=True)
+
+    def fake_compose(group, api_key, model=None, _post=None):
+        body = '\n\n'.join(n.body for n in group.notes)
+        return f'## {group.tag.split("/")[-1]}\n\n本文分为 3 个部分。\n\n{body}'
+
+    orig = (mn.compose.compose, mn.images.drive_service,
+            mn.images.load_index, mn.images.fetch_images)
+    mn.compose.compose = fake_compose
+    mn.images.drive_service = lambda _: None
+    mn.images.load_index = lambda *a, **k: {}
+    mn.images.fetch_images = lambda *a, **k: ({}, [])
+    try:
+        rs = mn.run_auto(v, blog, 'fake-key', '{}', count=1)   # 不传 publish
+    finally:
+        (mn.compose.compose, mn.images.drive_service,
+         mn.images.load_index, mn.images.fetch_images) = orig
+
+    assert rs and rs[0]['ok'] is True, rs      # 校验确实过了
+    assert rs[0]['status'] == 'draft', rs      # 但默认不直接发布，等人工放行
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    text = (blog / 'src' / 'content' / 'posts' / month
+           / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    assert re.search(r'^draft: true$', text, re.M), text[:300]
+    pub = json.loads((blog / 'published.json').read_text(encoding='utf-8'))
+    assert pub[rs[0]['slug']]['draft'] is True, pub
 
 
 def test_run_auto_marks_failed_verification_as_draft():
