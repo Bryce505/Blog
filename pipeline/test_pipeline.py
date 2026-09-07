@@ -1305,7 +1305,9 @@ def test_routinerun_writes_tools_category_and_strips_h1():
         '# Git & GitHub 学习笔记\n\n按时间顺序追加记录每次相关对话的要点。\n\n' + '正文' * 400,
         encoding='utf-8')
 
-    rs = rr.run(repo, blog)
+    # publish=True：这个用例测的是「产出长什么样」，不是发布开关本身——
+    # 开关本身另有 test_routinerun_default_is_draft 覆盖
+    rs = rr.run(repo, blog, publish=True)
     assert rs[0]['status'] == 'published', rs
     import datetime as _dt
     month = _dt.date.today().strftime('%Y-%m')
@@ -1315,11 +1317,36 @@ def test_routinerun_writes_tools_category_and_strips_h1():
     assert fm['category'] == '工具与效率'
     assert fm['title'] == 'Git & GitHub 学习笔记'
     assert fm['description']
+    assert 'draft' not in fm, fm
     body = text.split('---', 2)[2]
     assert not body.lstrip().startswith('# '), '标题应从正文摘掉'
 
     # 重跑不覆盖，避免抹掉人工修改
-    assert rr.run(repo, blog)[0]['status'] == 'skipped'
+    assert rr.run(repo, blog, publish=True)[0]['status'] == 'skipped'
+
+
+def test_routinerun_default_is_draft():
+    """自动发布已关闭：不传 publish 时，哪怕是体量过关的正常笔记也要落
+    draft: true 等人工放行——这条通道原来完全没有草稿位，只要笔记体量过
+    了 MIN_BODY_CHARS 就无条件直接发布。"""
+    import routinerun as rr
+    import shutil
+    repo = TMP / 'rr-draft-gate'
+    blog = TMP / 'rr-draft-gate-blog'
+    shutil.rmtree(repo, ignore_errors=True)
+    shutil.rmtree(blog, ignore_errors=True)
+    (repo / 'git&github').mkdir(parents=True)
+    (repo / 'git&github' / '笔记.md').write_text(
+        '# Git & GitHub 学习笔记\n\n按时间顺序追加记录每次相关对话的要点。\n\n' + '正文' * 400,
+        encoding='utf-8')
+
+    rs = rr.run(repo, blog)   # 不传 publish
+    assert rs[0]['status'] == 'draft', rs
+    import datetime as _dt
+    month = _dt.date.today().strftime('%Y-%m')
+    text = (blog / 'src' / 'content' / 'posts' / month
+           / f"{rs[0]['slug']}.md").read_text(encoding='utf-8')
+    assert re.search(r'^draft: true$', text, re.M), text[:300]
 
 
 def test_routinerun_skips_when_slug_exists_in_different_month_folder():

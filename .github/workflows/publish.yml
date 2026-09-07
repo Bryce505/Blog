@@ -90,8 +90,11 @@ jobs:
           cache: pip
       - run: pip install -r pipeline/requirements.txt
 
+      # 这条通道原来不认 $PUBLISH，无条件直接发布——是本仓库唯一漏了草稿
+      # 位的通道，实测踩过（2026-09-06 夜间两次定时任务各自把 RoutineRun
+      # 里新增的笔记直接发布，事后手工删了 3 篇），见对应 devlog
       - name: 工具与效率栏目
-        run: python pipeline/main.py --routinerun .routinerun --blog . | tee -a report.json
+        run: python pipeline/main.py --routinerun .routinerun --blog . $PUBLISH | tee -a report.json
 
       # 放在发文前面：补图会顺手刷新 Drive 索引缓存，后面发新文直接复用
       - name: 给已发布文章补图
