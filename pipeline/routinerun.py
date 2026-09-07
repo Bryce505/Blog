@@ -81,8 +81,16 @@ def _copy_images(repo_root, src_rel, body, blog_root, slug):
     return mapping, missing
 
 
-def run(repo_root, blog_root, today=None):
-    """写入 src/content/posts/，已存在则跳过（不覆盖人工改动）。"""
+def run(repo_root, blog_root, today=None, publish=False):
+    """写入 src/content/posts/，已存在则跳过（不覆盖人工改动）。
+
+    publish=False（默认）时打草稿位：这条通道原来没有草稿位，
+    workflow 每次运行都无条件直接发布，等于 RoutineRun 私库里随手记的
+    工作笔记（含占位 README、CDE 审评答复这类内部材料）一旦体量过了
+    MIN_BODY_CHARS 就自动上线——实测踩过，2026-09-06 夜间两次定时任务
+    各自把新增的 RoutineRun 笔记直接发布，人工事后删了 3 篇。跟其余
+    通道一样落 draft: true 等人工放行，不是不发，是发之前多一步确认。
+    """
     posts_dir = Path(blog_root) / 'src' / 'content' / 'posts'
     posts_dir.mkdir(parents=True, exist_ok=True)
     date = (today or dt.date.today()).isoformat()
@@ -102,19 +110,22 @@ def run(repo_root, blog_root, today=None):
             continue
         img_map, missing = _copy_images(repo_root, rel, body, blog_root, slug)
         body = render.rewrite_images(body, img_map, missing, {})
-        fm = {
+        fm = {}
+        if not publish:
+            fm['draft'] = True   # 草稿位放最前面，跟其余通道的约定一致
+        fm.update({
             'title': title,
             'date': date,
             'category': CATEGORY,
             'tags': [f'{CATEGORY}/{Path(rel).parts[0]}'],
             'description': drafts.fill_defaults(
                 {'title': title}, Path(rel), body)['description'],
-        }
+        })
         out = mn.post_path(posts_dir, slug, month)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(
             '---\n' + yaml.safe_dump(fm, allow_unicode=True, sort_keys=False)
             + '---\n\n' + body, encoding='utf-8')
-        results.append({'file': rel, 'status': 'published', 'slug': slug,
-                        'images': len(img_map), 'missingImages': missing})
+        results.append({'file': rel, 'status': 'published' if publish else 'draft',
+                        'slug': slug, 'images': len(img_map), 'missingImages': missing})
     return results

@@ -7,6 +7,8 @@
   python main.py --seed [笔记路径...] --vault <路径> [--count N] [--publish]
 人工投稿通道（处理 drafts/ 下的稿子）：
   python main.py --manual --vault <路径> [--publish]
+工具与效率栏目（RoutineRun 笔记接成栏目）：
+  python main.py --routinerun <RoutineRun 仓库路径> [--publish]
 另有两条辅助通道：
   补图      python main.py --repair-images
   图片体检  python main.py --audit-images --vault <路径>
@@ -397,7 +399,7 @@ def main():
         rs = repair.run(a.blog, os.environ['GDRIVE_SA_JSON'], a.refresh_index)
     elif a.routinerun:
         import routinerun
-        rs = routinerun.run(a.routinerun, a.blog)
+        rs = routinerun.run(a.routinerun, a.blog, publish=a.publish)
     elif a.drafts:
         import drafts
         rs = drafts.run_drafts(a.blog, os.environ['GDRIVE_SA_JSON'])
