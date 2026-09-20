@@ -1,94 +1,120 @@
 ---
 draft: true
 reviewNotes:
-  - "正文过短: 3832/13096=29% < 40%"
+  - "正文过短: 5000/13045=38% < 40%"
+  - "空壳章节（正文不足 120 字）: ['抗体应答的产物是多克隆抗体，且不限于 IgG']"
   - "1 张图没取到，正文里留着「图片暂缺」占位"
-  - "减法模式下篇幅 4,260 字符（原文 16,470，比例 26%）超出 9,058～15,646 字符的区间"
-title: "ELISA 的理论基础：抗原表位、抗体亲和力与抗体应答"
-date: 2026-09-19
+  - "减法模式下篇幅 5,187 字符（原文 16,405，比例 32%）超出 9,023～15,585 字符的区间"
+title: "ELISA 理论基础：抗原表位、抗体亲和力与亲合力"
+date: 2026-09-20
 category: "02分子表征"
 primaryTag: "02分子表征/相互作用/亲和力Affinity"
-description: "ELISA 的定量性能最终由抗原—抗体相互作用的性质决定，而不是由显色体系或读板仪器决定。这篇笔记整理了三个层面的理论前提：抗原一侧的分子大小与表位定义，抗体一侧的亲和力与亲合力，以及免疫应答所产生的抗体群体异质性。把这些前提摆清楚，才能解释为什么同一份样品在不同稀释度、不同抗血"
+description: "本篇整理自 ELISA 理论章节，按三条线索展开：抗原本身的特性如何决定一个分子上可结合的抗体数量，如何用 affinity 与 avidity 描述抗体—抗原结合的强弱，以及抗体应答的产生方式（多克隆、免疫途径、isotype）对检测设计意味着什么。内容偏概念与前提条件，目的是"
 tags:
   - "02分子表征/相互作用/亲和力Affinity"
 sourceNotes:
-  - "Analytical technology/ELISA Assay/Chapter-5-Theoretical-Considerations-ZPPCN57P.md"
+  - "Analytical technology/ELISA Assay/ELISA Guidebook-John R. Crowther/Chapter-5-Theoretical-Considerations-ZPPCN57P.md"
 ---
 
-ELISA 的定量性能最终由抗原—抗体相互作用的性质决定，而不是由显色体系或读板仪器决定。这篇笔记整理了三个层面的理论前提：抗原一侧的分子大小与表位定义，抗体一侧的亲和力与亲合力，以及免疫应答所产生的抗体群体异质性。把这些前提摆清楚，才能解释为什么同一份样品在不同稀释度、不同抗血清下会给出不同的读数。
+本篇整理自 ELISA 理论章节，按三条线索展开：抗原本身的特性如何决定一个分子上可结合的抗体数量，如何用 affinity 与 avidity 描述抗体—抗原结合的强弱，以及抗体应答的产生方式（多克隆、免疫途径、isotype）对检测设计意味着什么。内容偏概念与前提条件，目的是为具体的试验设计和结果解释提供依据。
 
-## 抗原的分子大小如何限制可结合的 Fab 位点数
+## 抗原分子大小如何决定可结合的抗体数量
 
-分子越大，其复杂性也就越高。Fab结合的面积大概是20nm^2，也就是epitope的表面积；通过计算分子的球形表面积，再把表面积除以20，可以获得Fab结合位点的最大数量。
+分子越大，其复杂性也就越高。
 
-这个计算给出的是上限而非实测值，Crowther 对其前提有明确限定：
+### 从 Fab 结合面积反推位点数量
 
-> "Such a calculation is based on the facts that the whole surface is antigenic (rarely true) and that the molecules bind maximally"
-> 这样的计算是基于整个表面具有抗原性（很少是真实的）和分子最大结合的事实。
+Fab 结合的面积大概是 20nm^2，也就是 epitope 的表面积；通过计算分子的球形表面积，再把表面积除以 20，可以获得 Fab 结合位点的最大数量。
 
-尽管只是上限，这一估算框架的用途落在两个方向上："calculate how much antibody is needed to saturate any agent, or measure the level of antibody attachment as a function of available surface" —— 估算饱和任一抗原所需的抗体量，或把抗体结合水平表示为可用表面的函数。
+> "Such a calculation is based on the facts that the whole surface is antigenic (rarely true) and that the molecules bind maximally" (Crowther, 2009)
 
-## 表位、表位型与互补位：三个术语的边界
+也就是说，这样的计算是基于整个表面具有抗原性（很少是真实的）和分子最大结合的事实。
 
-**epitope** 指 antigenic site，即抗原上被抗体识别的位点；**paratope** 指抗体上结合抗原表位的部分。两者分居抗原侧与抗体侧。
+### 这个估算的用途与边界
 
-**Epitype** 描述的是另一层面的概念：
+这类估算的用途有两方面：
 
-> "An epitype is an area on an antigen that is identified by a closely related set of antibodies identifying very similar chemical structures (e.g., mAbs, which define overlapping or interrelated epitopes). An epitype can be regarded as an area identifying slightly different specificities of antibodies reacting with the same antigenic site"
-> 表位型是抗原上的一个区域，由一组化学结构非常相似的抗体（例如 mAbs，它们定义重叠或相互关联的表位）识别。表位型可视为识别与同一抗原位点反应的抗体特异性略有不同的区域。
+> "calculate how much antibody is needed to saturate any agent, or measure the level of antibody attachment as a function of available surface" (Crowther, 2009)
 
-区别在于：epitope 是单个抗原决定簇，epitype 描述的是抗体群体对同一区域的重叠识别关系。
+即估算饱和任意一种试剂所需的抗体量，或测量抗体结合水平随可用表面而变化的关系。需要注意，它给出的是上限而非实际值。
 
-## 亲和力与亲合力：单一位点强度与整体结合强度
+## 表位相关术语：epitope、epitype 与 paratope
 
-### 亲和力（affinity，binding affinity）
+### epitope 与 epitype
+
+epitope：antigenic site。
+
+Epitype：
+
+> "An epitype is an area on an antigen that is identified by a closely related set of antibodies identifying very similar chemical structures (e.g., mAbs, which define overlapping or interrelated epitopes). An epitype can be regarded as an area identifying slightly different specificities of antibodies reacting with the same antigenic site" (Crowther, 2009)
+
+表位型是抗原上的一个区域，由一组化学结构非常相似的抗体（例如 mAb，它们定义重叠或相互关联的表位）识别。表位型可视为识别与同一抗原位点反应、但特异性略有不同的抗体的区域。
+
+### paratope
+
+paratope：抗体上结合抗原表位的部分。
+
+## affinity 与 avidity：单一位点结合能与总体结合强度
+
+### affinity 的定义与物理基础
 
 - the energy between a single epitope and paratope；
-- the binding affinity is the strength of the interaction between the antigen's epitope and the antibody's paratope at a singular binding site —— 即抗原表位与抗体互补位在单一结合位点上相互作用的强度；
-- Affinity is mediated by non-covalent interactions that include hydrogen bonds, electrostatic bonds, Van der Waals forces, and hydrophobic interactions and is defined by the equilibrium dissociation constant (K<sub>D</sub>)。
+- the binding affinity is the strength of the interaction between the antigen's epitope and the antibody's paratope at a singular binding site；
+- Affinity is mediated by non-covalent interactions that include hydrogen bonds, electrostatic bonds, Van der Waals forces, and hydrophobic interactions and is defined by the equilibrium dissociation constant (K_D)；
 
-### 亲合力（avidity，functional affinity）
+概括地说，affinity 是单个结合位点上抗原表位与抗体 paratope 之间相互作用的强度，由氢键、静电键、范德华力和疏水相互作用等非共价作用介导，以平衡解离常数（K_D）定义。
 
-亲合力是与抗原的总结合能。"The avidity represents an average binding energy from the sum of all the individual affinities of a population of antibodies binding to different antigenic sites" —— 亲合力代表一群结合不同抗原位点的抗体各自亲和力之和的平均结合能。
+> "The binding energy between an antibody molecule and an antigen determinant is termed affinity." (Crowther, 2009)
 
-它也称为 functional affinity，即抗体在每个结合位点上总结合强度的度量，其三个影响因素是：1) the binding affinity, 2) valency, and 3) the structural arrangement of the antibody and antigen in question（结合亲和力、价数，以及所讨论的抗体与抗原的结构排布）。
+抗体分子与抗原决定簇之间的结合能称为亲和力。
 
-对异质性抗体群体，亲合力还有一层含义："Avidity can be regarded as the sum of all the different affinities between the heterogeneous antibodies contained in a serum and the various antigenic sites (epitopes)" —— 亲合力可看作血清中包含的异质性抗体与各种抗原位点（表位）之间所有不同亲和力的总和。
+### avidity 的定义与三个影响因素
 
-> [!warning] 稀释会改变血清的表观亲合力
-> "It is important to realize that the avidity of a serum may change on dilution because an operator may be diluting out certain populations of antibodies"
-> 重要的是要认识到血清的亲合力在稀释时可能会发生变化，因为操作者可能会稀释掉某些群体的抗体。
+- overall binding energy with an antigen；
+- The measure of the total binding strength of an antibody at every binding site is termed avidity. Avidity is also known as the functional affinity；
+- 三个影响因素：1) the binding affinity, 2) valency, and 3) the structural arrangement of the antibody and antigen in question.
 
-Crowther 用一个具体情形说明这一点：血清中可能同时存在低丰度的高亲和力抗体和高丰度的低亲和力抗体。在血清不作大幅稀释的免疫分析条件下，高、低亲和力抗体竞争抗原位点，高亲和力抗体优先反应；但一经稀释，高亲和力抗体的浓度会被降低，直到只剩下低亲和力抗体。这在用免疫分析、以不同抗血清的差异活性比较抗原时尤为重要；由于异质性抗体群体的动态（各个抗体分子的相对浓度与亲和力），任何血清的稀释都可能影响其区分不同抗原的能力。
+> "The avidity represents an average binding energy from the sum of all the individual affinities of a population of antibodies binding to different antigenic sites" (Crowther, 2009)
 
-## 抗体应答：多克隆来源、同种型与免疫途径
+## 抗体应答的产物是多克隆抗体，且不限于 IgG
 
-### 抗原刺激产生的抗体群体
+应对抗原刺激产生抗体，为多克隆抗体，且抗体类型并不仅限于 IgG；抗体类型产生的时间顺序见下图。
 
-应对抗原刺激产生抗体，得到的是多克隆抗体，且抗体类型并不仅限于 IgG；抗体类型产生的时间顺序见下图。
+*[图片暂缺]*<!--missing-image: TMX6RAKJ.png|-->\
+(Crowther, 2009)
 
-*[图片暂缺]*<!--missing-image: TMX6RAKJ.png|-->
+## 血清稀释为什么会改变表观 avidity
 
-抗体分子与抗原决定簇之间的结合能称为亲和力："The binding energy between an antibody molecule and an antigen determinant is termed affinity."
+avidity 描述的是整个抗体群体的行为，而不是单一分子的性质：
 
-### 被动免疫与主动免疫
+> "Avidity can be regarded as the sum of all the different affinities between the heterogeneous antibodies contained in a serum and the various antigenic sites (epitopes)" (Crowther, 2009)
+
+亲和力可以看作是血清中包含的异质性抗体与各种抗原位点（抗原表位）之间所有不同亲和力的总和。
+
+正因为如此：
+
+> "It is important to realize that the avidity of a serum may change on dilution because an operator may be diluting out certain populations of antibodies" (Crowther, 2009)
+
+重要的是要认识到，血清的 avidity 在稀释时可能会发生变化，因为操作者可能会把某些抗体群体稀释掉。
+
+### 高低亲和力抗体混合的一个例子
+
+> "As an example, we could have a serum containing a low quantity of antibodies showing high affinity for a particular complex antigen and a high quantity of low-affinity antibody. Under immunoassay conditions in which that serum is not diluted greatly, we would have competition for antigenic sites between the high- and low-affinity antibodies, and the high-affinity antibodies would react preferentially. On dilution, however, the concentration of the high-affinity antibodies would be reduced until we would be left only with low-affinity antibodies. Such problems are important when an operator is using immunoassays to compare antigens by their differential activity with different antisera. The dilution of any serum can affect its ability to discriminate between antigens owing to the dynamics of the heterogeneous antibody population (relative concentrations and affinities of individual antibody molecules)." (Crowther, 2009)
+
+举例来说，血清中可能含有少量对某一复杂抗原呈高亲和力的抗体，同时含有大量低亲和力抗体。在血清未被大幅稀释的免疫测定条件下，高、低亲和力抗体会竞争抗原位点，高亲和力抗体优先反应；而一旦稀释，高亲和力抗体的浓度会被降低，直至只剩下低亲和力抗体。当操作者试图用免疫测定、以不同抗血清对抗原的差异活性来比较抗原时，这类问题很重要。由于异质性抗体群体的动态变化（各抗体分子的相对浓度与亲和力），任何血清的稀释都可能影响其区分抗原的能力。
+
+## 免疫途径与检测策略的选择
 
 passive immunization：直接打中和抗体；active immunization：服用抗原，产生保护性抗体。
 
-疫苗注射方式：sc-皮下注射或 im-肌内注射；这种方式可以诱导产生多种抗体类型-isotype；必须考虑是否使用总抗体检测，isotype-specific assay 或检测抗原清除的检测来评估疫苗接种效果。
+疫苗注射方式为 sc—皮下注射或 im—肌内注射；这种方式可以诱导产生多种抗体类型—isotype；必须考虑是否使用总抗体检测、isotype-specific assay 或检测抗原清除的检测来评估疫苗接种效果。
 
-口服／吸入免疫则牵涉到另一个判断："The immunoassayist must decide whether an assay for isotype-specific antibodies, notably IgA, may provide deeper insight into the benefits of vaccination than an assay for total antibody" —— 免疫分析工作者必须决定，同型抗体（特别是 IgA）的检测是否比总抗体检测能更深入地反映疫苗接种的收益。
+对于口服/吸入免疫：
 
-## 这些理论前提对 ELISA 设计与判读意味着什么
+> "The immunoassayist must decide whether an assay for isotype-specific antibodies, notably IgA, may provide deeper insight into the benefits of vaccination than an assay for total antibody" (Crowther, 2009, p. 140)
 
-把上面的线索归拢起来，可以看到几条直接影响实验设计的约束。
+免疫分析工作者必须决定，同型抗体（特别是 IgA）的检测是否能比总抗体的检测更深入地了解疫苗接种的获益。
 
-第一，抗原侧的可结合位点数只能作上限估计。球形表面积除以 20nm^2 的算法建立在「整个表面都具有抗原性」和「分子最大结合」两个假设上，而这两个假设很少成立，因此按表面积推算得到的位点数不能当作实测值使用。
+## 小结
 
-第二，亲和力与亲合力是不同层级的量。亲和力描述单个 epitope 与 paratope 在单一结合位点上的相互作用强度，由非共价作用介导、以平衡解离常数定义；亲合力描述的是抗体（或抗体群体）与抗原的整体结合强度，受结合亲和力、价数和抗体—抗原结构排布三者共同影响。讨论多克隆抗血清时，只能谈亲合力。
-
-第三，稀释本身是一个变量，而不只是浓度缩放。稀释会改变异质性抗体群体的组成，从而改变血清的表观亲合力，并影响其区分不同抗原的能力。因此同一份样品在不同稀释度下的读数不必然线性可比。
-
-第四，免疫途径决定抗体同种型谱，进而决定检测策略。sc/im 注射诱导多种 isotype，口服／吸入免疫则把问题引向 IgA 等 isotype-specific 检测与总抗体检测之间的取舍；在评估疫苗效果时，还需要在总抗体、isotype-specific assay 与抗原清除检测之间作出选择。
-
-至于具体的数据处理环节——标准曲线拟合、cut-off 值设定——已超出本章理论讨论的范围。
+这一章的理论考量可以归为三层。抗原层面，Fab 结合面积与球形表面积的换算只给出结合位点数量的上限，其成立依赖「整个表面都具有抗原性」和「分子最大结合」两个很少同时满足的前提。结合层面，affinity 是单一位点、可以用 K_D 描述的强度，avidity 则是抗体群体在多个抗原位点上结合能的平均，受结合亲和力、价数和抗体—抗原结构排布三者共同影响。样本层面，血清的 avidity 会随稀释而改变，因此用不同稀释度比较不同抗血清对抗原的区分能力时需要格外谨慎。检测设计层面，免疫途径决定了所诱导的抗体类型，也就决定了应当选择总抗体检测还是 isotype-specific 检测来评价免疫效果。
