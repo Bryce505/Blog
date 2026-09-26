@@ -2,6 +2,135 @@
   {
     "source": "weixin",
     "month": "2026-09",
+    "title": "10 个 Skill，搭出一套日更爆文公众号写作系统【附总控指令】",
+    "clippedAt": "2026-09-25 18:01",
+    "publishedAt": "2026-09-23",
+    "priority": "中",
+    "keywords": [
+      "AI Skill",
+      "公众号日更",
+      "内容生产线",
+      "提示词工作流",
+      "爆款选题"
+    ],
+    "summary": "作者把公众号日更流程拆成 10 个可独立调用的 AI Skill，按生产线顺序排列：找爆款选题（gzh-explosive-content-detector）、拆解爆文结构（baokuan-article-analysis）、用 agent-reach 去官方文档与当事人原帖核实事实、写初稿（只有选题用 gzh-longform-writer，有种子文章改用 xiexiu-article-remix-v2）、批量生成标题（baokuan-title-generator）、让 tiaoci 挑刺、做封面与逻辑配图、最后由 gzh-paiban 输出微信 HTML。文中给出每个环节的具体调用指令模板，并附一条总控指令串起全流程，只在选题确认和最终成稿两个节点让人拍板。作者强调 Skill 的价值在于岗位划分而非名字，若没有同名 Skill 可用 skill-creator 自建，核心主张是把重复劳动流水线化，把时间留给判断。",
+    "insights": [
+      "日更的真正成本不是写字的字数，而是每天重复走一遍找题、查证、结构、标题、配图、排版的完整流程，把流程岗位化才是提效关键。",
+      "不要做一个万能 Skill，每个 Skill 只负责一个明确结果，出错时才能定位到具体环节。",
+      "有种子爆文时应抛开原文重新搜证重写，只继承被验证过的选题信号，避免写成换皮稿。",
+      "事实核验应作为独立工序前置，禁止 AI 用记忆补事实，无证据必须标注未验证。"
+    ],
+    "verdict": "给出了一套结构清晰、可直接复用的 AI 写作流水线与具体指令模板，对做内容的人有实操价值，但本质是工具清单与工作流介绍，末尾带资料包引流，观点新颖度有限。",
+    "url": "https://mp.weixin.qq.com/s/7eihunxmR_XpY872d-w5hQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-09/10_%E4%B8%AA_Skill%EF%BC%8C%E6%90%AD%E5%87%BA%E4%B8%80%E5%A5%97%E6%97%A5%E6%9B%B4%E7%88%86%E6%96%87%E5%85%AC%E4%BC%97%E5%8F%B7%E5%86%99%E4%BD%9C%E7%B3%BB%E7%BB%9F%E3%80%90%E9%99%84%E6%80%BB%E6%8E%A7%E6%8C%87%E4%BB%A4%E3%80%91-7eihun.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-09",
+    "title": "从Zotero到Obsidian：用一个SKILL即可形成文献解析和笔记双链闭环。",
+    "clippedAt": "2026-09-25 16:02",
+    "publishedAt": "2026-09-23",
+    "priority": "中",
+    "keywords": [
+      "Zotero",
+      "Obsidian",
+      "MinerU",
+      "SKILL/Agent 工作流",
+      "知识图谱",
+      "科研工具链"
+    ],
+    "summary": "作者此前开发了 Obsidian-vault-mcp（已获 87 star），但认为它过重、文件命名非标准、只服务于 Agent，于是另起新项目 omnischolar：以 Zotero 为源、MinerU 为解析媒介、Obsidian 为载体的多源科研工具，Codex、Cursor、WorkBuddy 等 Agent 均可调用。安装几条命令并填写统一配置 omnischolar.config.json（MinerU API 必填，否则图表公式无法完整解析）后，直接向 Agent 提需求即可：MinerU 解析生成带 frontmatter（标题、作者、DOI、zotero-link）的 markdown，图表公式基本无损，wiki 索引以 callout 折叠，自动生成双向链接、多视图文献数据库与知识图谱，并提供科研绘图 SKILL、PubMed/Semantic Scholar 等数据库接口和文献检索后去重导入 Zotero 的流程。文末作者感慨技术迭代太快（MCP→SKILL→loop/harness），真正稀缺的是好奇心与终身学习。",
+    "insights": [
+      "把第二大脑全权交给 Agent 管理是一种风险，文献命名与目录结构应保持对人类可读的标准，工具要服务于人的检索习惯。",
+      "当原有架构无法承载自定义配置、翻译、绘图等扩展需求时，另起新项目往往比系统性重构更划算。",
+      "用 SKILL 加统一配置文件把 Zotero→解析→Obsidian→知识图谱串成闭环，可让单篇文献精读的产出沉淀为可双链跳转、可复用的知识资产。",
+      "在技术栈快速换代（MCP 到 SKILL 到 loop/harness）的环境下，信息差不再值钱，真正拉开差距的是好奇心与持续学习的能力。"
+    ],
+    "verdict": "属于个人开源项目的发布演示贴，价值集中在工具链配置步骤与文献闭环工作流思路，但具体效果多靠截图展示，非科研/知识管理方向的读者收益有限。",
+    "url": "https://mp.weixin.qq.com/s/LIp2ZpPxLnNkxGSu3TZT4A",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-09/%E4%BB%8EZotero%E5%88%B0Obsidian%EF%BC%9A%E7%94%A8%E4%B8%80%E4%B8%AASKILL%E5%8D%B3%E5%8F%AF%E5%BD%A2%E6%88%90%E6%96%87%E7%8C%AE%E8%A7%A3%E6%9E%90%E5%92%8C%E7%AC%94%E8%AE%B0%E5%8F%8C%E9%93%BE%E9%97%AD%E7%8E%AF%E3%80%82-LIp2Zp.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-09",
+    "title": "Waters高分辨的系统原理及应用",
+    "clippedAt": "2026-09-25 16:00",
+    "publishedAt": "2026-09-23",
+    "priority": "低",
+    "keywords": [
+      "Waters",
+      "高分辨质谱",
+      "系统原理",
+      "应用",
+      "操作手册",
+      "资料汇总"
+    ],
+    "summary": "文章标题涉及Waters高分辨质谱的系统原理及应用，但正文并未展开讲解具体原理或应用案例，主体仅包含一张图片，并列出若干相关文章链接，如Waters TQD简单操作手册、Xevo TQD_H-Class操作练习手册、QTOF中DDA和MSe方法的区别分析，以及分析仪器操作使用资料汇总。文末附有转载声明和免责说明，强调转载出于传递信息目的，文章仅代表作者观点。整体看，本文更像资料索引或图片内容载体，缺少可直接阅读的实质性论述，无法据此判断Waters高分辨系统的原理细节和应用价值。",
+    "insights": [
+      "正文实质内容可能藏于图片中，纯文本无法获取有效信息。",
+      "文章主要价值是汇总Waters液质相关操作手册与方法比较资料。",
+      "DDA与MSe方法区别可能是其中较有技术含量的延伸阅读点。",
+      "该文更适合作资料导航，而非直接精读原理或应用文章。"
+    ],
+    "verdict": "正文几乎无实质文字，仅图片和资料链接，属于资料罗列，无法提供高信息密度的原理或应用讲解。",
+    "url": "https://mp.weixin.qq.com/s/4s6wY88Keofh0CiPC9iUBQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-09/Waters%E9%AB%98%E5%88%86%E8%BE%A8%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-4s6wY8.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-09",
+    "title": "FDA CRL هڈ¯ن»¥ه¯¹ه¤–ه…¬ه¼€هگ—ï¼ں",
+    "clippedAt": "2026-09-25 09:20",
+    "publishedAt": "2026-09-24",
+    "priority": "高",
+    "keywords": [
+      "FDA CRL",
+      "监管透明度",
+      "EMA EPAR",
+      "商业机密删改",
+      "openFDA",
+      "药物研发"
+    ],
+    "summary": "文章围绕 FDA 对「完全回应函」（CRL，即药品申请未获批准的官方文件）的公开政策展开。长期以来 CRL 属于保密监管文件，只有申请最终获批时才随审批档案间接公开；撤回、搁置或永未获批的申请，其 CRL 几乎不披露，公众信息只能依赖企业自选的新闻稿，而研究显示企业公告往往淡化安全性风险、漏报关键技术缺陷，造成信息不对称。2025 年 7 月 10 日 FDA 在 openFDA 集中发布 200 余份历史 CRL，9 月 4 日又新增 89 份涉及撤回、搁置、从未获批申请的文件，打破数十年惯例。但公开不等于原文照发：依据《商业机密法》、信息自由法与 FDA 法规，发布前必须做法定删改，隐去生产工艺、配方、专有技术等商业秘密与个人隐私，仅保留企业名称、申请号、疾病领域与核心缺陷类别（安全性、有效性、CMC 等）。文章对标欧盟 EMA 的 EPAR 制度，指出 FDA 直接公开原始信函保留了「第一手监管声音」，但文本零散、缺乏统一梳理，普通读者门槛高；并建议 FDA 在公开原始 CRL 基础上补充标准化缺陷摘要与结构化元数据。",
+    "insights": [
+      "CRL 能否被外界看到，过去很大程度取决于该药最终有没有获批、以及企业愿意说多少，形成系统性的信息不对称",
+      "「对外公开」并不等于原文照发：FDA 公开前必须依《商业机密法》做 Redaction，只保留缺陷类别而隐去工艺与配方",
+      "对标 EMA 的 EPAR 可见两种路径的取舍——FDA 保留第一手监管原始声音但文本零散难读，EMA 输出结构化但经过二次梳理的评估报告",
+      "透明度的核心难题是边界：删改过度则公开失去意义，删改不足则泄露企业合法专有技术、打击创新投入"
+    ],
+    "verdict": "包含 2025 年 FDA 具体公开时点与文件数量、保密红线、EMA 制度对比表及对研发、IR、BD 各方的可操作影响，信息密度与专业价值明显高于常规科普。",
+    "url": "https://mp.weixin.qq.com/s/2UuwvoSeUEBEKD0r84usog",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-09/FDA_CRL_%D9%87%DA%88%C2%AF%D9%86%C2%BB%C2%A5%D9%87%C2%AF%C2%B9%D9%87%C2%A4%E2%80%93%D9%87%E2%80%A6%C2%AC%D9%87%C2%BC%E2%82%AC%D9%87%DA%AF%E2%80%94%C3%AF%C2%BC%DA%BA-2Uuwvo.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-09",
+    "title": "案例分享|一款抗CD52单抗的脱酰胺修饰稳定化的工程改造",
+    "clippedAt": "2026-09-25 09:16",
+    "publishedAt": "2026-09-24",
+    "priority": "高",
+    "keywords": [
+      "抗CD52单抗",
+      "脱酰胺化",
+      "抗体工程改造",
+      "饱和突变",
+      "晶体结构",
+      "可开发性评估"
+    ],
+    "summary": "文章复盘了赛诺菲二代抗CD52单抗Gatralimab的脱酰胺稳定化改造案例。可开发性评估发现轻链CDR1的N33是脱酰胺热点：加速条件下脱酰胺比例随pH和时间上升，修饰后亲和力显著下降，直接做N33D突变更使结合活性降低约400倍。X射线晶体结构显示N33与抗原CD52多肽的磷酸基团形成氢键、K35形成离子相互作用，因此变为D后产生电荷排斥、几近丧失结合。由于N33位所有突变（含保守的N33Q及序列反转KGN）都会大幅降低亲和力，研究者转向处于相互作用界面之外的G34做饱和突变，BLI与SPR筛选出G34K≈G34R>WT。加速稳定性实验显示G34K/G34R/G34Q亲和力衰减在1.5倍以内，远优于WT的3-4倍；CDC实验证实G34R、G34K效应功能与WT相当，改造成功。",
+    "insights": [
+      "脱酰胺热点若位于CDR功能位点，修饰会直接摧毁活性——N33D使亲和力下降400倍，说明关键位点修饰不是稳定性问题而是疗效问题。",
+      "结构解析是改造的前提：N33与抗原磷酸基团形成氢键，换成带负电的D会产生电荷排斥，这解释了为何保守替换N33Q同样失败。",
+      "改造思路可迁移：当功能位点本身不能动时，应选择紧邻但位于相互作用界面之外的位点（如G34）做饱和突变，兼顾活性与稳定性。",
+      "稳定化改造需要多重验证闭环：BLI/SPR筛亲和力、加速稳定性验证抗脱酰胺效果、CDC确认效应功能不丢失，三者齐备才算成功。"
+    ],
+    "verdict": "提供了从修饰热点定位、结构解析到界面外位点饱和突变筛选再到功能验证的完整可迁移工程改造方法论，数据与结论扎实，对抗体CMC和蛋白工程从业者参考价值高。",
+    "url": "https://mp.weixin.qq.com/s/S1__gdnzSV8UiTQsJwoQqw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-09/%E6%A1%88%E4%BE%8B%E5%88%86%E4%BA%AB%E4%B8%80%E6%AC%BE%E6%8A%97CD52%E5%8D%95%E6%8A%97%E7%9A%84%E8%84%B1%E9%85%B0%E8%83%BA%E4%BF%AE%E9%A5%B0%E7%A8%B3%E5%AE%9A%E5%8C%96%E7%9A%84%E5%B7%A5%E7%A8%8B%E6%94%B9%E9%80%A0-S1__gd.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-09",
     "title": "中检院 - 糖位点特异性bsADC的关键质量属性评估及分析方法开发",
     "clippedAt": "2026-09-23 19:46",
     "publishedAt": "2026-09-23",
