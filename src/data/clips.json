@@ -2,6 +2,58 @@
   {
     "source": "x",
     "month": "2026-10",
+    "title": "Clash Verge从0~1零基础教程（界面认识）",
+    "clippedAt": "2026-10-17 20:18",
+    "publishedAt": "2026-07-31",
+    "priority": "中",
+    "keywords": [
+      "Clash Verge",
+      "TUN模式",
+      "代理模式",
+      "分流规则",
+      "订阅配置",
+      "Mihomo"
+    ],
+    "summary": "作者从自己频繁切换代理、调试网络工具的痛点出发，系统梳理 Clash Verge 的界面与核心概念：首页的节点、系统代理/TUN、规则/全局/直连、流量统计和 IP 信息；代理组与链式代理；配置、节点、订阅三者的区别；连接、规则、日志、测试及设置中的 TUN 堆栈、DNS 劫持、系统代理守卫、局域网连接等。文章强调先分清“流量如何进入 Clash”和“进入后如何分流”，并预告后续再讲 IP、DNS 与数据传输。",
+    "insights": [
+      "网络设置决定流量怎样进入 Clash，代理模式决定进入后走规则、全局还是直连，两者不能混为一谈。",
+      "系统代理只接管读取系统代理的软件，TUN 通过虚拟网卡接管范围更广，但更容易与 VPN、游戏加速器、公司网络等冲突。",
+      "直连模式不等于退出 Clash：流量仍先进入 Mihomo，只是最后选择不走远程节点。",
+      "链式代理可改善入口线路，但会增加延迟和故障点，通常不建议常规使用。"
+    ],
+    "verdict": "这是一篇结构清晰、可操作的零基础界面教程，适合需要建立 Clash Verge 概念框架的读者，但内容偏基础科普，进阶信息有限。",
+    "url": "https://x.com/gengdaJ/status/2083195661353394227",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/Clash_Verge%E4%BB%8E0~1%E9%9B%B6%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B%EF%BC%88%E7%95%8C%E9%9D%A2%E8%AE%A4%E8%AF%86%EF%BC%89-394227.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-10",
+    "title": "AI时代需要补的网络基础知识",
+    "clippedAt": "2026-10-17 20:15",
+    "publishedAt": "2026-08-10",
+    "priority": "高",
+    "keywords": [
+      "网络基础",
+      "NAT",
+      "DNS",
+      "代理与VPN",
+      "IP类型",
+      "AI API"
+    ],
+    "summary": "作者从自己\"不学网络就处处被卡\"的体验出发，把 AI 时代常用的网络概念串成一条线：IP 与 IPv4/IPv6、内网 IP 经 NAT/PAT/CGNAT 变成公网出口、回环地址；在外访问 NAS 的三种方案（端口映射+DDNS、内网穿透、Tailscale/ZeroTier 组网）；客户端/服务器/网站与请求响应模型；CPU、内存、硬盘、GPU 与 CDN；域名、URL、DNS 递归查询链路与公共 DNS 的六大好处；代理与 VPN 的原理差异（隧道 vs 转发、REALITY 伪装为何更抗封锁）、HTTP 代理与 SOCKS5、显式与透明代理；机房/住宅/移动/ISP IP 的风控差异与选型；节点命名、直连中转专线、流量倍率；最后落到 API、SSE 流式传输与限流/超时/重试的实战坑。整体是一份面向 AI 工具使用者的网络扫盲长文。",
+    "insights": [
+      "科学上网能否稳定，关键不在\"多一层加密\"，而在流量能否被识别出代理特征，所以 VLESS+REALITY 这类伪装方案优于特征明显的 VPN 隧道。",
+      "VPN 是网卡层面的加密隧道、整机全走；代理是应用/规则层面的转发，可按规则分流，二者不是同一个东西也不是替代关系。",
+      "住宅 IP 不等于干净 IP，也不等于动态 IP；一个长期独享、无滥用记录的机房 IP 可能比被用滥的住宅代理更稳。",
+      "在 AI 时代真正拉开差距的是能否用准确的术语向模型描述问题，而不是会不会让模型\"用大白话解释\"。"
+    ],
+    "verdict": "概念覆盖密集且成体系，把 IP、DNS、代理、风控、API 串成一条可操作的认知链，并给出选型与排错方法，适合精读后当手册反复查。",
+    "url": "https://x.com/gengdaJ/status/2086694377016131669",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/AI%E6%97%B6%E4%BB%A3%E9%9C%80%E8%A6%81%E8%A1%A5%E7%9A%84%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-131669.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-10",
     "title": "2026 年 X 上最值得关注的 100 个 AI 博主（全球精选榜单）",
     "clippedAt": "2026-10-16 21:53",
     "publishedAt": "2026-10-15",
