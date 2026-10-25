@@ -2,6 +2,80 @@
   {
     "source": "weixin",
     "month": "2026-10",
+    "title": "让 Zotero 里的每一条标注，自动流进 Obsidian",
+    "clippedAt": "2026-10-24 20:24",
+    "publishedAt": "2026-09-22",
+    "priority": "高",
+    "keywords": [
+      "Zotero",
+      "Obsidian",
+      "Zotero Integration",
+      "文献笔记",
+      "citekey",
+      "高亮标注"
+    ],
+    "summary": "文章针对科研人读了大量 PDF 却用不上自己标注的普遍困境，提出把 Zotero（负责文献原件与高亮批注）和 Obsidian（负责文献笔记与个人思考）分工打通。具体做法是装三样东西：Zotero 7、Better BibTeX（生成终身不变的 citekey）和 Obsidian 社区插件 Zotero Integration，再按五步设定数据接口、PDF 路径、笔记存放位置、以 @{{citekey}} 命名和导入模板。作者给出一个 Nunjucks 模板精简版，自动填入题录、摘要、带页码的高亮，并用 persist 区块保证重新导入时不覆盖用户手写内容。作者还建议用四色高亮约定区分论点、方法、质疑与可用点，并用 Web Clipper 收拢非 PDF 网页材料。结论是：一次配置即可让每篇文献都形成原文在 Zotero、思考在 Obsidian 的「活的」笔记。",
+    "insights": [
+      "标注失效的根因不是记性差，而是标注与思考分家：高亮留在 PDF 里，想法无处安放。",
+      "citekey 是两个软件之间的唯一对应标识，一旦生成就不能手改，否则文件名与引文全部失配。",
+      "高亮是原料、批注才是产品；只划不写等于没读，每条绿色高亮必须配一句自己的批注。",
+      "用 persist 区块划分「自动生成区」和「自留地」，才能既享受自动刷新又不丢手写内容。"
+    ],
+    "verdict": "给出了完整可复现的工具链、具体插件设置步骤和可直接套用的模板，信息密度高且能当晚跑通，属于可操作的方法文而非泛泛科普。",
+    "url": "https://mp.weixin.qq.com/s/_YteQyZgAhDpwltNDn8DYA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-10/%E8%AE%A9_Zotero_%E9%87%8C%E7%9A%84%E6%AF%8F%E4%B8%80%E6%9D%A1%E6%A0%87%E6%B3%A8%EF%BC%8C%E8%87%AA%E5%8A%A8%E6%B5%81%E8%BF%9B_Obsidian-_YteQy.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-10",
+    "title": "吹爆ECC：给Codex装71个Agent",
+    "clippedAt": "2026-10-24 13:44",
+    "publishedAt": "2026-10-23",
+    "priority": "低",
+    "keywords": [
+      "Codex",
+      "ECC",
+      "AI Agent",
+      "Skills 管理",
+      "开源工具"
+    ],
+    "summary": "作者极力推荐开源项目 affaan-m/ECC，称它能为 Codex 配齐 71 个专业 Agent、311 个 Skills、需求到验证的完整流水线、长期记忆与安全扫描，并给出提示词安装方式，引导观看视频；转发部分主张定期卸载不用的 Skills 以减少上下文开销。全文无实测数据，数字与效果均为宣传口吻。",
+    "insights": [
+      "多 Agent 分工（架构、编码、审查、安全）比单个 Agent 从头干到尾更能控制上下文混乱。",
+      "Skills 不只是做加法：定期卸载低频技能可降低上下文开销、提升执行效率。",
+      "把安装配置本身委托给 Agent（用提示词让它读文档自装）是一种可复用的自动化范式。"
+    ],
+    "verdict": "通篇感叹号式吹捧加视频引流，效果无任何可验证数据，核心信息仅有项目名和一句安装提示词，直接看仓库文档即可。",
+    "url": "https://x.com/goan999999/status/2113490736327123197",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/%E5%90%B9%E7%88%86ECC%EF%BC%9A%E7%BB%99Codex%E8%A3%8571%E4%B8%AAAgent-123197.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-10",
+    "title": "Codex 搭配 Context7 提效 20 倍",
+    "clippedAt": "2026-10-24 13:43",
+    "publishedAt": "2026-10-22",
+    "priority": "中",
+    "keywords": [
+      "Codex",
+      "Context7",
+      "MCP",
+      "AI 编程",
+      "文档检索"
+    ],
+    "summary": "帖子推荐给 Codex 安装开源工具 Context7，在写 React、Next.js、Supabase 等代码时自动把对应版本的最新文档和示例放进上下文，减少查资料时间和 API、参数写错导致的返工。作者给出四步使用要点，并附一段可直接复制给 Codex 的提示词，让 Codex 自己读 upstash/context7 文档、完成 MCP 或 CLI+Skills 配置并验证。但「效率提高 20 倍」这一结论仅为作者宣称，未给出任何数据或对比依据；引用部分另推 Claude-Mem 记忆插件。整体属于工具推荐帖，含可操作步骤，但夸大成分明显。",
+    "insights": [
+      "让 AI 先查对应版本文档再写代码，比生成完再报错返工更省时间",
+      "把安装配置本身写成提示词交给 AI 执行，是降低工具上手成本的可迁移套路",
+      "「提效 20 倍」缺乏任何实测数据，属于典型的推广话术，需自行验证"
+    ],
+    "verdict": "提供了可直接复制的安装提示词和明确适用场景，有操作价值，但核心收益数字无依据，需自行验证后再决定是否投入时间。",
+    "url": "https://x.com/goan999999/status/2113208152917258677",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/Codex_%E6%90%AD%E9%85%8D_Context7_%E6%8F%90%E6%95%88_20_%E5%80%8D-258677.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-10",
     "title": "27 章讲透抗体下游工艺，这本书值得翻烂",
     "clippedAt": "2026-10-22 06:49",
     "publishedAt": "2026-10-17",
