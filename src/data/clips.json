@@ -2,6 +2,84 @@
   {
     "source": "weixin",
     "month": "2026-10",
+    "title": "如何理解质谱分析氨基酸突变(sva)的列表库？",
+    "clippedAt": "2026-10-26 07:59",
+    "publishedAt": "2026-10-26",
+    "priority": "高",
+    "keywords": [
+      "序列变异体SV",
+      "氨基酸突变列表",
+      "单核苷酸替换",
+      "肽图质谱",
+      "抗体质量控制",
+      "Byos"
+    ],
+    "summary": "文章围绕质谱肽图分析抗体序列变异体（SV/SVA）时应选用哪套氨基酸突变列表展开。作者指出，Thermo BPF中的Single Base Change选项对应单核苷酸替换原则：20种氨基酸两两替换共190对，其中仅75对可由单碱基突变产生；若按有向计为150种，再合并Ile/Leu后约为142-143种。这也是Byos软件和中检院于传飞团队分析51种商业化抗体时采用的标准。文章引用2006年以血红蛋白为模型蛋白的FT-ICR MS研究，说明精确质量测量（小数点后三位）可区分53对特异性质量变化，而名义质量只能区分25对。核心数据是：51种上市抗体共鉴定3006个SV事件，92.5%的位点≤0.1%，仅2.4%超0.2%，据此提出0.2%可作为商业化抗体SV质控的实用基准。",
+    "insights": [
+      "190对氨基酸替换中只有75对能由单核苷酸替换产生，因此抗体SV分析普遍采用142-143种的精简列表，这一做法已被中检院大规模研究采用，可放心沿用。",
+      "名义质量只能区分25对替换，必须精确到小数点后第三位（最小差值仅0.0364 Da，如Lys/Gln）才能覆盖53对具有特异性质量变化的替换。",
+      "51种上市抗体3006个SV事件显示92.5%的位点≤0.1%、仅2.4%超0.2%，0.2%可当作工艺能力与质控阈值的实证基准。",
+      "抗体分析理论上应包含从Ile出发的9种替换（共148种），合并Ile/Leu为Xle后应为143种，Byos表却只有142种，疑为漏计Glu-Gln，提示使用现成列表时要自行核对。"
+    ],
+    "verdict": "面向做抗体肽图SV分析的实际操作者，给出了列表选择的推导逻辑、质量分辨率要求和大规模实证阈值，信息密度高且可直接照搬。",
+    "url": "https://mp.weixin.qq.com/s/NoqH_gUgVw_4JxWZiOz5nA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-10/%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E8%B4%A8%E8%B0%B1%E5%88%86%E6%9E%90%E6%B0%A8%E5%9F%BA%E9%85%B8%E7%AA%81%E5%8F%98%28sva%29%E7%9A%84%E5%88%97%E8%A1%A8%E5%BA%93%EF%BC%9F-NoqH_g.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-10",
+    "title": "几千人催我的 Codex +Obsidian 公众号创作工作流，开源了！",
+    "clippedAt": "2026-10-26 07:04",
+    "publishedAt": "2026-08-05",
+    "priority": "低",
+    "keywords": [
+      "Obsidian",
+      "Codex",
+      "公众号排版",
+      "AI 创作工作流",
+      "WeSight 插件",
+      "积分付费"
+    ],
+    "summary": "作者苍何介绍自己基于 Obsidian 插件 WeSight 与 Codex 的公众号创作工作流，并正式开源发布。核心思路是把标题、封面、排版、配图这些重复劳动交给 Agent：在 Obsidian 右侧 Chat 面板直接让 Codex 润色、插入句子、按文章上下文生成标题与封面（依托 GPT Image-2），右侧实时预览公众号排版，确认后一键同步到公众号后台草稿，还能一键分享到飞书或 WeSight 供他人带排版评论。发布后可在插件内查看阅读数据。插件本身开源、多数功能免费，同步、分享、数据分析等依赖服务器的功能按积分收费，新用户送 30 积分。",
+    "insights": [
+      "把写作留在人手里、把排版封面标题交给 Agent，是比全自动生成更现实的协作形态。",
+      "Obsidian 的本地 Markdown 库可当作 Agent 的长期知识库，让标题、文案生成带上下文而非凭空发挥。",
+      "所见即所得的编辑器内嵌 Chat + 实时排版预览，比 CLI 或独立 App 更贴合图文创作者的改稿习惯。",
+      "开源插件 + 服务器功能积分收费，是个人开发者把创作方法论产品化的一条常见路径。"
+    ],
+    "verdict": "本质是自家插件 WeSight 的发布推广文，工作流思路有参考价值，但关键能力与收费细节都指向产品转化，信息增量有限。",
+    "url": "https://x.com/canghe/status/2084949218314105068",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/%E5%87%A0%E5%8D%83%E4%BA%BA%E5%82%AC%E6%88%91%E7%9A%84_Codex_%2BObsidian_%E5%85%AC%E4%BC%97%E5%8F%B7%E5%88%9B%E4%BD%9C%E5%B7%A5%E4%BD%9C%E6%B5%81%EF%BC%8C%E5%BC%80%E6%BA%90%E4%BA%86%EF%BC%81-105068.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-10",
+    "title": "入职大厂两个月，我的 AI 开发心得",
+    "clippedAt": "2026-10-26 05:43",
+    "publishedAt": "2026-10-09",
+    "priority": "高",
+    "keywords": [
+      "AI Coding",
+      "Agent 工作流",
+      "Prompt Engineering",
+      "端到端测试",
+      "Code Review",
+      "Harness Engineering"
+    ],
+    "summary": "作者结合入职大厂两个月的 Agent 开发实践，分享如何用 Codex、Astra、Claude 等工具和轻量 Skill/Prompt 提升开发效率。核心做法是少写重型流程，改用第一性原理、对抗性审查、消融实验、奥卡姆剃刀、高内聚低耦合等“思维快捷键”；工作流上先对齐需求并沉淀 Spec/Context，再拆分 Issue 并行实现，并用 Agent 友好的端到端测试和聚焦高风险的 Review 保底。结论是开发瓶颈已转向人的审查速度，Harness 需要同时提供上下文、执行环境和判断依据，工作流也要随模型迭代做减法。",
+    "insights": [
+      "模型变强后，重型 Skill 和工作流可能变成噪声，应定期删减约束：简单任务直接做，复杂任务再加规划、拆分和交叉审查。",
+      "用第一性原理、对抗性审查、消融实验、奥卡姆剃刀、高内聚低耦合等成熟方法论作短 Prompt，比手写长流程更能指定模型的思考方式。",
+      "Agent 友好的端到端环境——一键启动、真实业务操作、只读 DB/日志、CLI 与 Skill 复用——是让 AI 代码可交付的关键基础设施。",
+      "AI 开发真正的瓶颈是人的理解、判断和 Review 速度，而非代码生成速度；Review 应聚焦验收标准、业务路径和高风险机制。"
+    ],
+    "verdict": "信息密度高，给出可直接复用的 Prompt、工作流、端到端测试与 Review 方法，并对 Harness 和工作流“做减法”有独到判断，值得精读。",
+    "url": "https://x.com/huangtongxueh/status/2108577165306687938",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/%E5%85%A5%E8%81%8C%E5%A4%A7%E5%8E%82%E4%B8%A4%E4%B8%AA%E6%9C%88%EF%BC%8C%E6%88%91%E7%9A%84_AI_%E5%BC%80%E5%8F%91%E5%BF%83%E5%BE%97-687938.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-10",
     "title": "让 Zotero 里的每一条标注，自动流进 Obsidian",
     "clippedAt": "2026-10-24 20:24",
     "publishedAt": "2026-09-22",
