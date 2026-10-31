@@ -1,5 +1,52 @@
 [
   {
+    "source": "x",
+    "month": "2026-10",
+    "title": "RackNerd 免费送一年 VPS 活动",
+    "clippedAt": "2026-10-30 21:52",
+    "publishedAt": "2026-10-25",
+    "priority": "低",
+    "keywords": [
+      "RackNerd",
+      "免费 VPS",
+      "LowEndTalk",
+      "羊毛",
+      "AdminBolt"
+    ],
+    "summary": "帖子称 RackNerd 在 LowEndTalk 论坛免费送出一年 VPS：3 核 4G 内存、60GB SSD、每月 7TB 流量、1Gbps 端口带独立 IPv4，无需绑定信用卡、不强制续费。首批 100 台送完后追加 50 台，完成体验反馈还可抽 30 份 AdminBolt 终身授权，参与方式是注册论坛账号并按活动帖规则申请。",
+    "insights": [
+      "VPS 厂商用限量免费名额在 LowEndTalk 引流，本质是低成本获客与口碑营销",
+      "参与门槛是论坛账号与批次规则，需盯帖抢名额，时间成本不低",
+      "免费额度不含续费义务，适合短期测试用途而非长期承载业务"
+    ],
+    "verdict": "属于典型的限时羊毛/推广信息，没有技术观点或方法论，价值仅在活动链接本身，需要时直接去看活动帖即可。",
+    "url": "https://x.com/hodu382759/status/2114254423241445885",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/RackNerd_%E5%85%8D%E8%B4%B9%E9%80%81%E4%B8%80%E5%B9%B4_VPS_%E6%B4%BB%E5%8A%A8-445885.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-10",
+    "title": "baoyu-design v2 开源发布",
+    "clippedAt": "2026-10-30 18:50",
+    "publishedAt": "2026-10-29",
+    "priority": "中",
+    "keywords": [
+      "baoyu-design",
+      "开源项目",
+      "Claude Artifacts",
+      "Agent",
+      "模型无关"
+    ],
+    "summary": "作者发布 baoyu-design v2，称已将 Claude Design、Claude Slides 和 Claude Dashboard 完整移植，体验与原版几乎一致，仅缺评论功能。项目可运行在任何 Agent、任何模型上，不再依赖 Claude Artifacts，并已完全开源，附 GitHub 地址和演示视频。",
+    "insights": [
+      "把 Claude 的产物功能从 Artifacts 依赖中解耦，可迁移到任意 Agent 和模型。",
+      "以开源复刻方式补齐评论之外的完整功能，降低使用门槛。"
+    ],
+    "verdict": "属于开源项目发布通告，信息量有限，但对需要模型无关设计/幻灯片/仪表盘生成能力的人有直接参考价值。",
+    "url": "https://x.com/dotey/status/2115667965328977920",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/baoyu-design_v2_%E5%BC%80%E6%BA%90%E5%8F%91%E5%B8%83-977920.md"
+  },
+  {
     "source": "weixin",
     "month": "2026-10",
     "title": "生物类似药开发中多属性方法(MAM)的分子归属与检测方法替换可行性",
