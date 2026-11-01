@@ -1,5 +1,109 @@
 [
   {
+    "source": "weixin",
+    "month": "2026-10",
+    "title": "CHO细胞系开发六十年的技术演进历程",
+    "clippedAt": "2026-10-31 20:00",
+    "publishedAt": "2026-10-31",
+    "priority": "高",
+    "keywords": [
+      "CHO细胞系开发",
+      "DHFR/MTX",
+      "GS/MSX",
+      "单克隆源性",
+      "CRISPR",
+      "AI/ML"
+    ],
+    "summary": "文章按年代系统梳理CHO细胞系开发六十年：从1950—60年代Puck建立CHO及CHO-K1，到70—80年代DHFR/MTX与GS/MSX筛选扩增系统及首个重组生物药阿替普酶；90年代无血清培养基、流加补料与非病毒转染；2000年代无动物成分工艺、载体设计、FACS单细胞铺板与滴度提升；2010年代基因组测序、单克隆源性监管、miRNA与CRISPR编辑；2020年代转座酶/靶向整合、NGS、合成生物学、自动化与AI/ML。结论是CHO的主导地位由多轮技术叠加和监管推动形成，滴度从100—500 mg/L升至超10 g/L，未来走向预测性、设计驱动的CLD。",
+    "insights": [
+      "CHO的主导地位不是单点突破，而是生物学特性、基因扩增、培养基与工艺、克隆筛选和基因组编辑多轮技术叠加的结果。",
+      "监管要求尤其是单克隆源性直接证据和无动物成分，并非被动合规，而是重塑CLD流程和推动仪器创新的关键外部力量。",
+      "滴度从1990年代100—500 mg/L提升到2025年先进细胞系超10 g/L，说明培养基、工艺、载体与细胞工程的协同优化比单一宿主改造更关键。",
+      "当前瓶颈正从表达量转向复杂分子折叠分泌和开发周期压缩，AI/ML与合成基因组学被视为下一阶段突破方向。"
+    ],
+    "verdict": "系统梳理六十年技术脉络、关键宿主系与工艺节点，信息密度高，适合生物制药和细胞株开发读者精读。",
+    "url": "https://mp.weixin.qq.com/s/dY0y5QIVwMQJOAU-gAgW1g?from=timeline&scene=2&subscene=1&sessionid=1793429690&clicktime=1793447956&enterid=1793447956",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-10/CHO%E7%BB%86%E8%83%9E%E7%B3%BB%E5%BC%80%E5%8F%91%E5%85%AD%E5%8D%81%E5%B9%B4%E7%9A%84%E6%8A%80%E6%9C%AF%E6%BC%94%E8%BF%9B%E5%8E%86%E7%A8%8B-dY0y5Q.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-10",
+    "title": "QbD 框架下单抗关键质量属性 CQA 如何判定",
+    "clippedAt": "2026-10-31 14:56",
+    "publishedAt": "2026-10-31",
+    "priority": "高",
+    "keywords": [
+      "CQA",
+      "QbD",
+      "RRF 风险排序过滤",
+      "QTPP",
+      "单克隆抗体",
+      "产品变体"
+    ],
+    "summary": "文章解读 Roche/Genentech 发表于 Biologicals 的经典文献，系统拆解单抗关键质量属性（CQA）的识别流程。作者先厘清 QbD 与“质量源于检验”的区别，强调 CQA 只评估属性对患者安全有效性的潜在影响，不掺入工艺可行性。方法上以 QTPP 为源头，汇总强制 CQA、产品变体、工艺杂质等得到 pCQA 清单，再用 RRF 风险排序过滤模型打分：风险分数=影响（生物活性、PK/PD、免疫原性、安全性四维度，2–20 分）×不确定性（1–7 分），任一维度>13 即判为 CQA，Impact=12 且 Uncertainty=1 也判 CQA；无数据默认给 16 分倒逼补研究。文中以去岩藻糖、CDR 糖基化、C 端赖氨酸、游离巯基四个实例说明判定逻辑，并提醒结论具分子特异性，最后讨论低丰度变体富集难、体内数据缺乏等局限。",
+    "insights": [
+      "CQA 判定只看对患者安全与有效性的潜在影响，工艺能否实现属于控制策略环节，混入打分是 QbD 实施的常见误区。",
+      "RRF 用“影响×不确定性”量化风险，缺乏数据时默认给高影响分（16 分），用评分机制倒逼补做研究而非默认无风险。",
+      "同样是氧化修饰，双链全氧化（homo）显著影响 PK，单链氧化（hetero）几乎无影响，关键性判定必须区分修饰分布。",
+      "结论具分子特异性：C 端赖氨酸在静脉给药下可判非 CQA，但换成皮下给药因体内代谢数据不足需重新评估。"
+    ],
+    "verdict": "给出了可直接套用的 CQA 评估操作框架（评分维度、阈值、变体富集要求）与四个判例，信息密度高、方法可迁移，适合生物药 CMC 从业者精读。",
+    "url": "https://mp.weixin.qq.com/s/rR_9ti9gDv8vueFbTHuPEg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-10/QbD_%E6%A1%86%E6%9E%B6%E4%B8%8B%E5%8D%95%E6%8A%97%E5%85%B3%E9%94%AE%E8%B4%A8%E9%87%8F%E5%B1%9E%E6%80%A7_CQA_%E5%A6%82%E4%BD%95%E5%88%A4%E5%AE%9A-rR_9ti.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-10",
+    "title": "我一行命令都没敲：让 AI 帮我配好 Claude 住宅 IP 链式代理，快一个月没封，每月不到 15 美元",
+    "clippedAt": "2026-10-31 10:50",
+    "publishedAt": "2026-10-18",
+    "priority": "高",
+    "keywords": [
+      "链式代理",
+      "住宅 IP",
+      "Claude 封号",
+      "Clash Verge",
+      "AI 代运维",
+      "流量分流"
+    ],
+    "summary": "作者分享一套用了近一个月未被封的 Claude 方案：本机 Clash Verge → DMIT（VLESS+Reality）→ Webshare 美国静态住宅 IP → Claude，构成链式代理，让 Anthropic 只看到固定家庭宽带出口；ChatGPT、Grok 和支付走 DMIT 机房出口，YouTube、X 等大流量走便宜的 RackNerd（Hysteria2 + WARP）。全文不贴任何命令，只给每一步的目标、原理、给 AI 的提示词和验收标准，主张“怎么做”交给能登服务器的 AI 编程助手，“做成什么样、为什么、怎么验收”由人决定。验收靠分流测试网站和 Clash 日志核对出口 IP；日常盯 DMIT 流量、住宅 IP 风险分，坚持一 IP 一号。Claude 链路每月不到 15 美元，全套约 17 美元，作者强调只能降低风控概率，不是免封保证。",
+    "insights": [
+      "Claude 风控的关键不在节点数量，而在出口是否被标为机房 IP：一个长期不变的美国静态住宅 IP，比频繁更换更安全。",
+      "教程的形式变了：只讲架构、原理和验收标准，把执行交给能登上服务器的 AI，人就只需判断对不对，避免手敲命令行出错。",
+      "分流是成本控制核心——贵线路只跑 Claude、支付这类小而关键的业务，大流量交给便宜机器；作者 20 天就跑掉 837GB 双向流量。",
+      "最危险的错误都是静默的：dialer-proxy 名字差一个字符、UDP 端口没放行，配置看似成功但不生效，必须用实际出口 IP 验收。"
+    ],
+    "verdict": "不抄命令，讲清架构、原理和验收方法，可以直接迁移到别的自建链路场景，信息密度和可操作性都高于常见教程。",
+    "url": "https://x.com/huhaoai/status/2111693743401406839",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/%E6%88%91%E4%B8%80%E8%A1%8C%E5%91%BD%E4%BB%A4%E9%83%BD%E6%B2%A1%E6%95%B2%EF%BC%9A%E8%AE%A9_AI_%E5%B8%AE%E6%88%91%E9%85%8D%E5%A5%BD_Claude_%E4%BD%8F%E5%AE%85_IP_%E9%93%BE%E5%BC%8F%E4%BB%A3%E7%90%86%EF%BC%8C%E5%BF%AB%E4%B8%80%E4%B8%AA%E6%9C%88%E6%B2%A1%E5%B0%81%EF%BC%8C%E6%AF%8F%E6%9C%88%E4%B8%8D%E5%88%B0_15_%E7%BE%8E%E5%85%83-406839.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-10",
+    "title": "RackNerd + 3x-ui 从零基础小白到完整自建Hysteria2节点保姆级教程",
+    "clippedAt": "2026-10-31 10:39",
+    "publishedAt": "2026-04-04",
+    "priority": "中",
+    "keywords": [
+      "自建节点",
+      "RackNerd",
+      "3x-ui",
+      "Hysteria2",
+      "VLESS Reality",
+      "VPS 教程"
+    ],
+    "summary": "文章面向零基础用户，介绍用低价 RackNerd VPS（约99元/年）配合 3x-ui 面板自建代理节点的完整流程。先科普 IP、VPS、机场与自建的区别，以及 VLESS、Reality、Hysteria2 三种协议定位；再分三阶段给出任务：购买 VPS 并 SSH 登录、安装 3x-ui 并创建 VLESS+Reality 入站（用 microsoft.com 做 SNI 伪装）、用一键脚本加装 Hysteria2 解决速度与弱网问题；末尾附多用户管理、个人小机场等进阶任务、实践清单、踩坑排查与 FAQ。作者主张自建比买机场更稳、成本透明、IP 自主可控。关键命令均以截图呈现，具体参数需照图操作，文内含 VPS 推广链接。",
+    "insights": [
+      "作者的核心论据是「稳定性」：机场晚高峰易超时，自建可掌控 IP 与流量、随时换 IP 升级协议。",
+      "方案采用双协议互补：VLESS+Reality 主打通用稳妥与流量伪装，Hysteria2 主打抗弱网和高速，卡顿时再切换。",
+      "真正有价值的不是教程步骤本身，而是后面的排雷清单（IP 被墙、面板端口、SNI 与密码不一致、开启 BBR 等）可直接用于故障定位。",
+      "成本对比思路可迁移：年付低价 VPS 加开源面板，把订阅制的开销换成一次性学习成本。"
+    ],
+    "verdict": "结构清晰、有任务清单和排雷表可作参考，但关键命令全在截图里、参数描述含糊，且带明显的 VPS 推广链接，实操时仍需查证官方文档。",
+    "url": "https://x.com/onehopeA9/status/2040335226250084437",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-10/RackNerd_%2B_3x-ui_%E4%BB%8E%E9%9B%B6%E5%9F%BA%E7%A1%80%E5%B0%8F%E7%99%BD%E5%88%B0%E5%AE%8C%E6%95%B4%E8%87%AA%E5%BB%BAHysteria2%E8%8A%82%E7%82%B9%E4%BF%9D%E5%A7%86%E7%BA%A7%E6%95%99%E7%A8%8B-084437.md"
+  },
+  {
     "source": "x",
     "month": "2026-10",
     "title": "RackNerd 免费送一年 VPS 活动",
