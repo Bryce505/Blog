@@ -2,6 +2,56 @@
   {
     "source": "x",
     "month": "2026-11",
+    "title": "搭建“纯净度100%”的海外静态住宅IP保姆级教程！",
+    "clippedAt": "2026-11-03 08:25",
+    "publishedAt": "2026-05-11",
+    "priority": "低",
+    "keywords": [
+      "静态住宅IP",
+      "机场订阅",
+      "Socks5代理",
+      "账号防封",
+      "Clash Verge"
+    ],
+    "summary": "作者凯迪针对发帖没流量、注册即封号的问题，认为根源在IP环境，推荐用「机场订阅+静态住宅IP」两级代理方案。文中给出Windows端Clash Verge配合v2rayN、iOS端Shadowrocket的具体配置步骤：先导入机场节点，再添加Socks5住宅IP，最后开TUN模式或全局路由。整体是操作流水线，关键信息（IP服务商选择标准、独享、Socks5协议、地区）夹在大量推广链接中。",
+    "insights": [
+      "账号被封常被归因于内容或操作，但作者认为IP环境（机房IP、共享IP）才是更隐蔽的触发点。",
+      "用「机场节点+住宅IP」两级代理，可以兼顾线路稳定与出口IP纯净。",
+      "选住宅IP要看三点：独享、静态、Socks5协议，便宜共享IP反而浪费钱。"
+    ],
+    "verdict": "核心操作只是通用的代理软件配置，且全文穿插多个带返利码的推广链接，属于带教程外壳的affiliate软文，信息增量有限。",
+    "url": "https://x.com/kaidkeji/status/2053774025915326486",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%E6%90%AD%E5%BB%BA%E2%80%9C%E7%BA%AF%E5%87%80%E5%BA%A6100%25%E2%80%9D%E7%9A%84%E6%B5%B7%E5%A4%96%E9%9D%99%E6%80%81%E4%BD%8F%E5%AE%85IP%E4%BF%9D%E5%A7%86%E7%BA%A7%E6%95%99%E7%A8%8B%EF%BC%81-326486.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "沈药 & 中检院 - 生物制剂中聚山梨酯的金属催化降解：机制、分析方法与缓解策略",
+    "clippedAt": "2026-11-02 14:21",
+    "publishedAt": "2026-11-02",
+    "priority": "高",
+    "keywords": [
+      "聚山梨酯",
+      "金属催化氧化",
+      "生物制剂",
+      "Fenton反应",
+      "ICP-MS",
+      "缓解策略"
+    ],
+    "summary": "文章系统综述生物制剂中聚山梨酯（PS20/PS80）的金属催化降解问题：从结构异质性和水解、酶解、氧化三条降解途径出发，解析Fe/Cu等经Fenton与Haber–Weiss反应引发的自催化氧化级联，梳理原材料、不锈钢设备、玻璃与预灌封注射器钨残留等金属污染来源，并比较ICP-MS、UHPLC-CAD-MS、LC-MS/MS等分析工具。结论指出该问题是跨化学、材料、过程与分析的体系性问题，需以螯合剂、牺牲性抗氧化剂、工艺包装优化和替代表面活性剂组成多屏障策略，并强调将风险评估前移至QbD框架。",
+    "insights": [
+      "微量ppb级Fe/Cu即可通过Fenton/Haber–Weiss循环自我放大，引发聚山梨酯氧化并进一步造成蛋白氧化、构象失稳和颗粒形成。",
+      "PS20与PS80降解谱不同：PS20更易酶促水解，PS80更易氧化，制剂设计需结合HCP清除谱选择表面活性剂。",
+      "金属来源贯穿原材料、不锈钢泵阀、玻璃内包材和预灌封注射器钨残留，药典重金属限度不等于催化安全阈值。",
+      "有效控制不能靠单一措施，需螯合剂、游离Met、低过氧化物原料、惰性接触面/低钨包装和替代表面活性剂的多屏障组合。"
+    ],
+    "verdict": "综述信息密度高，机制、污染源、分析方法和缓解策略链条完整，对生物制剂处方与质量风险控制有直接参考价值。",
+    "url": "https://mp.weixin.qq.com/s/mJXPsrQNUcaEKy_WXl5JzA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E6%B2%88%E8%8D%AF_%26_%E4%B8%AD%E6%A3%80%E9%99%A2_-_%E7%94%9F%E7%89%A9%E5%88%B6%E5%89%82%E4%B8%AD%E8%81%9A%E5%B1%B1%E6%A2%A8%E9%85%AF%E7%9A%84%E9%87%91%E5%B1%9E%E5%82%AC%E5%8C%96%E9%99%8D%E8%A7%A3%EF%BC%9A%E6%9C%BA%E5%88%B6%E3%80%81%E5%88%86%E6%9E%90%E6%96%B9%E6%B3%95%E4%B8%8E%E7%BC%93%E8%A7%A3%E7%AD%96%E7%95%A5-mJXPsr.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
     "title": "为了用上 Claude，这是我所做的（干巴版）",
     "clippedAt": "2026-11-02 05:53",
     "publishedAt": "2026-06-04",
