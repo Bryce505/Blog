@@ -1,5 +1,109 @@
 [
   {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "10月科研自动化工具排行榜 Top 10",
+    "clippedAt": "2026-11-06 08:10",
+    "publishedAt": "2026-10-29",
+    "priority": "低",
+    "keywords": [
+      "科研自动化",
+      "智能体",
+      "GitHub Star 排行",
+      "文献调研",
+      "实验迭代",
+      "工具盘点"
+    ],
+    "summary": "文章按 GitHub Star 数排列出十个科研自动化开源项目，数据截至2026年10月28日。榜首 deer-flow（84.5k）是字节的多智能体工作流，支持搜索、代码、文件处理与沙箱记忆扩展；第二名 gpt-researcher（30.3k）围绕问题检索网络或本地资料并生成带来源报告；第三名微软 RD-Agent（15.1k）面向研发场景做方案提出、写代码与实验反馈迭代。其余包括覆盖科研全流程的 AutoResearchClaw、深度研究智能体 MiroThinker、按指标反复改代码做实验的 pi-autoresearch、生成科研图示的 PaperBanana、本地优先的 open-science、多智能体助手 EvoScientist 与 openscience。每个项目仅给出一句定位描述，无对比评测与使用体验。文末以「扫码免费领取 skill 及压缩包」收尾。",
+    "insights": [
+      "头部项目 star 数差距悬殊（84.5k 对 30.3k），反映科研智能体工作流类项目更受关注，而非单点工具。",
+      "十个项目大致分为四类：资料检索与报告生成、实验与代码迭代、图示绘制、本地一体化工作台，选型应先明确自己要补哪一环。",
+      "pi-autoresearch 的「保留有效改进、撤回无效尝试」是可迁移的自动化优化范式，前提是有明确评价指标和自动评测条件。",
+      "榜单仅以 star 数排序，star 高不等于好用，且文末引流领取压缩包，实质接近软文导流。"
+    ],
+    "verdict": "只是按 star 数罗列项目并各配一句简介，没有评测、对比或实操细节，且结尾带扫码引流，信息增量有限。",
+    "url": "https://mp.weixin.qq.com/s/q8EvMk_iBLK9_yDh-9zqOg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/10%E6%9C%88%E7%A7%91%E7%A0%94%E8%87%AA%E5%8A%A8%E5%8C%96%E5%B7%A5%E5%85%B7%E6%8E%92%E8%A1%8C%E6%A6%9C_Top_10-q8EvMk.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "860.TCEP凭什么替代DTT？拆解二硫键还原的底层逻辑和实操方案",
+    "clippedAt": "2026-11-06 06:41",
+    "publishedAt": "2026-10-26",
+    "priority": "高",
+    "keywords": [
+      "TCEP",
+      "DTT",
+      "二硫键还原",
+      "马来酰亚胺标记",
+      "固相还原",
+      "蛋白/多肽样品前处理"
+    ],
+    "summary": "文章从反应机理入手比较TCEP与DTT：DTT依赖pKa约9.2的巯基形成硫醇盐，经可逆的巯基交换还原二硫键，中性pH下活性偏低；TCEP是三价膦，通过SN2亲核进攻形成磷硫中间体，不可逆地打开二硫键并释放两个游离巯基。由此推导出TCEP的实际边界：pH 3–8.5高效，pH 1.5–2仅适合降速或大幅过量场景；对马来酰亚胺并非完全惰性，≤1 mM可直接标记，>5 mM建议脱盐或加大标记试剂投料。文中给出标准流程（0.5 M储备液、终浓度5–10 mM、室温30–60分钟、磷酸盐缓冲须现配现加、碘乙酰胺20 mM避光15分钟封端），并说明Fab选择性还原可用固相TCEP，常规浓度下对Ni-IMAC兼容性优于DTT。同时提示磷酸盐中易氧化失活、避光防冻融、高温长时间可能致脱硫脱硒等风险，最后给出TCEP与DTT的选择判断清单。",
+    "insights": [
+      "TCEP与DTT的核心差异在机理而非还原能力：前者不可逆SN2进攻、产物稳定，后者依赖低占比硫醇盐的可逆交换，因此pH敏感性差别很大。",
+      "TCEP对马来酰亚胺并非惰性，高浓度长时间会生成加合物消耗标记试剂，实操应以1 mM与5 mM为分界决定是否脱盐。",
+      "磷酸盐缓冲（尤其PBS）中TCEP氧化极快，0.35 M PBS pH 7.0下72小时几乎完全失效，必须现配现加而非预混入缓冲液。",
+      "需要单点断键时，把TCEP偶联到琼脂糖微球上做固相还原，可利用空间位阻只还原溶剂暴露的链间二硫键，是Fab制备的关键技巧。"
+    ],
+    "verdict": "机理解释与浓度/pH边界、标准操作、常见坑和选型清单齐备，信息密度高且可直接照做，属于可操作的方法型干货。",
+    "url": "https://mp.weixin.qq.com/s/e-s02tl2_1vBa4cI_5VORQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/860.TCEP%E5%87%AD%E4%BB%80%E4%B9%88%E6%9B%BF%E4%BB%A3DTT%EF%BC%9F%E6%8B%86%E8%A7%A3%E4%BA%8C%E7%A1%AB%E9%94%AE%E8%BF%98%E5%8E%9F%E7%9A%84%E5%BA%95%E5%B1%82%E9%80%BB%E8%BE%91%E5%92%8C%E5%AE%9E%E6%93%8D%E6%96%B9%E6%A1%88-e-s02t.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "CE-SDS碎片鉴定：5个案例分析及通用策略总结",
+    "clippedAt": "2026-11-06 06:38",
+    "publishedAt": "2026-11-02",
+    "priority": "中",
+    "keywords": [
+      "CE-SDS",
+      "碎片鉴定",
+      "单克隆抗体",
+      "二硫键/硫醚键",
+      "SEC-MS",
+      "RP-MS"
+    ],
+    "summary": "文章介绍复宏汉霖2024年发表于《Electrophoresis》的CE-SDS碎片峰鉴定工作流，并解析5个由易到难的单抗/双抗案例：二硫键相关片段用部分还原标准品比对；硫醚键结合非还原与MS鉴定；糖基化变异体用Native/变性脱糖对比；HC断裂先用MW线性拟合定位区域，再用SEC-MS或RP-MS确定位点；复杂GS linker断裂则结合IdeS酶切与RP-MS。结论是可按四条路径组合完成CE-SDS碎片鉴定，适用于早期研发、工艺开发及BLA表征。文末含泳拓生物产品推广。",
+    "insights": [
+      "CE-SDS碎片鉴定可拆成四条路径：部分还原标品比对、脱糖对比、MW线性拟合定位区域、SEC-MS/RP-MS精确定位，按样品特性组合使用。",
+      "二硫键或硫醚键相关片段可通过优化部分还原条件制备LC、HL、HH等标准品，以迁移时间比对快速归属。",
+      "糖基化相关NGHC需区分变性与天然去糖条件，利用Fab域糖基暴露差异判断双糖基化HC片段。",
+      "对未知断裂，先通过线性拟合估计MW并判断是否含链间二硫键以缩小区域，再用正交MS确认位点，可减少盲目摸索。"
+    ],
+    "verdict": "技术工作流和案例细节较实用，但核心内容来自已发表论文且文末为厂商产品推广，适合按需查阅而非精读。",
+    "url": "https://mp.weixin.qq.com/s/D3HJnIuQVtUpw7Vb2TU9Bg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/CE-SDS%E7%A2%8E%E7%89%87%E9%89%B4%E5%AE%9A%EF%BC%9A5%E4%B8%AA%E6%A1%88%E4%BE%8B%E5%88%86%E6%9E%90%E5%8F%8A%E9%80%9A%E7%94%A8%E7%AD%96%E7%95%A5%E6%80%BB%E7%BB%93-D3HJnI.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "Claude Pro 保姆级订阅教程 ｜ 性价比版",
+    "clippedAt": "2026-11-05 11:59",
+    "publishedAt": "2026-11-04",
+    "priority": "高",
+    "keywords": [
+      "Claude Pro订阅",
+      "自建Hy2节点",
+      "美区Apple账号",
+      "礼品卡充值",
+      "Claude Code",
+      "DNS泄露"
+    ],
+    "summary": "作者分享一套低成本长期持有 Claude Pro 的方案，分四步：先买 RackNerd 年付 10～20 美元的 VPS，把服务器信息交给 Codex，让它通过 SSH 搭好 Hysteria 2 节点，并直接产出可导入的 hy2.yaml；再注册美区 Apple 账号，在 iPhone 上用 Karing 导入节点、下载官方 Claude 应用并用 Apple 登录，账号每天正常使用几句话，放置几天；然后用支付宝把城市切到旧金山，在 Pockyt Shop 买美区 Apple 礼品卡充值，再在 Claude 应用内订阅 Pro（约 20 美元/月）；最后在电脑上让 Codex 排查 DNS 泄露、把时区改为出口 IP 所在地、用 Apple 中转邮箱登录 Claude Code。作者称已稳定使用两个月，并主张与其高价买住宅 IP，不如自建独享并保持出口稳定。",
+    "insights": [
+      "所谓“IP 纯净度”的实际含义是少与陌生人共享；自建独享、出口固定比追求住宅 IP 更划算，也更可控。",
+      "把搭建节点、排查 DNS、设置时区等运维工作交给 Codex，用带占位符的结构化提示词直接产出可导入配置，是这套流程效率的核心。",
+      "订阅整体拆成网络、账号、支付、日常使用四段，每段可独立替换；未来可通过“自建 Hy2 前段 + 住宅代理出口”升级，无需推倒重来。",
+      "账号先放置几天再付款、登录时填 Apple 中转邮箱但去绑定邮箱收验证码，这类细节是实操中最容易踩坑的地方。"
+    ],
+    "verdict": "步骤完整、命令与提示词可直接复用，属于信息密度高且可操作性强的教程，唯一需自行判断的是支付与网络环境的合规风险。",
+    "url": "https://x.com/xuxingai/status/2117809198637744395",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/Claude_Pro_%E4%BF%9D%E5%A7%86%E7%BA%A7%E8%AE%A2%E9%98%85%E6%95%99%E7%A8%8B_%EF%BD%9C_%E6%80%A7%E4%BB%B7%E6%AF%94%E7%89%88-744395.md"
+  },
+  {
     "source": "x",
     "month": "2026-11",
     "title": "折腾了整整1年，毫无保留地分享一下我这套Agent自动化系统。",
