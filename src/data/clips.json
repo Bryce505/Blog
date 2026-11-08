@@ -1,5 +1,185 @@
 [
   {
+    "source": "x",
+    "month": "2026-11",
+    "title": "克劳德别再被脏 IP 坑：1.5 刀拿美国家宽纯净出口",
+    "clippedAt": "2026-11-08 08:50",
+    "publishedAt": "2026-11-05",
+    "priority": "中",
+    "keywords": [
+      "Claude",
+      "Webshare",
+      "住宅IP",
+      "ASN",
+      "Clash链式代理"
+    ],
+    "summary": "作者JKL分享如何用Webshare静态住宅代理（约1.5美元/月）为Claude配置干净的美国家宽出口，替代市面上10美元档的独享家宽。核心步骤：购买时选Static Residential、Private类型、1条美国IP；在Proxy List中用Replace Proxy按ASN刷IP，优先Chiller-City(20012)、Rcn-As(6079)等小众ASN，避开Comcast、Charter等大热门；用IPQuality脚本配合ping0、ippure等网站检测纯净度；最后通过Clash链式代理（本机→机场中转→Webshare落地）只让Claude等AI域名走家宽。作者强调固定出口比追求全绿更重要。",
+    "insights": [
+      "家宽IP的价值不在省钱，而在抬高「环境看起来正常」的下限，减少Cloudflare验证和风控",
+      "同一运营商不同ASN/C段干净度差异巨大，冷门ASN（如Chiller-City 20012）往往比知名大厂ASN更干净",
+      "应把家宽出口只分配给高价值AI流量，视频下载走普通节点，避免共用把IP用脏",
+      "固定一条略差但稳定的IP，优于频繁更换，频繁切换本身就会触发风控"
+    ],
+    "verdict": "操作步骤具体、ASN选型有实测经验，对需要稳定Claude环境的用户有实用价值，但属工具教程类，且大量细节依赖另一篇原文，信息并不完全自足。",
+    "url": "https://x.com/jklthinking/status/2118168179356922315?a=9Ng7Bhs9feaxAhnqPp0&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%E5%85%8B%E5%8A%B3%E5%BE%B7%E5%88%AB%E5%86%8D%E8%A2%AB%E8%84%8F_IP_%E5%9D%91%EF%BC%9A1.5_%E5%88%80%E6%8B%BF%E7%BE%8E%E5%9B%BD%E5%AE%B6%E5%AE%BD%E7%BA%AF%E5%87%80%E5%87%BA%E5%8F%A3-922315.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "减少 CF 盾和 GPT 降智：用 Webshare 低成本获取家宽 IP",
+    "clippedAt": "2026-11-08 08:47",
+    "publishedAt": "2026-07-05",
+    "priority": "高",
+    "keywords": [
+      "住宅 IP",
+      "Webshare",
+      "Clash 链式代理",
+      "IP 质量检测",
+      "ASN 选择",
+      "风控"
+    ],
+    "summary": "文章针对使用机场或数据中心代理时频繁触发 Cloudflare 验证、ChatGPT 降智与账号风控的问题，给出了一套用 Webshare 静态住宅 IP 的低成本方案。作者依次说明了购买流程（Plans & Pricing → Static Residential → 类型选 Private、数量 1、带宽按量选择，年付约七折）、IP 质量检测（以开源项目 IPQuality 脚本为准，ping0、ippure、iprisk 只做初筛）、以及用 Replace Proxy 更换 IP 的具体操作，并列出各 ASN 的实测口碑：小众的 Chiller-City(20012) 较干净，Rcn-As(6079) 刷到 72.1.x.x 可用，Comcast 与 Charter 因用户多而质量一般。最后给出接入 Clash 的链式代理配置三步：proxy-providers、Dialer 中转节点、在 AI 服务代理组中引用。作者也强调家宽 IP 只能降低触发概率，不能保证绕过风控。",
+    "insights": [
+      "家宽 IP 是概率工具而非解决方案，它只能降低 CF 盾和降智的发生率。",
+      "选 IP 的关键在于选 ASN 而非国家：小众 ASN 因为用的人少反而更干净，主流家宽如 Comcast、Charter 因名声大而 IP 质量被稀释。",
+      "先月付试出干净 IP，再切换年付锁价，套餐余额可折算成积分抵扣，试错成本很低。",
+      "检测要分层：用免费网站做初筛，最终以 IPQuality 脚本的量化结果为准。"
+    ],
+    "verdict": "步骤具体到页面路径与配置项，附有 ASN 实测推荐和检测方法，可直接照做，超出泛泛科普的信息密度。",
+    "url": "https://x.com/yuchenmax/status/2073633036915167623?a=ZuENQiZWeR428t3_35Q&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%E5%87%8F%E5%B0%91_CF_%E7%9B%BE%E5%92%8C_GPT_%E9%99%8D%E6%99%BA%EF%BC%9A%E7%94%A8_Webshare_%E4%BD%8E%E6%88%90%E6%9C%AC%E8%8E%B7%E5%8F%96%E5%AE%B6%E5%AE%BD_IP-167623.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "Obsidian 平替来了：这次连服务器都不要钱",
+    "clippedAt": "2026-11-08 07:35",
+    "publishedAt": "2026-10-26",
+    "priority": "中",
+    "keywords": [
+      "EdgeEver",
+      "Obsidian 替代",
+      "Cloudflare Workers",
+      "MCP",
+      "开源笔记",
+      "自托管"
+    ],
+    "summary": "介绍开源笔记工具 EdgeEver v2.5.0（GitHub 2.7k 星），定位为 Obsidian 与印象笔记的平替。它能整体跑在 Cloudflare 免费额度上：Workers 跑逻辑、D1 存笔记、R2 存附件，个人约可存 15 万条短笔记加 5 万张图、月费 0 元，但需先绑定支付方式。文章给出三条部署路径：把仓库自带 prompt 交给 AI Agent 自动部署、手动六步部署、一条 Docker 命令自托管。核心差异是原生支持 MCP/ACP，AI 可直接读写笔记库，并适配 20 多个平台网页剪藏。作者也列出劝退项：底层是 SQLite 而非纯 Markdown、插件生态薄弱、iOS 国区下载不到，建议先并行使用两周再搬家。",
+    "insights": [
+      "把笔记应用整体跑在 Cloudflare Workers + D1 + R2 的免费额度里，让个人用户的服务器成本归零，代价是必须绑定支付方式并接受约 15 万条笔记的容量上限。",
+      "真正的差异点是原生 MCP/ACP 支持：AI 不需要插件或导入导出就能直接读写笔记库，这是 Obsidian 靠插件生态绕一圈才能达到的能力。",
+      "比“免费”更关键的是数据可迁移：底层用标准 SQLite，支持 ZIP 与 Markdown 无损导出，避免笔记被锁进私有格式。",
+      "fork 数超过星标一半，说明多数人真的把代码拉下来部署了，这种比值可比单纯 star 数更能判断工具的实际采用率。"
+    ],
+    "verdict": "有不俗的实操价值（三条部署路径、现成 prompt、明确的容量与限制说明），但本质是单一工具的推荐文，观点无独创，适合扫一遍摘要后按需再回看部署步骤。",
+    "url": "https://mp.weixin.qq.com/s/4Gk-BmpIyDZ-yhL4HyUkdg",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/Obsidian_%E5%B9%B3%E6%9B%BF%E6%9D%A5%E4%BA%86%EF%BC%9A%E8%BF%99%E6%AC%A1%E8%BF%9E%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%83%BD%E4%B8%8D%E8%A6%81%E9%92%B1-4Gk-Bm.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "让 Claude Code 爆改电视，这个开源项目有点意思！",
+    "clippedAt": "2026-11-07 11:46",
+    "publishedAt": "2026-10-20",
+    "priority": "高",
+    "keywords": [
+      "CleanYourTV",
+      "Claude Code",
+      "安卓电视去广告",
+      "ADB 调试",
+      "开源项目",
+      "AI Agent 自动化"
+    ],
+    "summary": "文章介绍开源项目 CleanYourTV（GitHub 已获 7700+ Star）：开发者因父母每次开电视都要先看广告，便把电视型号告诉 Claude Code，让 AI 在同一 Wi-Fi 局域网内通过 ADB/USB 调试连上电视，清掉 25 个预装软件，并照 Apple TV 的样式写了一个极简新桌面。项目适用绝大多数安卓电视（三星、LG 等自研系统除外，部分国行固件只能去广告、不能换桌面），无需 Root、不用插线、不卸载应用，只需停用。提示词放在 PROMPT.md，粘贴到能执行命令的 Agent 工具即可：AI 先列出全部应用，分成数据上报、广告推荐、无用后台、预装 App 等类，遇到用途不明的包会先查证或询问用户；每改一步都模拟遥控器按键并截图验证。动手前会备份完整软件列表和设置，停用的应用一条命令即可恢复。新桌面仅 250KB，面向 1GB 内存电视设计，无模糊特效、不联网。上手只需开启开发者选项与 USB 调试，按网友反馈约 15 分钟可完成，仓库已收录二十多个型号的去广告清单。",
+    "insights": [
+      "AI Agent 的真正价值不只是生成代码，而是替代人执行一长串命令行操作，并把每一步都截图验证、遇到不确定就反问用户。",
+      "这个方案的可信度来自三件事：动手前先备份、只停用不删除、提供一条命令回滚，使试错成本几乎为零。",
+      "针对 1GB 内存的老电视做 250KB 桌面，说明把资源约束当作设计起点的极致减法，往往比堆功能更实用。",
+      "社区贡献各型号的去广告清单，把一次性的人工排查变成了可复用资产，这是这类项目能迅速扩散的关键。"
+    ],
+    "verdict": "给出了从开启 USB 调试到粘贴提示词、约 15 分钟即可复现的完整路径，且有备份与回滚保障，对家里有安卓电视的读者可直接照做，不是空泛资讯。",
+    "url": "https://mp.weixin.qq.com/s/GAElWJJu499wHuVtnv99tQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E8%AE%A9_Claude_Code_%E7%88%86%E6%94%B9%E7%94%B5%E8%A7%86%EF%BC%8C%E8%BF%99%E4%B8%AA%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E6%9C%89%E7%82%B9%E6%84%8F%E6%80%9D%EF%BC%81-GAElWJ.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "Nature：博士生读文献七个步骤",
+    "clippedAt": "2026-11-07 11:21",
+    "publishedAt": "2026-10-29",
+    "priority": "中",
+    "keywords": [
+      "批判性阅读",
+      "文献精读",
+      "研究方法",
+      "证据与结论",
+      "Nature Careers"
+    ],
+    "summary": "文章介绍剑桥大学博士生 Jacques Cornwell 于 2026 年 6 月 9 日发表在 Nature Careers 的专栏《Seven steps for critically analysing research papers》，并把它改写成读人文社科论文也能直接用的版本。七步分为三段：先看标题、摘要、图表，弄清研究对象；再到引言末尾找真正的研究问题，并搞清它接续了哪条前人研究；然后检查方法（样本来源、访谈还是行为数据），读完结果先合上讨论，自己写一句「仅凭这些材料我能确定什么」；最后再读讨论与结论，逐项对照自己的判断与作者说法，看「相关」是否被写成「导致」、小样本是否被泛化为「所有用户」，并主动寻找替代解释。作者强调不必每篇都填满七步：筛选文献时前三步足够，写综述或准备组会时才做完整流程。",
+    "insights": [
+      "读结果后先合上讨论部分，自己写一句「这些证据说明了什么」，再与作者对照，能有效防止被论文的叙事节奏带着走。",
+      "读方法部分不能跳：要分清数据是实际行为记录还是受访者回忆，否则看似顺畅的结论可能缺少证据支撑。",
+      "审稿式阅读的重点是检查「相关」有没有被写成「导致」、样本结论有没有被放大成普遍结论。",
+      "七步不必每篇做全：找文献时前三步就能决定去留，只有写综述、设计研究或准备组会才值得走完流程。"
+    ],
+    "verdict": "方法具体可操作，尤其「先自己写结论再读讨论」值得一试，但整体仍属常见的批判性阅读建议，读完本文摘要即可掌握要点，无需再回头精读原文。",
+    "url": "https://mp.weixin.qq.com/s/cVVnDKFN5cisxOTSwOFD2g",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/Nature%EF%BC%9A%E5%8D%9A%E5%A3%AB%E7%94%9F%E8%AF%BB%E6%96%87%E7%8C%AE%E4%B8%83%E4%B8%AA%E6%AD%A5%E9%AA%A4-cVVnDK.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "双抗错配杂质很难测？一套三步正交分析工具箱，覆盖从早期筛选到放行全流程",
+    "clippedAt": "2026-11-07 11:18",
+    "publishedAt": "2026-11-06",
+    "priority": "高",
+    "keywords": [
+      "不对称双抗",
+      "错配杂质",
+      "疏水相互作用色谱HIC",
+      "二维LC-MS",
+      "轻链交换",
+      "方法验证"
+    ],
+    "summary": "文章基于 MedImmune 2018 年发表于 mAbs 的研究，系统介绍不对称 IgG 样双抗（KiH、DuetMab、FAST-Ig 等四链格式）错配杂质的表征策略。作者指出单靠一种手段必有盲区：完整分子 LC-MS 速度快、几乎无需方法开发，适合早期克隆筛选，但轻链交换（LC swap）错配总质量不变，会被完全漏检；HIC 疏水色谱经固定相、盐种类、pH 与盐浓度系统优化（MAbPac HIC-10、1M 硫酸钠、pH6.5），并按 ICH Q2 完成验证（线性 r²=0.9954、回收率 83-87%），适合作放行定量；二维在线 LC-MS 通过峰心切割捕获后分别测完整质量与在线还原亚基质量，可逐一确认色谱峰身份。以 Bis-A/Bis-B 为例解析出 7 个峰，涵盖目标物、半抗体、同源二聚、PTM 变体与 LC swap。结论是三套工具正交互补而非替代。",
+    "insights": [
+      "完整分子质谱存在结构性盲区：轻链交换错配总分子量不变，仅靠完整质量必然漏检，必须补充亚基水平分析。",
+      "分析方法应按开发阶段分工：早期用低开发成本的完整 LC-MS 快筛，工艺定型后用经验证的 HIC 放行，未知峰再用 2D-LC-MS 确证，三者正交互补。",
+      "HIC 因错配间疏水性差异常大于电荷差异、且不易被电荷变体干扰，比离子交换普适性更好；但 PTM 同样改变疏水性，会造成峰重叠。",
+      "在线二维切割捕获替代手工馏分收集，既提高效率，又避免脱酰胺、氧化等样品处理引入的非预期修饰；但 1Da 级修饰仍需肽图补充。"
+    ],
+    "verdict": "内容为具体可落地的三套正交方法学方案，含色谱条件、验证数据与逐峰解析实例，对双抗 CMC 分析人员信息密度高且可直接借鉴。",
+    "url": "https://mp.weixin.qq.com/s/SC53Sv4dzZdFVL3MD3nAyw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E5%8F%8C%E6%8A%97%E9%94%99%E9%85%8D%E6%9D%82%E8%B4%A8%E5%BE%88%E9%9A%BE%E6%B5%8B%EF%BC%9F%E4%B8%80%E5%A5%97%E4%B8%89%E6%AD%A5%E6%AD%A3%E4%BA%A4%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E7%AE%B1%EF%BC%8C%E8%A6%86%E7%9B%96%E4%BB%8E%E6%97%A9%E6%9C%9F%E7%AD%9B%E9%80%89%E5%88%B0%E6%94%BE%E8%A1%8C%E5%85%A8%E6%B5%81%E7%A8%8B-SC53Sv.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "试试这个文献检索skill，没有找不到的论文！",
+    "clippedAt": "2026-11-07 10:50",
+    "publishedAt": "2026-11-06",
+    "priority": "中",
+    "keywords": [
+      "Paper Search MCP",
+      "文献检索",
+      "MCP",
+      "系统综述",
+      "引用追踪",
+      "大语言模型"
+    ],
+    "summary": "文章介绍开源项目 Paper Search MCP：它提供 MCP 服务、命令行工具和 Skill，接入 AI 助手后可用自然语言检索 arXiv、PubMed、Crossref、Semantic Scholar 等多个学术来源，并把题目、作者、摘要、DOI 汇总在一起，对开放获取论文还能下载 PDF、读取正文、追踪引用关系。作者以“大语言模型如何辅助系统综述的文献筛选”为示例问题实测：先下载到 16 篇开放全文，抽查三篇均紧扣主题，分别涉及人和模型筛选的对比、筛选评测数据集和完整证据综合流程；再通过 PubMed 检索到 87 条记录，挑出 40 条带摘要的候选，并按研究问题归类；最后以一篇种子论文为起点，做前向和后向引用追踪，找到 Kappa 一致性等方法学基础与后续研究。结论是：说清研究问题后，该工具能快速搭起第一轮阅读清单，但原始检索结果会混入不相关记录，需再让 AI 二次筛选。",
+    "insights": [
+      "把跨库检索、摘要整理、开放全文下载和引用追踪串成一条流程，比在多个网站间反复切换更快搭起第一轮阅读框架。",
+      "数据库原始结果会混入主题不符的记录（如医学考试、科研人员使用 AI），需要在检索后追加一次“是否真的研究文献筛选”的二次筛选。",
+      "以一篇高相关论文为种子做前向和后向引用追踪，比反复重组关键词更省力，还能顺带找到 Kappa 一致性这类方法学基础文献。",
+      "不同来源各有侧重：PubMed 偏生物医学、arXiv 收预印本、Crossref 提供出版信息与 DOI，只有组合使用才能覆盖面够。"
+    ],
+    "verdict": "文章给出了可复现的安装步骤、环境变量配置和实际提示词示例，并附实测结果，对想上手该工具的人有操作价值；但本质仍是工具推荐文，观点和方法上没有超出常规，不必逐字精读。",
+    "url": "https://mp.weixin.qq.com/s/dRWL1XVSq3JcKt9XrOWwcA",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E8%AF%95%E8%AF%95%E8%BF%99%E4%B8%AA%E6%96%87%E7%8C%AE%E6%A3%80%E7%B4%A2skill%EF%BC%8C%E6%B2%A1%E6%9C%89%E6%89%BE%E4%B8%8D%E5%88%B0%E7%9A%84%E8%AE%BA%E6%96%87%EF%BC%81-dRWL1X.md"
+  },
+  {
     "source": "weixin",
     "month": "2026-11",
     "title": "如何高效阅读英文文献——基于经典论文《How to Read a Paper》的方法与思考",
