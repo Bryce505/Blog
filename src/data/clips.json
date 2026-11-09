@@ -2,6 +2,55 @@
   {
     "source": "x",
     "month": "2026-11",
+    "title": "推荐斯坦福2.5小时LLM全景课",
+    "clippedAt": "2026-11-09 05:37",
+    "publishedAt": "2026-11-06",
+    "priority": "低",
+    "keywords": [
+      "LLM入门",
+      "斯坦福课程",
+      "Transformer",
+      "BPE分词",
+      "Next-token预测"
+    ],
+    "summary": "作者推荐一门斯坦福的2小时34分钟讲座，称它从零到端到端讲清ChatGPT和Claude的构建流程，无论有没有AI编程经验都值得看。作者把课程要点归纳为五层：BPE分词把文本变成数字、语言模型本质是预测下一个token、Transformer靠Attention做消息传递、训练用NLL loss提升整条序列概率、生成时逐步解码。帖中除这段大纲外没有给出任何具体论据或例子，价值主要指向视频本身。",
+    "insights": [
+      "把大模型知识压缩成五层路线图：分词→下一token预测→Attention→NLL训练→逐步解码，可作为自学的检查清单",
+      "作者强调「全景图」比零散知识点更稀缺：多数人花数年才拼齐，系统课程一次给完"
+    ],
+    "verdict": "本质是资源推荐帖，只列了课程目录，没有原创观点或可直接使用的方法，是否值得花时间取决于那支视频而非这条帖。",
+    "url": "https://x.com/huxlab/status/2118519047457546367?a=dNTA-avgBI4kRdieSOU&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%E6%8E%A8%E8%8D%90%E6%96%AF%E5%9D%A6%E7%A6%8F2.5%E5%B0%8F%E6%97%B6LLM%E5%85%A8%E6%99%AF%E8%AF%BE-546367.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "Claude 独家秘籍-本人长期使用（不封号）",
+    "clippedAt": "2026-11-09 05:36",
+    "publishedAt": "2026-08-02",
+    "priority": "中",
+    "keywords": [
+      "Claude 防封号",
+      "固定家庭 IP",
+      "指纹浏览器",
+      "环境变量代理",
+      "美区 Apple 订阅",
+      "多模型交叉验证"
+    ],
+    "summary": "作者是有 11 年经验的程序员，自称已近一年不写代码，日常把 Claude 与 Codex 交叉使用：Codex 适合需求明确的实现，Claude 则擅长推理、Agent 调度与意图理解。帖子主体是一套“Claude 不封号”的 Mac 配置流程：一是用两层代理，即常用 VPN 加 v2rayN 搭配 webshare 独享美国家庭 IP，保证出口 IP 固定不漂移；二是在指纹浏览器 ADS 内用老谷歌邮箱注册 Claude；三是订阅时走美区 Apple ID，用支付宝 Pockyt Shop 买礼品卡充值，只开 20 美元 Pro 档。四是给 claude 命令写 alias 强制走本地 10808 端口，并用 Lulu 防火墙拦截其他出站做兜底。注意事项：先用满一个月 Pro 再考虑 5x，别开 20x，别用客户端只用 CLI。",
+    "insights": [
+      "封号风险的核心变量是出口 IP 是否固定，作者认为稳定独享家庭 IP 比账号注册技巧更关键。",
+      "Codex 适合目标、入参、出参都清晰的实现任务，Claude 更适合探索型推理与 Agent 调度，两者交叉验证比单模型更强。",
+      "除了给 claude 命令加 alias 强制走代理端口，还要用 Lulu 拦截其他出站做兜底，防止程序“偷偷”走直连暴露真实 IP。",
+      "订阅路径选美区 Apple 内购礼品卡而非 U 卡，且只开最低档 Pro，作者称直接上高档位更易触发风控与人脸验证。"
+    ],
+    "verdict": "步骤完整、可直接照做，但属于规避平台风控的操作流，含联盟推广链接且部分细节需自行补全，参考价值大于精读价值。",
+    "url": "https://x.com/mycndota/status/2083922150214476196?a=r5ZVI2Rc2UPNfwxJX8s&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/Claude_%E7%8B%AC%E5%AE%B6%E7%A7%98%E7%B1%8D-%E6%9C%AC%E4%BA%BA%E9%95%BF%E6%9C%9F%E4%BD%BF%E7%94%A8%EF%BC%88%E4%B8%8D%E5%B0%81%E5%8F%B7%EF%BC%89-476196.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
     "title": "克劳德别再被脏 IP 坑：1.5 刀拿美国家宽纯净出口",
     "clippedAt": "2026-11-08 08:50",
     "publishedAt": "2026-11-05",
