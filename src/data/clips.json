@@ -1,5 +1,107 @@
 [
   {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "40°C强制降解，ADCC活性怎么降了？关注VSNK的脱酰胺",
+    "clippedAt": "2026-11-12 07:00",
+    "publishedAt": "2026-11-12",
+    "priority": "中",
+    "keywords": [
+      "N325脱酰胺",
+      "ADCC活性",
+      "FcγRIIIa结合",
+      "关键质量属性CQA",
+      "肽图分析",
+      "电荷变异体"
+    ],
+    "summary": "文章解读阿斯利康2020年发表于《Scientific Reports》的研究：一株IgG1单抗经40°C应激4个月后，ADCC活性由94%降至35%。SEC与IEC分离表明活性丧失与二聚体、片段无关，而与酸性电荷变异体中N325脱酰胺比例呈强负相关；人血清37°C孵育使N384/N389脱酰胺升至35%却不影响活性，N325D/Q突变体则完全丧失ADCC与FcγRIIIa结合，锁定N325为主因，机制推测为紧邻P329疏水核心、改变结合界面。文中还说明该位点不属常规脱酰胺基序、中性pH被埋藏而酸性pH暴露叠加高温才发生，并讨论VSNK四肽共洗脱、同位素峰与双脱酰胺肽段等检测要点；结尾为泳拓生物酶与电荷异构试剂的产品推广。",
+    "insights": [
+      "N325脱酰胺是40°C应激下ADCC活性丧失的主因，其单独发生即可消除ADCC与FcγRIIIa结合，而非聚体或片段所致。",
+      "该位点不符合Asn-Gly/Ser/Thr等常规脱酰胺基序：中性pH下被埋藏，只有酸性pH暴露叠加高温才脱酰胺，因此属应激诱导型风险而非常规储存风险。",
+      "一个脱酰胺位点可产生两个保留时间不同的脱酰胺肽段（提前或推后），是isoD存在的典型证据；同位素峰型变化即使在MS/MS谱差或共流出时也能佐证。",
+      "VSNK四肽亲水易在死体积附近与脱酰胺产物共洗脱，需用Glu-C酶切做正交验证并富集酸性组分，才能可靠定量。"
+    ],
+    "verdict": "前半部分是论据扎实的文献精读，对ADC相关抗体的CQA评估有实操参考价值；但结尾整段转为泳拓生物试剂产品推广，且方法学细节需结合原文图表才能落地，故属可选精读而非必读。",
+    "url": "https://mp.weixin.qq.com/s/4GigRbYDE0lmE6sUK3trng",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/40%C2%B0C%E5%BC%BA%E5%88%B6%E9%99%8D%E8%A7%A3%EF%BC%8CADCC%E6%B4%BB%E6%80%A7%E6%80%8E%E4%B9%88%E9%99%8D%E4%BA%86%EF%BC%9F%E5%85%B3%E6%B3%A8VSNK%E7%9A%84%E8%84%B1%E9%85%B0%E8%83%BA-4GigRb.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "一条推销 Claude 课程的帖子",
+    "clippedAt": "2026-11-11 17:47",
+    "publishedAt": "2026-11-11",
+    "priority": "低",
+    "keywords": [
+      "Claude",
+      "AI课程",
+      "自动化",
+      "推特推广",
+      "信息空洞"
+    ],
+    "summary": "这条帖子主张与其今晚看网飞，不如花一小时学一套「完整 Claude AI 课程」，并称只要今晚看了，明天就能掌握「构建和自动化任何东西」的新技能，最后号召读者立刻观看并收藏。正文没给出课程内容、讲授者、具体案例或任何依据，只放了一个视频附件，本质上只是为课程引流，缺少可验证的信息。",
+    "insights": [
+      "帖子只承诺「明天掌握新技能」，却没有任何可核查的课程大纲或案例，是典型的营销话术。",
+      "用「别刷剧了」制造时间焦虑来促成点击，是课程引流的常见套路。",
+      "这类只含链接或视频、没有实质内容的帖子，收藏价值远低于其宣称。"
+    ],
+    "verdict": "纯课程引流帖，没有实质内容与可验证信息，不值得花时间精读。",
+    "url": "https://x.com/AI_oldwang/status/2120389016520696005/video/1?a=sbWGcuQ1jIPPFUgQ2BA&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%E4%B8%80%E6%9D%A1%E6%8E%A8%E9%94%80_Claude_%E8%AF%BE%E7%A8%8B%E7%9A%84%E5%B8%96%E5%AD%90-696005.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "斯坦福 CS329Z 智能体工程课资料全公开",
+    "clippedAt": "2026-11-11 17:15",
+    "publishedAt": "2026-11-11",
+    "priority": "高",
+    "keywords": [
+      "CS329Z",
+      "agent harness",
+      "开源课程",
+      "Terminal-Bench",
+      "上下文工程",
+      "AI Agent 教学"
+    ],
+    "summary": "斯坦福新课 CS329Z「AI agent 工程」把全部资料公开：讲座视频每天在 Stanford Online 的 YouTube 频道更新，两份作业以 MIT 协议开源到 GitHub，外校注明出处即可用于教学。作业一要求不用任何 agent 框架，只给“消息进、文本出”的最原始接口，从零手写一个 harness：前半做邮件优先级判断、每日摘要、手写 BM25 检索和多跳问答，后半为虚构能源公司搭一个带沙盒终端、上下文压缩、跨会话记忆和人工审批的内部助理，最后由模拟用户对话、另一模型打分。88 分里 48 分是不调用模型的测试，参考答案跑完全部线上测试仅 0.05 美元。作业二由 SWE-bench 作者 John Yang 设计，教学生用 Harbor 出一道 Terminal-Bench 风格的题，并用 mini-SWE-agent 配 Gemini 跑五次检验题目质量。",
+    "insights": [
+      "禁掉所有 agent 框架、只留最裸的模型接口，是把“agent 工程”从调库变成真正理解工具调用格式、上下文管理与审批边界的手段。",
+      "先让全部测试失败、再逐个修通，且 48/88 分不消耗模型调用，是自学 agent 成本最低的路径——参考答案跑完全部线上测试仅 0.05 美元。",
+      "出题比做题更检验理解：作业二让学生自己造 Terminal-Bench 题，再用极简 agent 跑五次，评估其有效性、真实度、可复现性与难度。",
+      "课程刻意不给标准答案的判断题（输出截断多少、压缩时保留什么、哪些操作免审批）考的是写设计说明的能力，而非把代码调通。"
+    ],
+    "verdict": "提供可直接克隆的两份 MIT 协议开源作业、明确的低成本学习路径和一手课程链接，对想动手做 agent 的读者信息密度和可操作性都极高。",
+    "url": "https://x.com/dotey/status/2120388990616433083?a=X6XSjxnisVfEroZRJBA&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%E6%96%AF%E5%9D%A6%E7%A6%8F_CS329Z_%E6%99%BA%E8%83%BD%E4%BD%93%E5%B7%A5%E7%A8%8B%E8%AF%BE%E8%B5%84%E6%96%99%E5%85%A8%E5%85%AC%E5%BC%80-433083.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "How To Do Great Work 《如何做出卓越工作》- Paul Graham 中文译文",
+    "clippedAt": "2026-11-11 12:49",
+    "publishedAt": "2026-10-05",
+    "priority": "高",
+    "keywords": [
+      "卓越工作",
+      "好奇心",
+      "原创性",
+      "选择问题",
+      "持续迭代",
+      "士气"
+    ],
+    "summary": "Paul Graham 系统讨论如何做出卓越工作：先找到既有天赋又深感兴趣、且有发挥空间的领域；通过工作与自学抵达知识前沿，注意缺口并探索离群想法。他强调好奇心是最可靠向导，选择问题比解决问题更关键；用真诚、智力诚实、避免矫揉造作来保持原创。方法上主张从小项目开始、持续迭代、保持连续版本，利用复利和士气循环，谨慎计划、承担可承受风险。结论是卓越工作来自能力、兴趣、努力与运气的结合，而是否尝试只能由自己主动回答。",
+    "insights": [
+      "决定做什么工作——尤其是选择什么问题——往往比解决问题更能决定能否做出卓越工作。",
+      "好奇心贯穿选择领域、抵达前沿、发现缺口和探索缺口四个步骤，是最可靠的长期向导。",
+      "从小项目开始并持续迭代连续版本，比预先制定完整计划更容易产生真正宏大的成果。",
+      "真诚与智力诚实能减少矫揉造作和错误世界模型带来的扭曲，是原创性的底层条件。"
+    ],
+    "verdict": "这是 Paul Graham 关于卓越工作的系统性长文，信息密度高，包含选择问题、原创性、迭代方法和士气管理等可操作且独到的观点，值得精读。",
+    "url": "https://mp.weixin.qq.com/s/bRKup1O_0MCvPqldW8n9HQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/How_To_Do_Great_Work_%E3%80%8A%E5%A6%82%E4%BD%95%E5%81%9A%E5%87%BA%E5%8D%93%E8%B6%8A%E5%B7%A5%E4%BD%9C%E3%80%8B-_Paul_Graham_%E4%B8%AD%E6%96%87%E8%AF%91%E6%96%87-bRKup1.md"
+  },
+  {
     "source": "x",
     "month": "2026-11",
     "title": "Anthropic 工程师的 90 分钟 Claude 代理课程",
