@@ -2,6 +2,58 @@
   {
     "source": "x",
     "month": "2026-11",
+    "title": "Anthropic 官方 5 篇 AI Agent 入门文章推荐",
+    "clippedAt": "2026-11-21 07:54",
+    "publishedAt": "2026-11-20",
+    "priority": "中",
+    "keywords": [
+      "AI Agent",
+      "Anthropic",
+      "上下文工程",
+      "Agent Skills",
+      "Claude Code",
+      "入门书单"
+    ],
+    "summary": "作者虽然对 Anthropic 的封号、限流政策不满，但推荐了其官网 5 篇通俗易懂的 AI 工程文章：讲 Agent 与 Workflow 区别及 5 种工作流模式的《Building effective agents》、Claude Code 最佳实践、Agent Skills 的结构与按需加载机制、Agent 上下文工程（为何上下文不是越长越好、如何检索压缩），以及 Anthropic 内部团队使用 Claude Code 的案例。引用部分还提 Personal Agent 的三个方向：场景自动化、长期记忆与个性化、稳定性成本与安全，并主张从简单方案起步。",
+    "insights": [
+      "Agent 与 Workflow 是两个不同层级的概念，多数任务用固定工作流就能解决，不必一上来就上多 Agent 系统。",
+      "上下文不是越长越好，上下文工程的关键在于检索、工具管理和压缩，而非堆 token。",
+      "Agent Skills 采用 SKILL.md 加按需加载的机制，是给 Agent 扩展能力的一种轻量结构。",
+      "成熟的 Personal Agent 取决于长期记忆与个性化、自动化执行力、以及长任务下的成本与权限安全三条主线。"
+    ],
+    "verdict": "本质是附链接的书单式推荐，无原创论证，但选文质量高、覆盖 Agent 入门的关键概念，可作为新手检索入口而非精读对象。",
+    "url": "https://x.com/xiaomovps/status/2123605050014748713?a=lsd7Fh2BdjlQTX1Ndtg&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/Anthropic_%E5%AE%98%E6%96%B9_5_%E7%AF%87_AI_Agent_%E5%85%A5%E9%97%A8%E6%96%87%E7%AB%A0%E6%8E%A8%E8%8D%90-748713.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "分享 7 款我用过的蛋白序列展示工具",
+    "clippedAt": "2026-11-20 12:05",
+    "publishedAt": "2026-11-17",
+    "priority": "低",
+    "keywords": [
+      "蛋白序列可视化",
+      "结构生物学工具",
+      "多序列比对",
+      "跨膜蛋白拓扑图",
+      "序列Logo",
+      "科研绘图"
+    ],
+    "summary": "文章按用途盘点 7 款蛋白序列与结构可视化工具：PyMOL 用于 PDB 结构渲染与标注，Protter 绘制跨膜蛋白蛇形拓扑图，UCSF ChimeraX 面向超大复合物和冷冻电镜结构，Jalview 做多序列比对与保守性分析，ESPript 把比对结果与二级结构结合输出矢量图，IBS 拖拽绘制结构域和功能位点示意图，WebLogo 生成序列 Logo 展示位点保守性。每款工具均附一句功能描述、适用场景与官网链接。全文属于工具清单罗列，没有横向对比评测、使用教程或选型建议，信息以「叫什么、能干什么、去哪下载」为主。结论是这些工具覆盖结构展示、比对可视化和示意图绘制三类需求，读者可按需试用。",
+    "insights": [
+      "工具选择可按需求分三类：三维结构渲染（PyMOL、ChimeraX）、比对与保守性展示（Jalview、ESPript、WebLogo）、示意图绘制（IBS、Protter），先明确出图类型再选工具效率更高。",
+      "Protter 只需 UniProt ID 或序列即可生成跨膜拓扑蛇形图，适合没有结构文件时快速出图。",
+      "ESPript 和 WebLogo 都把多序列比对结果转成发表级图形，前者叠加二级结构，后者量化单位点氨基酸频率。",
+      "ChimeraX 学术使用免费且擅长冷冻电镜超大复合物，是 PyMOL 之外值得备选的渲染方案。"
+    ],
+    "verdict": "仅是七款工具的清单式罗列，每项只有一两句简介和链接，缺少对比评测与实操细节，需要时直接查官网即可，不值得专门精读。",
+    "url": "https://mp.weixin.qq.com/s/8f4zPAS2dWP4-tVQGF1bEw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E5%88%86%E4%BA%AB_7_%E6%AC%BE%E6%88%91%E7%94%A8%E8%BF%87%E7%9A%84%E8%9B%8B%E7%99%BD%E5%BA%8F%E5%88%97%E5%B1%95%E7%A4%BA%E5%B7%A5%E5%85%B7-8f4zPA.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
     "title": "开了 TUN 就是全局？一文讲清代理软件的「规则、全局、系统代理、TUN」（附最佳实践）",
     "clippedAt": "2026-11-18 05:43",
     "publishedAt": "2026-11-17",
