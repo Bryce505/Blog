@@ -1,5 +1,261 @@
 [
   {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "蛋白质研究必备：18 个结构预测、结构比对与蛋白质设计工具，一篇讲清楚",
+    "clippedAt": "2026-11-22 09:42",
+    "publishedAt": "2026-11-21",
+    "priority": "高",
+    "keywords": [
+      "蛋白质结构预测",
+      "AlphaFold3",
+      "Foldseek",
+      "酶工程",
+      "稳定性设计",
+      "ΔΔG"
+    ],
+    "summary": "作者用一个月实测了结构预测、结构比对和酶设计中最常用的 18 个在线服务器，按用途分成三组。结构预测类含 AlphaFold3（唯一免费支持蛋白-核酸-配体-离子复合物）、ColabFold（批量单体主力）、ESMFold（秒级初筛）、RoseTTAFold All-Atom、Phyre2、Swiss-Model、I-TASSER、Robetta，逐一交代适用场景、局限、排队时长和网址；比对类介绍 Foldseek（结构版 BLAST）、HHpred（远缘同源）、DALI（精细比对金标准）、PDBeFold；酶工程类介绍 PROSS、FireProt、HotSpot Wizard、CavityPlus、DynaMut2、FoldX。结论是工具选择要按任务类型分工：复合物用 AF3、批量单体用 ColabFold、选位点先用口袋与热点扫描再用 ΔΔG 工具收尾。",
+    "insights": [
+      "ColabFold 与 AlphaFold3 的关键区别是能不能加配体，这决定了常规单体批量任务应改走 ColabFold，而不是等待公共队列。",
+      "ESMFold 跳过 MSA 直接由语言模型出结构，对缺少同源序列的孤儿蛋白和宏基因组序列有时比 AF2 更稳定，适合做大规模初筛而非精细对接。",
+      "酶工程选位点应遵循“先扫描后精算”的分层策略：CavityPlus 加 HotSpot Wizard 确定位点，PROSS/FireProt 出突变文库，DynaMut2/FoldX 逐个验证 ΔΔG。",
+      "Foldseek 的性价比最高：它把结构编码成字母表做秒级搜索，能在序列 BLAST 找不到同源时靠结构保守性找到远缘关系，但正式发表仍需 DALI 复核。"
+    ],
+    "verdict": "文章按任务场景给出 18 个工具的适用边界、排队代价和具体限制条件，并附速查决策路径，信息密度高、可直接指导实践，值得收藏备查。",
+    "url": "https://mp.weixin.qq.com/s/ndCvHrzVLLHLYDpJGa-v2w",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E8%9B%8B%E7%99%BD%E8%B4%A8%E7%A0%94%E7%A9%B6%E5%BF%85%E5%A4%87%EF%BC%9A18_%E4%B8%AA%E7%BB%93%E6%9E%84%E9%A2%84%E6%B5%8B%E3%80%81%E7%BB%93%E6%9E%84%E6%AF%94%E5%AF%B9%E4%B8%8E%E8%9B%8B%E7%99%BD%E8%B4%A8%E8%AE%BE%E8%AE%A1%E5%B7%A5%E5%85%B7%EF%BC%8C%E4%B8%80%E7%AF%87%E8%AE%B2%E6%B8%85%E6%A5%9A-ndCvHr.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "ECA 发布的《OOS结果》指南第3.0版(中文翻译版)",
+    "clippedAt": "2026-11-22 09:36",
+    "publishedAt": "2026-11-18",
+    "priority": "中",
+    "keywords": [
+      "ECA",
+      "OOS结果",
+      "实验室数据管理",
+      "第3.0版",
+      "制药质量控制",
+      "合同实验室"
+    ],
+    "summary": "文章介绍ECA分析质量控制工作组发布的《实验室数据管理指南——不符合规格（OOS）结果》第3.0版中文翻译。该版是自2013年第2.1版以来的一次全面修订，适用范围与篇幅明显扩展，由Burgess与Sabater撰写、Ermer审校。指南限于分析检测实验室，涵盖批放行与起始物料检验、用于批评价或认证的中控检验、IMP/上市产品/API的稳定性研究及临床试验批。修订还纳入问卷识别的反复问题，如调查阶段转换、假设检验、重测与重新取样、根本原因判定、统计解释、质量监督、合同实验室接口和实用决策支持。",
+    "insights": [
+      "第3.0版是十余年来首次全面修订，表明OOS治理正从单一检验结果调查扩展到全生命周期数据管理和检查可辩护性。",
+      "适用范围明确覆盖稳定性研究、中控检验和临床试验批次，企业OOS程序不应只覆盖批放行检验。",
+      "修订重点集中在重测/重新取样、假设检验和统计解释等争议环节，强调结论需有证据和统计逻辑支撑。",
+      "质量监督与合同实验室接口被单独关注，提示OOS问题常发生在跨组织交接和调查阶段转换处。"
+    ],
+    "verdict": "对新版指南的适用范围和修订重点做了清晰提示，但正文偏发布说明，具体方法需读原文或图片，适合制药质量相关人员按需查阅而非立即精读。",
+    "url": "https://mp.weixin.qq.com/s/NaOnROVDLroD2oAbYgvFcw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/ECA_%E5%8F%91%E5%B8%83%E7%9A%84%E3%80%8AOOS%E7%BB%93%E6%9E%9C%E3%80%8B%E6%8C%87%E5%8D%97%E7%AC%AC3.0%E7%89%88%28%E4%B8%AD%E6%96%87%E7%BF%BB%E8%AF%91%E7%89%88%29-NaOnRO.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "目标加验收：我的 Agent 自动化方法",
+    "clippedAt": "2026-11-22 06:43",
+    "publishedAt": "2026-11-20",
+    "priority": "高",
+    "keywords": [
+      "AI Agent 自动化",
+      "验收标准",
+      "Skill 沉淀",
+      "自我进化",
+      "目标驱动",
+      "lessons.md"
+    ],
+    "summary": "作者对比 Lauren Tan 的自动化入门指南（把人的最佳实践教给 Grok bot，让它像自己一样思考），提出自己的做法：更相信模型能力，只定目标和验收标准，少干涉中间步骤，形成「目标→验收→改进」的循环。具体做法：讲清目标；可选地给出验收标准，并配上验收工具（截图、联网检索、代码运行环境）。例如做新闻发布自动化时，动笔前必须先做事实核查。先让 Agent 跑一遍再调整；调整前自己要能判断好坏并把问题描述清楚。还要让 Agent 自我进化：把打磨好的做法趁热沉淀成 Skill，每轮往 lessons.md 记教训，让模型自行决定是否优化 Skill，并定期重构去臃肿、重跑测试集防回退。",
+    "insights": [
+      "与其教 Agent 照搬人的最佳实践，不如只定目标和验收标准，把执行细节交给模型；模型越强，这种做法越省心。",
+      "关键是「先跑一枪」：先有产出才有可优化的偏差，看靶心比看执行过程更有价值。",
+      "真正的门槛在验收环节——你得自己知道什么是好的，并能把差距准确描述给 AI。",
+      "让 Agent 在任务现场把成功经验沉淀成 Skill、把教训写进 lessons.md，可绕开会话记忆丢失的问题；代价是 Skill 臃肿，需定期重构并回归测试。"
+    ],
+    "verdict": "给出了可直接照搬的 Agent 自动化工作流（目标—验收—沉淀—重构）及具体工具与案例，并与另一套方法论对比，信息密度高、可操作性强。",
+    "url": "https://x.com/dotey/status/2123667995570413718?a=6oCgVhzY_5CnU7Tr5mc&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%E7%9B%AE%E6%A0%87%E5%8A%A0%E9%AA%8C%E6%94%B6%EF%BC%9A%E6%88%91%E7%9A%84_Agent_%E8%87%AA%E5%8A%A8%E5%8C%96%E6%96%B9%E6%B3%95-413718.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "亚马逊 AWS-Quick 免费用 Claude",
+    "clippedAt": "2026-11-22 06:39",
+    "publishedAt": "2026-11-21",
+    "priority": "低",
+    "keywords": [
+      "AWS-Quick",
+      "Claude Opus",
+      "免费额度",
+      "办公 AI",
+      "亚马逊"
+    ],
+    "summary": "帖子推荐亚马逊旗下办公 AI 工具 AWS-Quick（帖中类比为「亚马逊版 WorkBuddy」），称其底层调用 Claude Opus 5.5 满血版，按 AI 输出时长而非 Token 计费，免费版每月 10 小时、每月 1 号重置，仅支持 Windows 和 Mac 客户端；只要有亚马逊账户授权登录即可使用，并提示可切换多个亚马逊账户延长可用时长。全文只有链接与截图，没有实测体验或能力对比。",
+    "insights": [
+      "按输出时长而非 Token 计费，对高频短问答场景更划算，对长文生成则更贵。",
+      "免费额度按月重置加多账号切换，实质是用账号成本换模型调用成本。",
+      "帖中「Claude Opus 5.5」等型号命名可疑，实际可用模型与地区限制需自行验证。"
+    ],
+    "verdict": "只是一条带链接和截图的产品推荐，没有实测数据或独到观点，且鼓励多账号注册的灰色操作，信息量不足以占用精读时间。",
+    "url": "https://x.com/yedabinbinah/status/2124122239008399781?a=1oXMrW3rrJ5DeVfYGb8&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%E4%BA%9A%E9%A9%AC%E9%80%8A_AWS-Quick_%E5%85%8D%E8%B4%B9%E7%94%A8_Claude-399781.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "Anthropic 八个免费 AI 学习资源清单",
+    "clippedAt": "2026-11-22 06:38",
+    "publishedAt": "2026-11-21",
+    "priority": "中",
+    "keywords": [
+      "Anthropic",
+      "AI Agent",
+      "学习资源",
+      "Claude Code",
+      "Skills",
+      "学习路线"
+    ],
+    "summary": "作者因推荐 Anthropic 官方 Agent 文章获得好评，进一步整理出 8 个学习资源：Claude Academy 免费课程（含中文）、Engineering 技术博客、Claude Code 文档、Platform Agent 开发文档、Research 论文、Resources 应用案例、GitHub 上的 Cookbooks 代码示例与 Skills 开源库。并给出三条学习路线：小白入门、Agent 开发、Harness 研究。作者态度是「讨厌这家公司但认可内容质量」，主张按需选学、不必全看。",
+    "insights": [
+      "Anthropic 的公开内容已构成一套从入门课程到 Agent 开发的完整免费体系，且不少有中文版。",
+      "按目标分三条路线选学（入门/Agent 开发/Harness 研究）比通读全部资源更高效。",
+      "官方 GitHub 仓库（Cookbooks、Skills）是少见的可直接复用代码与设计范式的学习材料。",
+      "对一家产品有抵触不妨碍吸收其方法论，可与商业评价分开看待。"
+    ],
+    "verdict": "本质是资源链接清单加简单路线图，信息增量有限，但作为入门索引实用、可收藏备查。",
+    "url": "https://x.com/xiaomovps/status/2124093967654679005?a=RWtBHtzFgegvWd9ClJQ&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/Anthropic_%E5%85%AB%E4%B8%AA%E5%85%8D%E8%B4%B9_AI_%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95-679005.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "CC Desk Tunnel：把 Claude Code 搬到 VPS",
+    "clippedAt": "2026-11-21 14:28",
+    "publishedAt": "2026-11-20",
+    "priority": "中",
+    "keywords": [
+      "Claude Code",
+      "CC Desk Tunnel",
+      "VPS 部署",
+      "反向隧道",
+      "封号风险",
+      "开源工具"
+    ],
+    "summary": "介绍开源项目 CC Desk Tunnel（GitHub 578 星）：把官方原版 Claude Code 装在境外 VPS 的 Docker 里，本机只装桌面客户端，通过加密反向隧道让 Claude 读写本机项目、执行本机命令，体验接近本地安装。目的是让模型请求全部从服务器发出、本机不留运行环境，以降低封号风险，作者称新号这样用了一周仍正常。服务器仅跑 Claude Code，2 核 1G 即可，Windows 无需开放入站端口，提供 Win/Linux/macOS 客户端和终端版。",
+    "insights": [
+      "把运行环境与开发环境分离：模型请求走 VPS，代码和编译留在本机，用反向隧道缝合两端体验。",
+      "所谓「降低封号风险」只有作者一周单账号的经验支撑，属于弱证据，实际风控逻辑并未被验证。",
+      "这种拆分思路可迁移到其他需要隔离网络出口的 AI 编程工具。",
+      "成本门槛很低，2 核 1G 即可，说明重活留在本地、服务器只做轻量转发是可行架构。"
+    ],
+    "verdict": "给出了具体可落地的工具与部署架构，但核心卖点「防封号」缺乏可信依据，且带明显推荐口吻，适合当作工具线索速览而非精读。",
+    "url": "https://x.com/jackluos3lpo/status/2123769954747256839?a=N3PjsdMYfWxvCSMGVn8&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/CC_Desk_Tunnel%EF%BC%9A%E6%8A%8A_Claude_Code_%E6%90%AC%E5%88%B0_VPS-256839.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "Karpathy 的 AI 工作法视频",
+    "clippedAt": "2026-11-21 12:29",
+    "publishedAt": "2026-11-20",
+    "priority": "低",
+    "keywords": [
+      "Karpathy",
+      "AI工作流",
+      "提示词",
+      "上下文",
+      "视频引流"
+    ],
+    "summary": "帖子宣称 OpenAI 联合创始人 Karpathy 用 70 分钟、无幻灯片展示了日常使用 AI 的方法，流程可概括为提示词、上下文、工具、工作流，并称多数人把问题想复杂了。但正文主要是吹捧和引流视频及后续 agent 指南，缺少具体可验证的操作细节。",
+    "insights": [
+      "帖子把高效使用 LLM 归结为选对模型、喂对上下文、让工具完成剩余工作。",
+      "所谓“顶级 1% 工作法”被包装成价值超过 2000 美元课程的内容，但正文未给出可操作细节。",
+      "后半段转向 agent 的 harness、loop、graph 指南，明显带有导流目的。"
+    ],
+    "verdict": "内容主要是吹捧和导流视频/指南，信息密度低且缺少可验证的具体方法，不值得优先精读。",
+    "url": "https://x.com/0xoctocat/status/2123798917049368850?a=hv01wB5pJZ2zLdzz1EE&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/Karpathy_%E7%9A%84_AI_%E5%B7%A5%E4%BD%9C%E6%B3%95%E8%A7%86%E9%A2%91-368850.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "Orbitrap高分辨质谱中离子传输路径参数的调谐策略",
+    "clippedAt": "2026-11-21 11:38",
+    "publishedAt": "2026-11-16",
+    "priority": "高",
+    "keywords": [
+      "Orbitrap UHMR",
+      "m/z偏倚",
+      "电荷检测质谱CDMS",
+      "离子光学调谐",
+      "宽质量范围传输",
+      "可重复性"
+    ],
+    "summary": "文章介绍柏林自由大学Kevin Pagel与Jacob S. Jordan团队在Analytical Chemistry发表的教程，聚焦Q Exactive UHMR上从进样口到C-trap之间9个可调离子光学元件如何造成m/z偏倚。作者用66 kDa BSA、145 kDa ADH、460 kDa BGal三种等摩尔标准蛋白，在1000~20000 m/z范围内逐参数全范围扫描，并重复三次，定量各电压对宽m/z分布传输的影响：S-Lens RF低于100%时强烈压制低m/z离子；Injection Flatapole降压可提高丰度和减少活化；去溶剂电压越高，高质量离子损失越多，导致AAV空实比失真；C-trap气压约2为兼顾高低质量的平衡点。统计显示Interflatapole Lens、Bent Flatapole、C-trap入口透镜和Trapping Gas Pressure影响最大，并且各参数相互耦合，因此须从源端向检测器依次调谐。结论强调调参是灵敏度、m/z覆盖与离子活化之间的折中，并呼吁论文完整披露调谐参数以保障可重复性。",
+    "insights": [
+      "靶向调谐（追求目标峰最强）会过滤掉其他质量段离子，使宽分布样品的丰度比例和分子量分布失真，谱图不等于样品真实组成。",
+      "S-Lens RF低于100%实质是低质量歧视器，宽范围检测应保持在100%~200%；去溶剂电压越高越易损失高m/z离子，直接扭曲AAV空/实比。",
+      "调参是在灵敏度、m/z覆盖宽度和离子活化程度之间的三方折中，不存在万能最优参数，只能按实验目标取舍。",
+      "各离子光学参数相互耦合，须按从源端到检测器的顺序优化；比调参更紧要的是在论文中完整披露全部电压参数以保障跨实验室可重复性。"
+    ],
+    "verdict": "面向具体仪器给出逐元件的可操作调参规则与偏倚机制解释，并附定量数据与参数披露规范，对做天然质谱/CDMS的研究者信息密度和实用价值都很高。",
+    "url": "https://mp.weixin.qq.com/s/VXbo9sajvALN_dscY2AQ5A",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/Orbitrap%E9%AB%98%E5%88%86%E8%BE%A8%E8%B4%A8%E8%B0%B1%E4%B8%AD%E7%A6%BB%E5%AD%90%E4%BC%A0%E8%BE%93%E8%B7%AF%E5%BE%84%E5%8F%82%E6%95%B0%E7%9A%84%E8%B0%83%E8%B0%90%E7%AD%96%E7%95%A5-VXbo9s.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "再见了 Superpowers！近 32 万 Star 的 mattpocock/skills 迎来了一波大更新。",
+    "clippedAt": "2026-11-21 11:35",
+    "publishedAt": "2026-11-09",
+    "priority": "中",
+    "keywords": [
+      "Claude Code Skills",
+      "mattpocock/skills",
+      "grill-me",
+      "需求澄清",
+      "TDD",
+      "上下文交接"
+    ],
+    "summary": "作者小 G 讲述自己放弃 Superpowers 的原因：流程管得太全（聊需求、写计划、测与审都包办），耗时长、Token 消耗大，Codex 20x 额度都常不够用，而模型能力变强后大部分场景已不需要这种重流程，因而转向更轻量的 grill-me / mattpocock/skills。文中挑出该仓库 10 月更新的 10 个 Skill 逐一举例：grill-with-docs 追问需求时顺手做领域建模，把词义记进 GLOSSARY.md、把代价大的取舍写成 ADR；prototype 先做可点击 HTML 原型验证交互；to-spec 把讨论结果落到 Issue 或 Markdown 规格；to-tickets 拆成可验收的任务卡；implement-spec 用多个子 Agent 在各自 worktree 并行开发再合入集成分支；tdd 先写一条会失败的测试；diagnosing-bugs 先构造能跑出问题的复现；code-review 用两个子 Agent 分别对照代码规范与原始需求；improve-codebase-architecture 从高频共改文件生成重构候选报告；handoff 为下个会话留交接文档。结论是轻量、按需取用优于全能重流程。",
+    "insights": [
+      "模型能力提升后，全流程强约束的重型 Skill 反而变成负担：时间与 Token 成本高，轻量、按需组合的 Skill 更划算。",
+      "需求讨论时就同步做领域建模——词义写入 GLOSSARY.md、代价高的取舍写成 ADR，比日后靠读代码反推便宜得多。",
+      "代码评审应拆成两条独立视角：一条对照 CONTRIBUTING 等仓库约定，一条对照原始 Issue 需求，后者才能抓出漏做与顺手多做。",
+      "TDD 与调试的共同方法是先拿到可观察信号（失败测试或可复现脚本），用复现替代对代码的猜测，修完再用同一输入回归验证。"
+    ],
+    "verdict": "十个 Skill 都配了具体业务场景，方法可迁移、可当速查手册用，但本质仍是工具清单盘点，缺少独到论证，且结尾带推荐阅读引流，扫读摘要即可，不必逐字精读。",
+    "url": "https://mp.weixin.qq.com/s/OZtXGUYUhO1uzZNNOvJ7Dw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E5%86%8D%E8%A7%81%E4%BA%86_Superpowers%EF%BC%81%E8%BF%91_32_%E4%B8%87_Star_%E7%9A%84_mattpocockskills_%E8%BF%8E%E6%9D%A5%E4%BA%86%E4%B8%80%E6%B3%A2%E5%A4%A7%E6%9B%B4%E6%96%B0%E3%80%82-OZtXGU.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
+    "title": "刚刚，微软官方公开了科研研究Skill",
+    "clippedAt": "2026-11-21 11:33",
+    "publishedAt": "2026-11-18",
+    "priority": "中",
+    "keywords": [
+      "ResearchStudio",
+      "科研选题",
+      "文献检索",
+      "AI Agent Skill",
+      "查新/撞车检查",
+      "长文档信息遗漏"
+    ],
+    "summary": "文章介绍微软开源的科研工具 ResearchStudio，重点讲其中负责研究构思的 ResearchStudio-Idea，可在 Codex 和 Claude Code 中调用，包含 Paper Search（检索并合并重复论文）、IdeaSpark（生成研究问题、方法与验证思路）、Scoop Check（与已有工作比对重合度）三个 Skill。作者以“大模型处理长文档时如何减少遗漏关键信息”为例完整走了一遍流程：检索 2024—2026 年相关文献得到 17 条有效记录并给出阅读顺序，借《Lost in the Middle》《AbsenceBench》区分“找到信息”与“发现漏项”；IdeaSpark 提出以“训练时屏蔽全文、联合替换证据片段”构造学习信号的方案，并设计了打乱训练信号的负对照；Scoop Check 把主张拆成问题定义、核心机制、关键洞见、应用领域四维比对 24 条记录、5 篇重点文献，判定中等重合（Level 3）。结论是它适合已有方向但贡献尚未具体化的研究者，用于准备选题讨论，耗时长于普通聊天，建议按任务单独选用某个 Skill。",
+    "insights": [
+      "把选题拆成检索、构思、查新三个可连续调用的 Skill，比一次性让 AI 想创新点更可控，每个环节都能单独复用。",
+      "区分“找到信息”和“发现漏项”是两个不同的评测问题，先分清研究对象比继续堆关键词更有价值。",
+      "把抽象目标（减少遗漏）落地为具体干预（训练时屏蔽全文、联合替换证据片段），并配打乱信号的负对照，使方法可被证伪。",
+      "查新的直接价值往往不是证明新颖，而是缩小贡献表述范围，指出真正值得比较的差异点。"
+    ],
+    "verdict": "有完整实操演示和可迁移的选题流程，对做研究的人有参考价值，但本质仍是工具功能介绍，方法论深度有限。",
+    "url": "https://mp.weixin.qq.com/s/ZUtDQjIfcdgyxtGbxVHtzw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E5%88%9A%E5%88%9A%EF%BC%8C%E5%BE%AE%E8%BD%AF%E5%AE%98%E6%96%B9%E5%85%AC%E5%BC%80%E4%BA%86%E7%A7%91%E7%A0%94%E7%A0%94%E7%A9%B6Skill-ZUtDQj.md"
+  },
+  {
     "source": "x",
     "month": "2026-11",
     "title": "Anthropic 官方 5 篇 AI Agent 入门文章推荐",
