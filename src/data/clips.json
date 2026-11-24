@@ -2,6 +2,58 @@
   {
     "source": "weixin",
     "month": "2026-11",
+    "title": "单抗Fc上Met氧化对产品质量有什么影响？",
+    "clippedAt": "2026-11-24 12:09",
+    "publishedAt": "2026-11-24",
+    "priority": "高",
+    "keywords": [
+      "甲硫氨酸氧化",
+      "单克隆抗体",
+      "电荷异质性",
+      "CDC活性",
+      "FcRn亲和力",
+      "强制氧化"
+    ],
+    "summary": "文章解读浙江大学团队2026年发表于《Journal of Chromatography B》的研究，评估甲硫氨酸氧化对单抗mAb A在5°C储存1.5年及强制氧化条件下的结构与功能影响。用LC-MS肽图、CEX、HIC、SEC、nrCE-SDS、DLS及BLI亲和力、报告基因ADCC、CDC和鼠模型药效/药代等正交方法，发现M253和M429优先氧化（储存样品达53.5%和22.1%），伴随碱性峰增加与疏水性增强且与氧化水平线性相关，但聚体、片段和构象稳定性无显著变化。功能上CDC活性下降约70%，FcRn亲和力降低3.2倍，而ADCC、FcγRIIIA与C1q结合、体内抗肿瘤疗效和PK均未受显著影响。结论是氧化改变理化性质但不损害mAb A以ADCC为主要机制的基本生物学功能，且强制氧化可模拟长期储存氧化进程。",
+    "insights": [
+      "M253/M429氧化显著改变电荷与疏水性，却不引起聚集或片段增加，说明理化性质变化不等于稳定性风险。",
+      "CDC活性下降70%但C1q结合不变，原因是氧化破坏CH2-CH3界面构象、阻碍IgG六聚化，故C1q结合数据不能替代CDC直接检测。",
+      "FcRn亲和力下降3.2倍而半衰期不变，说明FcRn亲和力是半衰期的必要非充分预测指标，存在阈值效应。",
+      "若CDC仅为次要作用机制，体外活性下降未必转化为体内疗效损失，功能相关性应结合MOA判断。"
+    ],
+    "verdict": "以完整正交数据回答“修饰超标是否等于质量风险”这一实际难题，并给出C1q不能替代CDC、FcRn亲和力非充分预测等可迁移判断方法，对生物药CMC与质量评价有直接参考价值。",
+    "url": "https://mp.weixin.qq.com/s/0CGcwHUDj_flqir2VVQrSQ",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E5%8D%95%E6%8A%97Fc%E4%B8%8AMet%E6%B0%A7%E5%8C%96%E5%AF%B9%E4%BA%A7%E5%93%81%E8%B4%A8%E9%87%8F%E6%9C%89%E4%BB%80%E4%B9%88%E5%BD%B1%E5%93%8D%EF%BC%9F-0CGcwH.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "毫无保留地分享一下，我是如何让Claude、GPT和Gemini完美协同的。",
+    "clippedAt": "2026-11-24 08:13",
+    "publishedAt": "2026-11-23",
+    "priority": "高",
+    "keywords": [
+      "多模型协同",
+      "Claude",
+      "Gemini",
+      "GPT",
+      "CLAUDE.md",
+      "AI 工作流"
+    ],
+    "summary": "作者对比 Claude、GPT、Gemini 三家模型的「性格」：Gemini 最好沟通、创意强、审美不错，但粗心、幻觉多、Harness 差；Claude 审美最佳、Harness 最强，但不够严谨且常不给用；GPT 最难沟通、审美差，却极其严谨。结论是不存在完美的全能模型，多模型协同本质是管理学问题——把合适的人放到合适的位置。他的调度结构是 Claude 居中当总指挥，负责听懂需求、拆解、派活和验收；Gemini 当军师，独立出一份方案并做文案与交互顾问；GPT 承担后端、算法、查 BUG 和合并前审查。文中附了完整的 CLAUDE.md 规则、派活脚本，以及审查分级（只有丢数据、越权这类严重问题才挡上线，最多审两轮）。",
+    "insights": [
+      "评价模型不能只看能力，可沟通性（人类可理解性）是被低估的关键指标，因为注意力是使用者最贵的资产。",
+      "居中的调度者要求最全面：听懂模糊需求、翻译成可执行任务、验收他人产出，因此综合 Harness 与审美的 Claude 最合适。",
+      "让不同模型在不给草稿的前提下独立出方案再合并，能补上彼此的思考盲区，方案完整性明显更高。",
+      "把反复犯的错固化成自动化检查或结构约束而非文字规则，文字规则只在无法自动化时保留，且欠账只减不增。"
+    ],
+    "verdict": "给出了可直接复用的多模型分工结构、CLAUDE.md 规则原文和审查分级策略，信息密度高且有明确操作方法。",
+    "url": "https://x.com/Khazix0918/status/2124680457623425334?a=b8OR6iTxsU4xlfLPx9s&s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%E6%AF%AB%E6%97%A0%E4%BF%9D%E7%95%99%E5%9C%B0%E5%88%86%E4%BA%AB%E4%B8%80%E4%B8%8B%EF%BC%8C%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E8%AE%A9Claude%E3%80%81GPT%E5%92%8CGemini%E5%AE%8C%E7%BE%8E%E5%8D%8F%E5%90%8C%E7%9A%84%E3%80%82-425334.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
     "title": "质谱参数解读",
     "clippedAt": "2026-11-23 05:38",
     "publishedAt": "2026-10-24",
