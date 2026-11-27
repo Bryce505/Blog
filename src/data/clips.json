@@ -2,6 +2,58 @@
   {
     "source": "weixin",
     "month": "2026-11",
+    "title": "手把手教你把Skill挂上支付宝挣钱，好手艺不该只有免费开源。",
+    "clippedAt": "2026-11-27 11:54",
+    "publishedAt": "2026-11-27",
+    "priority": "高",
+    "keywords": [
+      "Skill变现",
+      "SkillPay",
+      "支付宝",
+      "AI Agent",
+      "知识付费",
+      "订阅制"
+    ],
+    "summary": "作者从朋友提问「Skill能否变现」切入，指出Skill本质是一个含SKILL.md的文件夹，经验内容全为明文、无技术门槛，导致「不给看没人买、给人看等于开源、卖出一份可无限转发」的困境，因此行业长期只有开源或自用两条路。文章随后介绍支付宝7月上线的Skill交易平台SkillPay，并给出实操路径：创作者签约（SkillPay协议+即刻收协议，后者收1%费率，平台年底前免服务费）、上传Skill文件夹自动识别名称描述、选买断（0.01–50元）或订阅（按周/月/季，上限50元，可设最低5次免费试用），付费模式不可改但价格可调，审核几分钟通过后通过分享卡片或购买指令分发。作者以「六度人脉连线」演示买断制、以雅思作文批改演示订阅制云端沙盒不暴露明文，并验证未支付无法绕过、到账即时。结论是Agent时代普通人的经验与工作流可成为可定价的数字资产，开源是个人选择而非唯一答案。",
+    "insights": [
+      "Skill的根本矛盾在于经验以明文存储：展示才能证明价值，展示即等于开源，因此传统买断制天然难以持续收费。",
+      "订阅制的关键在于云端沙盒只回传任务所需指令，完整SKILL.md始终不下发到本地Agent，从机制上解决了复制转发问题。",
+      "把行业经验和判断直觉封装成可调用、可定价的数字资产，是Agent时代普通人最低门槛的商业化路径。",
+      "平台早期免服务费（仅支付通道收1%）带来时间窗口红利，且买断/订阅模式一旦选定不可更改，需在上架前想清商业模式。"
+    ],
+    "verdict": "提供了从签约、定价到分发、迭代的完整可复现操作路径，并解释了买断与订阅两种模式的技术与商业差异，对想做Skill变现的读者信息密度和可操作性都很高。",
+    "url": "https://mp.weixin.qq.com/s/x7Yt237NPL-sLvkUJlwESw",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/2026-11/%E6%89%8B%E6%8A%8A%E6%89%8B%E6%95%99%E4%BD%A0%E6%8A%8ASkill%E6%8C%82%E4%B8%8A%E6%94%AF%E4%BB%98%E5%AE%9D%E6%8C%A3%E9%92%B1%EF%BC%8C%E5%A5%BD%E6%89%8B%E8%89%BA%E4%B8%8D%E8%AF%A5%E5%8F%AA%E6%9C%89%E5%85%8D%E8%B4%B9%E5%BC%80%E6%BA%90%E3%80%82-x7Yt23.md"
+  },
+  {
+    "source": "x",
+    "month": "2026-11",
+    "title": "🇺🇸 手把手用 Webshare 搭美国独享住宅 IP，首月 $4.09，连换两次才留下 Comcast",
+    "clippedAt": "2026-11-26 19:01",
+    "publishedAt": "2026-11-19",
+    "priority": "中",
+    "keywords": [
+      "Webshare",
+      "静态住宅代理",
+      "ASN 挑 IP",
+      "Comcast 家宽",
+      "Clash 代理链",
+      "Hysteria 2"
+    ],
+    "summary": "作者完整演示了用 Webshare 静态独享住宅代理（首月折后 $4.09）给指定网站配一个固定美国出口的操作过程。先说明这类所谓的“家宽”，其实是把 Comcast 等宽带商的住宅号段放进数据中心机房运行，并不是真正的居民宽带；购买时选择 Static、Dedicated 和高信誉段，套餐自带 10 次手动换 IP。挑选 IP 时以 ASN 为准，只认 Comcast、AT&T、Verizon、Spectrum 四家；作者连换两次才拿到 Comcast（AS7922），并建议先拿 IP 到 CheckIP 核对数据中心字段，再立刻关闭三项自动替换开关。接入有两条路径：没有 VPS 时，用 Clash Verge Rev 的代理链接在已有节点后面；有 VPS 时，则在 Hysteria 2 上另开 UDP 端口转发，把 Webshare 的账号密码留在服务器端。实测出站选 HTTP 比 SOCKS5 更快，偶尔建连慢不必换 IP。文末附 ChatGPT 配网提示词与推广群。",
+    "insights": [
+      "判断住宅代理是否干净，应以 ASN 为标准：NTT、Cogent、Lumen 等骨干网段即使标成“非托管”，本质上仍是机房段。",
+      "住宅号段被租进数据中心运行，所以查询结果中企业归属为商业公司是正常现象，只要数据中心字段为“否”、ASN 又对上四家宽带商即可放行。",
+      "静态住宅代理变慢通常发生在建立连接的一瞬间，而不是 IP 本身坏掉，因此应先关掉自动替换、用 HTTP 出站配合本地补连，避免浪费有限的换 IP 额度。",
+      "用自建 VPS 做前置跳板，可以把 Webshare 的账号密码留在服务端，避免机场节点运营方看到代理凭据；但换来的代价是多维护一套配置。"
+    ],
+    "verdict": "内容含有 ASN 对照表、替换策略、代理链与 Hysteria 转发配置、实测延迟等可复用的细节，但整体带有明显的推广链接和引流话术，仅对确有固定美国出口需求的人有精读价值。",
+    "url": "https://x.com/0xmason/status/2123431436539609201?s=19",
+    "snapshot": "https://raw.githubusercontent.com/Bryce505/Notes/master/archive/x/2026-11/%F0%9F%87%BA%F0%9F%87%B8_%E6%89%8B%E6%8A%8A%E6%89%8B%E7%94%A8_Webshare_%E6%90%AD%E7%BE%8E%E5%9B%BD%E7%8B%AC%E4%BA%AB%E4%BD%8F%E5%AE%85_IP%EF%BC%8C%E9%A6%96%E6%9C%88_%244.09%EF%BC%8C%E8%BF%9E%E6%8D%A2%E4%B8%A4%E6%AC%A1%E6%89%8D%E7%95%99%E4%B8%8B_Comcast-609201.md"
+  },
+  {
+    "source": "weixin",
+    "month": "2026-11",
     "title": "刚刚，DeepSeek张博创业曝光：开源个人Agent！",
     "clippedAt": "2026-11-26 06:38",
     "publishedAt": "2026-11-20",
